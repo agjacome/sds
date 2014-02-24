@@ -1,0 +1,11 @@
+.cache
+.classpath
+.project
+.settings
+
+logs
+project/*
+!project/build.properties
+!project/Build.scala
+!project/plugins.sbt
+target
