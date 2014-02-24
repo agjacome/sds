@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model.ner
+package es.uvigo.esei.tfg.smartdrugsearch.model.entity
 
 final class Sentence private (val words : Seq[String]) {
 

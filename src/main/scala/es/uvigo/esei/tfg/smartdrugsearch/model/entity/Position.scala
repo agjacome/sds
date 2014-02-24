@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model.ner
+package es.uvigo.esei.tfg.smartdrugsearch.model.entity
 
 class Position private (val pos : Int) extends AnyVal with Ordered[Position] {
 
