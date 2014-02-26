@@ -25,7 +25,6 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "org.webjars"        %% "webjars-play"         % "2.2.1-2",
   "com.typesafe.slick" %% "slick"                % "2.0.0",
-  "org.slf4j"          %  "slf4j-nop"            % "1.7.6",
   "mysql"              %  "mysql-connector-java" % "5.1.29"
 )
 
