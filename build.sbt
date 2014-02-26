@@ -16,14 +16,16 @@ unmanagedBase := baseDirectory.value / "lib"
 
 // testing dependencies
 libraryDependencies ++= Seq(
-  "org.scalatest"  %% "scalatest" % "2.0"     % "test",
-  "com.h2database" %  "h2"        % "1.3.175" % "test"
+  "org.scalatest"  %% "scalatest"                   % "2.0"     % "test",
+  "org.scalamock"  %% "scalamock-scalatest-support" % "3.0.1"   % "test",
+  "com.h2database" %  "h2"                          % "1.3.175" % "test"
 )
 
 // scala/java dependencies
 libraryDependencies ++= Seq(
   "org.webjars"        %% "webjars-play"         % "2.2.1-2",
   "com.typesafe.slick" %% "slick"                % "2.0.0",
+  "org.slf4j"          %  "slf4j-nop"            % "1.7.6",
   "mysql"              %  "mysql-connector-java" % "5.1.29"
 )
 
