@@ -1,6 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model.entity
 
-class Position private (val pos : Int) extends AnyVal with Ordered[Position] {
+final class Position private (val pos : Int) extends AnyVal with Ordered[Position] {
 
   def compare(that : Position) : Int =
     this.pos - that.pos
