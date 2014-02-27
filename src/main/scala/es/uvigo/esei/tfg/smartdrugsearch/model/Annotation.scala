@@ -5,7 +5,7 @@ import org.virtuslab.unicorn.ids._
 
 import Category._
 
-case class AnnotationId (id : Long) extends AnyVal with BaseId
+final case class AnnotationId (id : Long) extends AnyVal with BaseId
 
 object AnnotationId extends IdCompanion[AnnotationId] {
 

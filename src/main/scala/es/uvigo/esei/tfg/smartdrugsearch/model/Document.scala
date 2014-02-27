@@ -3,7 +3,7 @@ package es.uvigo.esei.tfg.smartdrugsearch.model
 import org.virtuslab.unicorn.ids._
 import scala.slick.session.Session
 
-case class DocumentId (val id : Long) extends AnyVal with BaseId
+final case class DocumentId (val id : Long) extends AnyVal with BaseId
 
 object DocumentId extends IdCompanion[DocumentId] {
 
