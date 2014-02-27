@@ -2,6 +2,8 @@ import com.typesafe.sbt.SbtGit._
 
 name := "Smart Drug Search"
 
+organization := "es.uvigo.esei"
+
 versionWithGit
 
 git.baseVersion := "0.1"
@@ -16,17 +18,22 @@ unmanagedBase := baseDirectory.value / "lib"
 
 // testing dependencies
 libraryDependencies ++= Seq(
-  "org.scalatest"  %% "scalatest"                   % "2.0"     % "test",
-  "org.scalamock"  %% "scalamock-scalatest-support" % "3.0.1"   % "test",
+  "org.scalatest"  %% "scalatest"                   % "2.0"     % "test" ,
+  "org.scalamock"  %% "scalamock-scalatest-support" % "3.0.1"   % "test" ,
   "com.h2database" %  "h2"                          % "1.3.175" % "test"
 )
 
 // scala/java dependencies
 libraryDependencies ++= Seq(
-  "org.webjars"        %% "webjars-play"         % "2.2.1-2",
-  "com.typesafe.slick" %% "slick"                % "2.0.0",
+  "org.webjars"        %% "webjars-play"         % "2.2.1-2" ,
+  "com.typesafe.slick" %% "slick"                % "1.0.1"   ,
+  "com.typesafe.play"  %% "play-slick"           % "0.5.0.9" ,
+  "org.virtuslab"      %% "unicorn"              % "0.4.2"   ,
   "mysql"              %  "mysql-connector-java" % "5.1.29"
 )
+
+// play framework dependencies
+libraryDependencies ++= Seq(jdbc)
 
 // import extra settings (view in project/Build.scala)
 Build.settings
