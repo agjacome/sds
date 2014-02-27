@@ -19,39 +19,34 @@ object AnnotationId extends IdCompanion[AnnotationId] {
 }
 
 case class Annotation (
-  val id             : Option[AnnotationId],
-  val originalText   : Sentence,
-  val normalizedText : Sentence,
-  val category       : Category,
-  val documentId     : DocumentId,
-  val startPosition  : Position,
-  val endPosition    : Position
+  val id       : Option[AnnotationId],
+  val docId    : DocumentId,
+  val entId    : NamedEntityId,
+  val text     : Sentence,
+  val startPos : Position,
+  val endPos   : Position
 ) extends WithId[AnnotationId] {
 
-  require(
-    startPosition < endPosition,
-    "Start Position must be less than End Position"
-  )
+  require(startPos < endPos, "Start Position must be less than End Position")
 
 }
 
-object Annotations extends IdTable[AnnotationId, Annotation]("Annotations") {
+object Annotations extends IdTable[AnnotationId, Annotation]("annotations") {
 
   import Category.Predef._
   import Position.Predef._
   import Sentence.Predef._
 
-  def originalText   = column[Sentence]("Text", O.NotNull)
-  def normalizedText = column[Sentence]("Normalized", O.NotNull)
-  def category       = column[Category]("Category", O.NotNull)
-  def documentId     = column[DocumentId]("Document", O.NotNull)
-  def startPosition  = column[Position]("Start", O.NotNull)
-  def endPosition    = column[Position]("End", O.NotNull)
+  def documentId    = column[DocumentId]("document", O.NotNull)
+  def namedEntityId = column[NamedEntityId]("named_entity", O.NotNull)
+  def originalText  = column[Sentence]("text", O.NotNull)
+  def startPosition = column[Position]("start", O.NotNull)
+  def endPosition   = column[Position]("end", O.NotNull)
 
-  def document = foreignKey("Annotation_Document_FK", documentId, Documents)(_.id)
+  def document    = foreignKey("Annotation_Document_FK", documentId, Documents)(_.id)
+  def namedEntity = foreignKey("Annotation_NamedEntity_FL", namedEntityId, NamedEntities)(_.id)
 
-  private def base =
-    originalText ~ normalizedText ~ category ~ documentId ~ startPosition ~ endPosition
+  private def base = documentId ~ namedEntityId ~ originalText ~ startPosition ~ endPosition
 
   override def * = id.? ~: base <> (Annotation.apply _, Annotation.unapply _)
 

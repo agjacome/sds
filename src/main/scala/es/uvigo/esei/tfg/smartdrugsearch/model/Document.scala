@@ -26,12 +26,12 @@ case class Document (
 
 }
 
-object Documents extends IdTable[DocumentId, Document]("Documents") {
+object Documents extends IdTable[DocumentId, Document]("documents") {
 
   import Sentence.Predef._
 
-  def title = column[Sentence]("Title", O.NotNull)
-  def text  = column[String]("Abstract", O.NotNull, O.DBType("TEXT"))
+  def title = column[Sentence]("title", O.NotNull)
+  def text  = column[String]("abstract", O.NotNull, O.DBType("TEXT"))
 
   private def base = title ~ text
 

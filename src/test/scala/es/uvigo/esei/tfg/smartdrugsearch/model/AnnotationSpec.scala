@@ -2,9 +2,10 @@ package es.uvigo.esei.tfg.smartdrugsearch.model
 
 import org.scalatest._
 
-import AnnotationId.Predef._
 import Category._
+import AnnotationId.Predef._
 import DocumentId.Predef._
+import NamedEntityId.Predef._
 import Position.Predef._
 import Sentence.Predef._
 
@@ -38,37 +39,34 @@ class AnnotationSpec extends FlatSpec with Matchers {
     i3 should be (-10)
   }
 
-  "An Annotation" should "hold its Annotation ID, original and normalized sentences, start and end positions, category and referenced Document ID" in {
-    val annot1 = Annotation(None, "original text", "normalized text", Drug, 123, 0, 8)
-    val annot2 = Annotation(Some(13), "text", "text", Species, 1, 1, 5)
+  "An Annotation" should "hold its Annotation ID, NamedEntity ID, Document ID, original text and start/end positions" in {
+    val annot1 = Annotation(None, 1, 2, "original text", 0, 8)
+    val annot2 = Annotation(Some(3), 4, 5, "text", 0, 4)
 
     annot1.id     should be (None)
-    annot2.id.get should be (AnnotationId(13))
+    annot2.id.get should be (AnnotationId(3))
 
-    annot1.originalText should equal (Sentence("original text"))
-    annot2.originalText should equal (Sentence("text"))
+    annot1.docId should be (DocumentId(1))
+    annot2.docId should be (DocumentId(4))
 
-    annot1.normalizedText should equal (Sentence("normalized text"))
-    annot2.normalizedText should equal (Sentence("text"))
+    annot1.entId should be (NamedEntityId(2))
+    annot2.entId should be (NamedEntityId(5))
 
-    annot1.category should be (Drug)
-    annot2.category should be (Species)
+    annot1.text should equal (Sentence("original text"))
+    annot2.text should equal (Sentence("text"))
 
-    annot1.documentId should be (DocumentId(123))
-    annot2.documentId should be (DocumentId(1))
+    annot1.startPos should be (Position(0))
+    annot2.startPos should be (Position(0))
 
-    annot1.startPosition should be (Position(0))
-    annot2.startPosition should be (Position(1))
-
-    annot1.endPosition should be (Position(8))
-    annot2.endPosition should be (Position(5))
+    annot1.endPos should be (Position(8))
+    annot2.endPos should be (Position(4))
   }
 
   it should "throw an IllegalArgumentException if given Start Position is bigger than given Ending Position" in {
-    a [IllegalArgumentException] should be thrownBy { Annotation(None, "asd", "asd", Drug, 1,   10,  0) }
-    a [IllegalArgumentException] should be thrownBy { Annotation(None, "asd", "asd", Drug, 1,    1,  0) }
-    a [IllegalArgumentException] should be thrownBy { Annotation(None, "asd", "asd", Drug, 1,   20, 15) }
-    a [IllegalArgumentException] should be thrownBy { Annotation(None, "asd", "asd", Drug, 1, 1000,  9) }
+    a [IllegalArgumentException] should be thrownBy { Annotation(None, 1, 2, "asd",   10,  0) }
+    a [IllegalArgumentException] should be thrownBy { Annotation(None, 1, 2, "asd",    1,  0) }
+    a [IllegalArgumentException] should be thrownBy { Annotation(None, 1, 2, "asd",   20, 15) }
+    a [IllegalArgumentException] should be thrownBy { Annotation(None, 1, 2, "asd", 1000,  9) }
   }
 
 }
