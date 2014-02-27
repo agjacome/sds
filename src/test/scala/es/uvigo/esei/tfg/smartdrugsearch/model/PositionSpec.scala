@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model.entity
+package es.uvigo.esei.tfg.smartdrugsearch.model
 
 import org.scalatest._
 
@@ -29,7 +29,23 @@ class PositionSpec extends FlatSpec with Matchers {
     val pos1 : Position = 0
     val pos2 : Position = 1
     val pos3 : Position = 129472
+
+    pos1.pos should be (0)
+    pos2.pos should be (1)
+    pos3.pos should be (129472)
   }
 
+  it can "be implicitly converted to a positive integer given Position.Predef is imported" in {
+    import Position.Predef._
+
+    val pos1 : Long = Position(0)
+    val pos2 : Long = Position(1)
+    val pos3 : Long = Position(298345)
+
+    pos1 should be (0)
+    pos2 should be (1)
+    pos3 should be (298345)
+  }
 
 }
+

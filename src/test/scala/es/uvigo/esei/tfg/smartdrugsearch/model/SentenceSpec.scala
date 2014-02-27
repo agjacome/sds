@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model.entity
+package es.uvigo.esei.tfg.smartdrugsearch.model
 
 import org.scalatest._
 
@@ -47,14 +47,14 @@ class SentenceSpec extends FlatSpec with Matchers {
     sentence.toString should equal ("This is a phrase with silly spaces")
   }
 
-  it should "implicitly be converted from a String if Sentence.Predef is imported" in {
+  it should "be implicitly converted from a String if Sentence.Predef is imported" in {
     import Sentence.Predef._
     val sentence : Sentence = "this should work"
   }
 
-  it should "correctly compute the number of words that compose it" in {
-    val words = "these are four words"
-    Sentence(words).countWords should be (4)
+  it should "be implicitly converted to a String if Sentence.Predef is imported" in {
+    import Sentence.Predef._
+    val sentence : String = Sentence("this should also work")
   }
 
 }

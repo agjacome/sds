@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model.entity
+package es.uvigo.esei.tfg.smartdrugsearch.model
 
 final object Category extends Enumeration {
 
@@ -7,9 +7,16 @@ final object Category extends Enumeration {
   object Predef {
 
     import scala.language.implicitConversions
+    import scala.slick.lifted.{ TypeMapper, MappedTypeMapper }
 
     implicit def stringToCategory(category : String) : Category =
       Category withName category
+
+    implicit def categoryToString(category : Category) : String =
+      category.toString
+
+    implicit val categoryTypeMapper : TypeMapper[Category] =
+      MappedTypeMapper.base[Category, String](categoryToString, stringToCategory)
 
   }
 
@@ -20,3 +27,4 @@ final object Category extends Enumeration {
   val Species  = Value("species")
 
 }
+
