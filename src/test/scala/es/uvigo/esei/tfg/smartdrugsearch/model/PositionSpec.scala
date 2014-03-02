@@ -1,8 +1,8 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-import org.scalatest._
+import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
-class PositionSpec extends FlatSpec with Matchers {
+class PositionSpec extends BaseSpec {
 
   "A Position" should "be just a positive Integer" in {
     Position(10)

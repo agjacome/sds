@@ -1,12 +1,11 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-import org.scalatest._
-
+import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import Category._
 import NamedEntityId.Predef._
 import Sentence.Predef._
 
-class NamedEntitySpec extends FlatSpec with Matchers {
+class NamedEntitySpec extends BaseSpec {
 
   "An NamedEntityID" should "be just a Long Integer value" in {
     NamedEntityId(0).id   should be (0)
@@ -41,9 +40,9 @@ class NamedEntitySpec extends FlatSpec with Matchers {
     val nEnt2 = NamedEntity(Some(12), "ceftazidime", Drug, 291)
     val nEnt3 = NamedEntity(Some(23), "escherichia coli", Species , 182)
 
-    nEnt1.id     should be (None)
-    nEnt2.id.get should be (NamedEntityId(12))
-    nEnt3.id.get should be (NamedEntityId(23))
+    nEnt1.id       should be (None)
+    nEnt2.id.value should be (NamedEntityId(12))
+    nEnt3.id.value should be (NamedEntityId(23))
 
     nEnt1.normalized should equal (Sentence("1S/C2H6O/c1-2-3/h3H,2H2,1H3"))
     nEnt2.normalized should equal (Sentence("ceftazidime"))

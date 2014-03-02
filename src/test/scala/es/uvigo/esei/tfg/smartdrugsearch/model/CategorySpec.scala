@@ -1,10 +1,9 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-import org.scalatest._
-
+import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import Category._
 
-class CategorySpec extends FlatSpec with Matchers {
+class CategorySpec extends BaseSpec {
 
   "A Category" can "be implicitly created from a String, given Category.Predef is imported" in {
     import Category.Predef._

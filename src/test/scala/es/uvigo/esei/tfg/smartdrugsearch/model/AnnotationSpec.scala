@@ -1,7 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-import org.scalatest._
-
+import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import Category._
 import AnnotationId.Predef._
 import DocumentId.Predef._
@@ -9,7 +8,7 @@ import NamedEntityId.Predef._
 import Position.Predef._
 import Sentence.Predef._
 
-class AnnotationSpec extends FlatSpec with Matchers {
+class AnnotationSpec extends BaseSpec {
 
   "An AnnotationID" should "be just a Long Integer value" in {
     AnnotationId(0).id   should be (0)
@@ -43,8 +42,8 @@ class AnnotationSpec extends FlatSpec with Matchers {
     val annot1 = Annotation(None, 1, 2, "original text", 0, 8)
     val annot2 = Annotation(Some(3), 4, 5, "text", 0, 4)
 
-    annot1.id     should be (None)
-    annot2.id.get should be (AnnotationId(3))
+    annot1.id       should be (None)
+    annot2.id.value should be (AnnotationId(3))
 
     annot1.docId should be (DocumentId(1))
     annot2.docId should be (DocumentId(4))

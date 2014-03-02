@@ -1,8 +1,8 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-import org.scalatest._
+import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
-class SentenceSpec extends FlatSpec with Matchers {
+class SentenceSpec extends BaseSpec {
 
   "A Sentence" should "be just a bunch of words" in {
     val sentence = Sentence("just a bunch of words")

@@ -1,11 +1,10 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-import org.scalatest._
-
+import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import DocumentId.Predef._
 import Sentence.Predef._
 
-class DocumentSpec extends FlatSpec with Matchers {
+class DocumentSpec extends BaseSpec {
 
   "A DocumentID" should "be just a Long Integer value" in {
     DocumentId(0).id   should be (0)
@@ -40,9 +39,9 @@ class DocumentSpec extends FlatSpec with Matchers {
     val doc2 = Document(Some(1) , "This is a title"    , "This is my nice text")
     val doc3 = Document(Some(10), "tnat is not a title", "this is my ugly text")
 
-    doc1.id     should be (None)
-    doc2.id.get should be (DocumentId(1))
-    doc3.id.get should be (DocumentId(10))
+    doc1.id       should be (None)
+    doc2.id.value should be (DocumentId(1))
+    doc3.id.value should be (DocumentId(10))
 
     doc1.title should equal (Sentence("this is a new doc"))
     doc2.title should equal (Sentence("This is a title"))
