@@ -1,6 +1,9 @@
+sbt.sh
+
 .cache
 .classpath
 .project
+.target
 .settings
 
 logs
