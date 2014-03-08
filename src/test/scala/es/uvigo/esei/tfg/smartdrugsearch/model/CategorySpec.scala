@@ -5,51 +5,63 @@ import Category._
 
 class CategorySpec extends BaseSpec {
 
-  "A Category" can "be implicitly created from a String, given Category.Predef is imported" in {
-    import Category.Predef._
+  "A Category" - {
 
-    val drug    : Category = "drug"
-    val species : Category = "species"
-
-    drug    should be (Drug)
-    species should be (Species)
-  }
-
-  it can "be created with withName passing it the right String" in {
-    val drug    = Category withName "drug"
-    val species = Category withName "species"
-
-    drug    should be (Drug)
-    species should be (Species)
-  }
-
-  it can "be implicitly converted back to a String, given Category.Predef is imported" in {
-    import Category.Predef._
-
-    val drug    : String = Drug
-    val species : String = Species
-
-    drug    should equal ("drug")
-    species should equal ("species")
-  }
-
-  it can "be converted back to a string as expected with toString" in {
-    val drug    = Category withName "drug"
-    val species = Category withName "species"
-
-    drug.toString    should equal ("drug")
-    species.toString should equal ("species")
-  }
-
-  it should "throw a NoSuchElementException if a non-existent category is given as string" in {
-    import Category.Predef._
-
-    a [NoSuchElementException] should be thrownBy {
-      Category withName "this_category_does_not_exist"
+    "defines values for" - {
+      "compounds" in { val value = Category.Compound }
+      "drugs"     in { val value = Category.Drug     }
+      "genes"     in { val value = Category.Gene     }
+      "proteins"  in { val value = Category.Protein  }
+      "species"   in { val value = Category.Species  }
     }
-    a [NoSuchElementException] should be thrownBy {
-      val noCat : Category = "this_category_also_does_not_exist"
+
+    "can be constructed" - {
+      "implicitly from a String" in {
+        val drug : Category = "drug"
+        drug should be (Drug)
+
+        val species : Category = "species"
+        species should be (Species)
+      }
+      "explicitly from a String with the 'withName' method" in {
+        val drug = Category withName "drug"
+        drug should be (Drug)
+
+        val species = Category withName "species"
+        species should be (Species)
+      }
     }
+
+    "can be converted to a String" - {
+      "implicitly" in {
+        val drug : String = Drug
+        drug should be ("drug")
+
+        val species : String = Species
+        species should be ("species")
+      }
+      "explicitly with the 'toString' method" in {
+        val drug = Drug.toString
+        drug should be ("drug")
+
+        val species = Species.toString
+        species should be ("species")
+      }
+    }
+
+    "should throw a NoSuchElementException" - {
+      "when implicitly constructed from an invalid String" in {
+        a [NoSuchElementException] should be thrownBy {
+          val invalid : Category = "THIS_IS_AN_INVALID_CATEGORY_STRING"
+        }
+      }
+      "when explicitly constructed from an invalid String" in {
+        a [NoSuchElementException] should be thrownBy {
+          val invalid : Category = Category withName "THIS_IS_ANOTHER_INVALID_CATEGORY_STRING"
+        }
+      }
+    }
+
   }
 
 }

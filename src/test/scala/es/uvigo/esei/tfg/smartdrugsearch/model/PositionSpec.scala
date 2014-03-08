@@ -4,47 +4,75 @@ import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
 class PositionSpec extends BaseSpec {
 
-  "A Position" should "be just a positive Integer" in {
-    Position(10)
-    Position(0)
-    Position(190842)
-  }
+  "A Position" - {
 
-  it should "throw an IllegalArgumentException if a negative Integer is given" in {
-    a [IllegalArgumentException] should be thrownBy { Position(-1)       }
-    a [IllegalArgumentException] should be thrownBy { Position(-10)      }
-    a [IllegalArgumentException] should be thrownBy { Position(-1129843) }
-  }
+    "can be constructed" - {
+      "implicitly from a 'Long'" in {
+        val posOne : Position = 1
+        posOne.value should be (1)
 
-  it can "be compared to another Position with expected behaviour" in {
-    Position(0)        should be <  Position(1)
-    Position(1)        should be >  Position(0)
-    Position(12302343) should be >= Position(3)
-    Position(190)      should be <= Position(200)
-  }
+        val posTwo : Position = 10
+        posTwo.value should be (10)
+      }
+      "explicitly by passing a 'Long' value to its constuctor" in {
+        val posOne = Position(1)
+        posOne.value should be (1)
 
-  it can "be implicitly created from a positive integer given Position.Predef is imported" in {
-    import Position.Predef._
+        val posTwo = Position(10)
+        posTwo.value should be (10)
+      }
+    }
 
-    val pos1 : Position = 0
-    val pos2 : Position = 1
-    val pos3 : Position = 129472
+    "can be compared with expected behaviour" - {
+      "with another Position" in {
+        val posOne   = Position(0)
+        val posTwo   = Position(1)
+        val posThree = Position(10)
 
-    pos1.pos should be (0)
-    pos2.pos should be (1)
-    pos3.pos should be (129472)
-  }
+        posOne should be < posTwo
+        posTwo should be < posThree
+        posOne should be < posThree
+        posTwo should be >= posOne
+        posOne should be <= posTwo
+      }
+    }
 
-  it can "be implicitly converted to a positive integer given Position.Predef is imported" in {
-    import Position.Predef._
+    "can be converted to a Long" - {
+      "implicitly" in {
+        val one : Long = Position(1)
+        one should be (1)
 
-    val pos1 : Long = Position(0)
-    val pos2 : Long = Position(1)
-    val pos3 : Long = Position(298345)
+        val ten : Long = Position(10)
+        ten should be (10)
+      }
+      "explicitly with the 'value' attribute" in {
+        val one = Position(1).value
+        one should be (1)
 
-    pos1 should be (0)
-    pos2 should be (1)
-    pos3 should be (298345)
+        val ten = Position(10).value
+        ten should be (10)
+      }
+    }
+
+    "should throw a IllegalArgumentException" - {
+      "when implicitly constructed from a negative Long" in {
+        a [IllegalArgumentException] should be thrownBy {
+          val invalid : Position = -1
+        }
+        a [IllegalArgumentException] should be thrownBy {
+          val invalid : Position = -10
+        }
+      }
+      "when explicitly constructed with a negative Long as parameter" in {
+        a [IllegalArgumentException] should be thrownBy {
+          val invalid = Position(-3)
+        }
+        a [IllegalArgumentException] should be thrownBy {
+          val invalid = Position(-17)
+        }
+      }
+    }
+
   }
 
 }

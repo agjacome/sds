@@ -1,30 +1,32 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model
 
-final class Position private (val pos : Long) extends AnyVal with Ordered[Position] {
+import scala.slick.lifted.MappedTo
+import play.api.mvc.{ PathBindable, QueryStringBindable }
 
-  def compare(that : Position) : Int = this.pos compare (that.pos)
+final class Position (val value : Long) extends AnyVal with Ordered[Position] with MappedTo[Long] {
+
+  def compare(that : Position) : Int =
+    value compare that.value
 
 }
 
-object Position extends (Long => Position) {
+final object Position extends (Long => Position) {
 
-  object Predef {
-
-    import scala.language.implicitConversions
-    import scala.slick.lifted.{ TypeMapper, MappedTypeMapper }
-
-    implicit def longToPosition(pos : Long)     : Position = Position(pos)
-    implicit def positionToLong(pos : Position) : Long     = pos.pos
-
-    implicit val positionTypeMapper : TypeMapper[Position] =
-      MappedTypeMapper.base[Position, Long](positionToLong, longToPosition)
-
-  }
+  import scala.language.implicitConversions
 
   def apply(pos : Long) : Position = {
     require(pos >= 0, "A Position must be a nonnegative Integer")
     new Position(pos)
   }
+
+  implicit def bindPath(implicit binder : PathBindable[Long]) : PathBindable[Position] =
+    binder transform (apply, _.value)
+
+  implicit def bindQuery : QueryStringBindable[Position] =
+    QueryStringBindable.bindableLong transform (apply, _.value)
+
+  implicit def longToPosition(pos : Long) : Position = Position(pos)
+  implicit def positionToLong(pos : Position) : Long = pos.value
 
 }
 
