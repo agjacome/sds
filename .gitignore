@@ -12,3 +12,7 @@ project/*
 !project/Build.scala
 !project/plugins.sbt
 target
+
+src/main/resources/*
+!src/main/resources/.gitkeep
+!src/main/resources/linnaeus.tar.lzma
