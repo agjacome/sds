@@ -28,7 +28,8 @@ libraryDependencies ++= Seq(
   "org.webjars"        %% "webjars-play"         % "2.2.1-2" ,
   "com.typesafe.slick" %% "slick"                % "2.0.0"   ,
   "com.typesafe.play"  %% "play-slick"           % "0.6.0.1" ,
-  "mysql"              %  "mysql-connector-java" % "5.1.29"
+  "mysql"              %  "mysql-connector-java" % "5.1.29"  ,
+  "com.twitter"        %% "util-collection"      % "6.12.1"
 )
 
 // play framework dependencies
