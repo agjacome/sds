@@ -12,7 +12,7 @@ class DALSpec extends BaseSpec {
 
   "The Data Access Layer" - {
 
-    "should work with the Database as expected" - {
+    "should work with the Database as expected with simple queries" - {
 
       "CRUDing documents" in new WithApplication {
         val dal = DAL(DB("test").driver)
@@ -34,6 +34,10 @@ class DALSpec extends BaseSpec {
           info("retrieving all documents")
           Documents.list should have size (3)
           all (Documents.list map (_.id)) should be ('defined)
+          Documents.contains(Document(Some(1), "Title One", "Text One")) should be (true)
+          Documents.contains(Document(Some(1), "Title One", "Text One")) should be (true)
+          Documents.contains(Document(Some(1), "Title One", "Text One")) should be (true)
+          Documents.contains(Document(Some(1), "Title One", "Text One")) should be (true)
 
           info("searching for a concrete document")
           val second = (Documents filter (_.title is Sentence("Title Two"))).first
@@ -168,9 +172,73 @@ class DALSpec extends BaseSpec {
         }
       }
 
-      "obtaining Documents directly from the ForeignKey of Annotations" in (pending)
+    }
 
-      "obtaining NamedEntities directly from the ForeignKey of Annotations" in (pending)
+    "should be able to use queries involving ForeignKeys as expected" - {
+
+      "obtaining Documents directly from the FK of Annotations" in (pending)
+
+      "obtaining NamedEntities directly from the FK of Annotations" in (pending)
+
+    }
+
+    "should be able to use the implicit extensions to create more complex queries" - {
+
+      "with the Documents table" in new WithApplication {
+        val dal = DAL(DB("test").driver)
+
+        import dal._
+        import dal.profile.simple._
+
+        DB("test") withSession { implicit session : Session =>
+          Documents.ddl.create
+
+          Documents ++= Seq(
+            Document(None, "Title One",   "Text One"),
+            Document(None, "Title Two",   "Text Two"),
+            Document(None, "Title Three", "Text Three")
+            )
+
+          info("searching by ID")
+          Documents.byId(DocumentId(1)).first should have (
+            'id    (Some(DocumentId(1))),
+            'title (Sentence("Title One")),
+            'text  ("Text One")
+            )
+
+          info("searching by title")
+          Documents.byTitle(Sentence("Title Two")).first should have (
+            'id    (Some(DocumentId(2))),
+            'title (Sentence("Title Two")),
+            'text  ("Text Two")
+            )
+
+          info("searching by text")
+          Documents.byText("Text Three").first should have (
+            'id    (Some(DocumentId(3))),
+            'title (Sentence("Title Three")),
+            'text  ("Text Three")
+            )
+
+          info("filtering by title with an incomplete String")
+          Documents.byTitleLike("three").map(_.id).first should be (DocumentId(3))
+
+          info("filtering by text with an incomplete String")
+          Documents.byTextLike("On").map(_.id).first should be (DocumentId(1))
+
+          info("checking if table contains a document")
+          val docOne = Document(Some(1), "Title One", "Text One")
+          val docTwo = Document(Some(7), "Non-existent", "Invalid text")
+          Documents.contains(docOne) should be (true)
+          Documents.contains(docTwo) should be (false)
+
+          Documents.ddl.drop
+        }
+      }
+
+      "with the NamedEntities table" in (pending)
+
+      "with the Annotations table" in (pending)
 
     }
 

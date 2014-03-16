@@ -21,5 +21,27 @@ private[database] trait NamedEntitiesComponent {
 
   }
 
+  implicit class NamedEntitiesExtension(val query : Query[NamedEntitiesTable, NamedEntity]) {
+
+    def byId(id : NamedEntityId) : Query[NamedEntitiesTable, NamedEntity] =
+      query filter (_.id is id)
+
+    def byNormalized(normalized : Sentence) : Query[NamedEntitiesTable, NamedEntity] =
+      query filter (_.normalized is normalized)
+
+    def byCategory(category : Category) : Query[NamedEntitiesTable, NamedEntity] =
+      query filter (_.category is category)
+
+    def byOccurrences(occurrences : Long) : Query[NamedEntitiesTable, NamedEntity] =
+      query filter (_.occurrences is occurrences)
+
+    def byNormalizedLike(filter : String =  "%") : Query[NamedEntitiesTable, NamedEntity] =
+      query filter (_.normalized.asColumnOf[String] like s"%${filter}%")
+
+    def contains(entity : NamedEntity)(implicit session : Session) : Boolean =
+      entity.id.isDefined && byId(entity.id.get).map(_.id).exists.run
+
+  }
+
 }
 

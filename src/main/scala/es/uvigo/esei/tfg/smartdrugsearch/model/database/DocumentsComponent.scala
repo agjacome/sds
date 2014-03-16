@@ -19,5 +19,27 @@ private[database] trait DocumentsComponent {
 
   }
 
+  implicit class DocumentsExtension(val query : Query[DocumentsTable , Document]) {
+
+    def byId(id : DocumentId) : Query[DocumentsTable, Document] =
+      query filter (_.id is id)
+
+    def byTitle(title : Sentence) : Query[DocumentsTable, Document] =
+      query filter (_.title is title)
+
+    def byText(text : String) : Query[DocumentsTable, Document] =
+      query filter (_.text is text)
+
+    def byTitleLike(filter : String = "%") : Query[DocumentsTable, Document] =
+      query filter (_.title.asColumnOf[String] like s"%${filter}%")
+
+    def byTextLike(filter : String = "%") : Query[DocumentsTable, Document] =
+      query filter (_.text like s"%${filter}%")
+
+    def contains(document : Document)(implicit session : Session) : Boolean =
+      document.id.isDefined && byId(document.id.get).map(_.id).exists.run
+
+  }
+
 }
 
