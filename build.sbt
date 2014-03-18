@@ -20,7 +20,7 @@ unmanagedBase := baseDirectory.value / "lib"
 libraryDependencies ++= Seq(
   "org.scalatest"     %% "scalatest"                   % "2.1.0"   % "test" ,
   "org.scalamock"     %% "scalamock-scalatest-support" % "3.1.RC1" % "test" ,
-  "com.typesafe.akka" %% "akka-testkit"                % "2.2.3"   % "test" ,
+  "com.typesafe.akka" %% "akka-testkit"                % "2.3.0"   % "test" ,
   "com.h2database"    %  "h2"                          % "1.3.175" % "test"
 )
 
@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "org.webjars"        %% "webjars-play"         % "2.2.1-2" ,
   "com.typesafe.slick" %% "slick"                % "2.0.0"   ,
   "com.typesafe.play"  %% "play-slick"           % "0.6.0.1" ,
-  "com.typesafe.akka"  %% "akka-actor"           % "2.2.3"   ,
+  "com.typesafe.akka"  %% "akka-actor"           % "2.3.0"   ,
   "mysql"              %  "mysql-connector-java" % "5.1.29"  ,
   "com.twitter"        %% "util-collection"      % "6.12.1"
 )
