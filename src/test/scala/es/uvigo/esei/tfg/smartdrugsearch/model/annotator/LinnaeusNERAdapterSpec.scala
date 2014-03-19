@@ -1,39 +1,38 @@
 package es.uvigo.esei.tfg.smartdrugsearch.model.annotator
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
-
-import akka.actor.{ Actor, ActorSystem, PoisonPill, Props }
-import akka.testkit.TestKitBase
+import akka.actor.{ Actor, PoisonPill, Props }
 
 import play.api.db.slick.DB
 import play.api.test._
 import play.api.test.Helpers._
 
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.prop.TableDrivenPropertyChecks
-import TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import es.uvigo.esei.tfg.smartdrugsearch.model._
 import es.uvigo.esei.tfg.smartdrugsearch.model.database.DAL
-import Category.{ Category, Species }
+import Category._
 
-class LinnaeusNERAdapterSpec extends BaseSpec with TestKitBase with BeforeAndAfterAll with TableDrivenPropertyChecks {
+private[annotator] trait LinnaeusSpecSetup extends AnnotatorBaseSpec {
 
-  implicit lazy val system = ActorSystem()
-
-  override def afterAll : Unit =
-    shutdown(system)
-
-  private def cleanSpaces(str : String) : String =
+  protected def cleanSpaces(str : String) : String =
     str.stripMargin filter (_ >= ' ')
 
-  // TODO: add more expectations, tuples (document, entities, annotations),
-  // test correct behavior of the Linnaeus Annotator
-  private val expectations = Table(
+  protected val expectations = Table(
     ("document", "entities", "annotations"),
     (
-      Document(Some(1), "Test Document One", cleanSpaces(
+      Document(Some(1), "empty document", ""),
+      Seq.empty,
+      Seq.empty
+    ),
+    (
+      Document(Some(1), "one-word document", "human"),
+      Seq(NamedEntity(Some(1), "homo sapiens", Species, 1)),
+      Seq(Annotation(Some(1), 1, 1, "human", 0, 5))
+    ),
+    (
+      Document(Some(1), "test document", cleanSpaces(
         """|We have boy a hub identified IGF022/01 cellline Buchnera aphidicola 
            |a novel human cDNA with a predicted protein sequence that has 28% 
            |amin acid identity with the E. coli Hsp70 co-chaperone GrpE and 
@@ -52,6 +51,9 @@ class LinnaeusNERAdapterSpec extends BaseSpec with TestKitBase with BeforeAndAft
     )
   )
 
+}
+
+class LinnaeusNERAdapterSpec extends LinnaeusSpecSetup {
 
   "The Linnaeus Annotator" - {
 
@@ -62,28 +64,26 @@ class LinnaeusNERAdapterSpec extends BaseSpec with TestKitBase with BeforeAndAft
       import dal.profile.simple._
 
       DB("test") withSession { implicit session : Session =>
-
-        info("creating Linnaeus Actor")
-        val linnaeus = system.actorOf(Props(classOf[LinnaeusNERAdapter], dal))
-        linnaeus ! session
-
-        info("checking validity of annotations performed by Linnaeus Actor")
         forAll (expectations) { (document, entities, annotations) =>
+
+          info(s"checking validity of annotations for document '${document.title}'")
           dal.create
+
+          val linnaeus = system.actorOf(Props(classOf[LinnaeusNERAdapter], dal))
+          linnaeus ! session
+
           Documents += document
 
-          linnaeus ! document
-          expectNoMsg(5.seconds)
+          linnaeus ! AnnotateDocument(document)
+          expectMsg(10.seconds, FinishedAnnotation(document))
 
           NamedEntities.list should contain theSameElementsAs (entities)
           Annotations.list   should contain theSameElementsAs (annotations)
 
+          linnaeus ! PoisonPill
           dal.drop
+
         }
-
-        info("shutting down Linnaeus Actor")
-        linnaeus ! PoisonPill
-
       }
     }
 
