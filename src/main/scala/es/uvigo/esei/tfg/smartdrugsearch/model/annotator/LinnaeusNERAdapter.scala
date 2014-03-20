@@ -41,7 +41,7 @@ private[annotator] class LinnaeusNERAdapter (protected val dal : DAL = current.d
   }
 
   private[this] def getEntity(ncbiId : String) : NamedEntity =
-    cache getOrElseUpdate (ncbiId, Await.result(normalize(ncbiId), 5.seconds))
+    cache getOrElseUpdate (ncbiId, Await.result(normalize(ncbiId), 10.seconds))
 
   private[this] def getAnnotation(m : Mention, e : NamedEntity, d : Document) : Annotation =
     Annotation(None, d.id.get, e.id.get, m.getText, m.getStart, m.getEnd)
