@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model
+package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
@@ -42,6 +42,13 @@ class SentenceSpec extends BaseSpec {
         val sentTwo = Sentence("this should also be converted to a string")
         sentTwo.toString should be ("this should also be converted to a string")
       }
+      "explicitly with the 'mkString' method using a separator between words" in {
+        val sentOne = Sentence("one two three four")
+        (sentOne mkString "-") should be ("one-two-three-four")
+
+        val sentTwo = Sentence("this should have percentages in between")
+        (sentTwo mkString "%") should be ("this%should%have%percentages%in%between")
+      }
     }
 
     "should throw an IllegalArgumentException" - {
@@ -76,21 +83,6 @@ class SentenceSpec extends BaseSpec {
         val cleanedWords = Seq("all", "this", "spaces", "should", "be", "removed")
         all (sentences map (_.words)) should equal (cleanedWords)
       }
-      "making all its characters lowercase" in {
-        val sentences = Seq(
-          Sentence("THIS ALL SHOULD BE CONVERTED TO LOWERCASE"),
-          Sentence("thIs All sHoULd Be ConVerTed tO loWeRCasE"),
-          Sentence("THIS all SHOULD be CONVERTED to LOWERCASE"),
-          Sentence("this all should be converted to lowercase")
-        )
-
-        forAll (sentences map (_.words)) {
-          words => all (words) should not include regex("[A-Z]")
-        }
-
-        val lowerWords = Seq("this", "all", "should", "be", "converted", "to", "lowercase")
-        all (sentences map (_.words)) should equal (lowerWords)
-      }
     }
 
     "can be compared for equality with another Sentence" - {
@@ -101,11 +93,11 @@ class SentenceSpec extends BaseSpec {
         Sentence("a sentence")       should not equal (Sentence("another sentence"))
         Sentence("another sentence") should not equal (Sentence("a sentence"))
       }
-      "after cleaning them up of spaces" in {
+      "ignoring spaces between words" in {
         Sentence("  a \n\n sentence\t") should equal (Sentence("a sentence"))
         Sentence("another sentence")    should equal (Sentence("\t\t\tanother\n\nsentence\t\t\t"))
       }
-      "after making them all lowercase" in {
+      "case-insensitively" in {
         Sentence("A SENTENCE")       should equal (Sentence("a sentence"))
         Sentence("AnOtHeR SeNTEnCE") should equal (Sentence("aNoTHeR SEnteNCe"))
       }

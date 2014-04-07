@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model
+package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 

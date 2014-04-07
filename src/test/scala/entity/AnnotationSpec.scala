@@ -1,19 +1,18 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model
+package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import Category._
 
 class AnnotationSpec extends BaseSpec {
 
   "An Annotation" - {
 
     "can be constructed" - {
-      "by using an Optional AnnotationId, a DocumentId, a NamedEntityId, a Sentence as original text and start and ending absoulte positions inside document's text" in {
+      "by using an Optional AnnotationId, a DocumentId, a KeywordId, a Sentence as original text and start and ending absoulte positions inside document's text" in {
         val annotOne = Annotation(None, 10, 13, Sentence.Empty, 0, 1)
         annotOne should have (
           'id       (None),
           'docId    (DocumentId(10)),
-          'entId    (NamedEntityId(13)),
+          'keyId    (KeywordId(13)),
           'text     (Sentence.Empty),
           'startPos (0),
           'endPos   (1)
@@ -23,7 +22,7 @@ class AnnotationSpec extends BaseSpec {
         annotTwo should have (
           'id       (Some(AnnotationId(17))),
           'docId    (DocumentId(1)),
-          'entId    (NamedEntityId(2)),
+          'keyId    (KeywordId(2)),
           'text     (Sentence("a sentence")),
           'startPos (3),
           'endPos   (9)

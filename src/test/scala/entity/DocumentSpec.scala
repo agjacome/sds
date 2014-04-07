@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model
+package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
@@ -8,11 +8,11 @@ class DocumentSpec extends BaseSpec {
 
     "can be constructed" - {
       "by using an Optional DocumentId, a Sentence as title, and a String as text" in {
-        val docOne = Document(None, Sentence.Empty, "")
+        val docOne = Document(None, Sentence.Empty, "text")
         docOne should have (
           'id    (None),
           'title (Sentence.Empty),
-          'text  ("")
+          'text  ("text")
         )
 
         val docTwo = Document(Some(1), "my title", "my text document body")
@@ -21,6 +21,14 @@ class DocumentSpec extends BaseSpec {
           'title (Sentence("my title")),
           'text  ("my text document body")
         )
+      }
+    }
+
+    "should throw an IllegalArgumentException" - {
+      "when constructed when an empty text" in {
+        a [IllegalArgumentException] should be thrownBy {
+          val invalid : Document = Document(None, Sentence.Empty, "")
+        }
       }
     }
 

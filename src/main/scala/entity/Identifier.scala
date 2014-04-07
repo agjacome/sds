@@ -1,11 +1,12 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model
+package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import scala.slick.lifted.MappedTo
+
 import play.api.mvc.{ PathBindable, QueryStringBindable }
 
-private[model] trait Identifier extends MappedTo[Long]
+private[entity] trait Identifier extends MappedTo[Long]
 
-private[model] abstract class IdentifierCompanion[I <: Identifier] extends (Long => I) {
+private[entity] abstract class IdentifierCompanion[I <: Identifier] extends (Long => I) {
 
   import scala.language.implicitConversions
 

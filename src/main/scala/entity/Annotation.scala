@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.model
+package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 final case class AnnotationId (value : Long) extends Identifier
 final object     AnnotationId extends IdentifierCompanion[AnnotationId]
@@ -6,7 +6,7 @@ final object     AnnotationId extends IdentifierCompanion[AnnotationId]
 case class Annotation (
   val id       : Option[AnnotationId],
   val docId    : DocumentId,
-  val entId    : NamedEntityId,
+  val keyId    : KeywordId,
   val text     : Sentence,
   val startPos : Position,
   val endPos   : Position
@@ -15,4 +15,3 @@ case class Annotation (
   require(startPos < endPos, "Start Position must be less than End Position")
 
 }
-
