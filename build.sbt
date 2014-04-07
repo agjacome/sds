@@ -31,19 +31,19 @@ libraryDependencies ++= Seq(
 // scala/java dependencies
 libraryDependencies ++= Seq(
   "org.webjars"        %% "webjars-play"         % "2.2.1-2" ,
-  "com.typesafe.slick" %% "slick"                % "2.0.0"   ,
+  "com.typesafe.slick" %% "slick"                % "2.0.1"   ,
   "com.typesafe.play"  %% "play-slick"           % "0.6.0.1" ,
-  "com.typesafe.akka"  %% "akka-actor"           % "2.3.0"   ,
-  "mysql"              %  "mysql-connector-java" % "5.1.29"  ,
+  "com.typesafe.akka"  %% "akka-actor"           % "2.3.1"   ,
+  "mysql"              %  "mysql-connector-java" % "5.1.30"  ,
   "com.twitter"        %% "util-collection"      % "6.12.1"
 )
 
 // testing dependencies
 libraryDependencies ++= Seq(
-  "org.scalatest"     %% "scalatest"                   % "2.1.0"   % "test" ,
-  "org.scalamock"     %% "scalamock-scalatest-support" % "3.1.RC1" % "test" ,
-  "com.typesafe.akka" %% "akka-testkit"                % "2.3.0"   % "test" ,
-  "com.h2database"    %  "h2"                          % "1.3.175" % "test"
+  "org.scalatest"     %% "scalatest"    % "2.1.3"   % "test" ,
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.1"   % "test" ,
+  "org.mockito"       %  "mockito-all"  % "1.9.5"   % "test" ,
+  "com.h2database"    %  "h2"           % "1.3.175" % "test"
 )
 
 // Play framework extra dependencies
@@ -52,3 +52,12 @@ libraryDependencies ++= Seq(jdbc)
 // import extra settings (from project/Build.scala)
 Build.settings
 
+// macros sub-project and main project with dependency on it
+lazy val macros = project.in(file("macros")).settings(
+  libraryDependencies ++= Seq(
+    "org.scala-lang" % "scala-reflect" % "2.10.4",
+    "org.scalatest"  %% "scalatest"     % "2.1.3"   % "test" 
+  )
+)
+
+lazy val main = project.in(file(".")).dependsOn(macros).aggregate(macros)

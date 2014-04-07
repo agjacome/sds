@@ -1,8 +1,5 @@
-resolvers ++= Seq(
-  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "jgit-repo" at "http://download.eclipse.org/jgit/maven"
-)
+resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.2.1")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.2.2")
 
-addSbtPlugin("com.typesafe.sbt"  % "sbt-git"    % "0.6.2")
+addSbtPlugin("com.typesafe.sbt"  % "sbt-git"    % "0.6.3")
