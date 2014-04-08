@@ -108,7 +108,7 @@ class KeywordsDAOSpec extends BaseSpec {
         }
       }
 
-      "find an existing Keywod by its ID" in new WithApplication {
+      "find an existing Keyword by its ID" in new WithApplication {
         DatabaseProfile setProfile DB("test").driver
 
         val db = DatabaseProfile()
@@ -143,8 +143,35 @@ class KeywordsDAOSpec extends BaseSpec {
         }
       }
 
+      "find an existing Keyword by its normalized sentence" in new WithApplication {
+        DatabaseProfile setProfile DB("test").driver
+
+        val db = DatabaseProfile()
+        import db.profile.simple._
+
+        val keywords = TableQuery[db.KeywordsTable]
+        DB("test") withSession { implicit session =>
+          db.create
+
+          val normalized = Sentence("normalized keyword")
+          keywords += Keyword(None, normalized, Compound)
+
+          val dao = KeywordsDAO()
+          (dao findByNormalized normalized) should be ('defined)
+          (dao findByNormalized normalized).value should have (
+            'id          (Some(KeywordId(1))),
+            'normalized  (Sentence("normalized keyword")),
+            'category    (Compound),
+            'occurrences (0)
+          )
+
+          db.drop
+        }
+      }
+
     }
 
   }
 
 }
+

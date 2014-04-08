@@ -1,9 +1,15 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Keyword, KeywordId }
+import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Keyword, KeywordId, Sentence }
 
-trait KeywordsDAO extends DAO[Keyword, KeywordId]
+trait KeywordsDAO extends DAO[Keyword, KeywordId] {
+
+  import db.profile.simple.Session
+
+  def findByNormalized(normalized : Sentence)(implicit session : Session) : Option[Keyword]
+
+}
 
 object KeywordsDAO extends (() => KeywordsDAO) with ((DatabaseProfile) => KeywordsDAO) {
 
@@ -25,6 +31,9 @@ private class KeywordsDAOImpl (val db : DatabaseProfile = DatabaseProfile()) ext
 
   override def findById(id : KeywordId)(implicit session : Session) : Option[Keyword] =
     (keywords where (_.id is id)).firstOption
+
+  def findByNormalized(normalized : Sentence)(implicit session : Session) : Option[Keyword] =
+    (keywords where (_.normalized is normalized)).firstOption
 
   protected def insert(keyword : Keyword)(implicit session : Session) : Keyword =
     keyword copy (id = Some(keywords returning (keywords map (_.id)) += keyword))
