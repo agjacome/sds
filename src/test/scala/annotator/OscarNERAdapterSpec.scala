@@ -36,7 +36,7 @@ private[annotator] trait OscarSpecSetup extends AnnotatorBaseSpec {
       ),
       Seq(
         Annotation(Some(1), 1, 1, "benzene", 12, 19),
-        Annotation(Some(2), 1, 2, "toluene", 42, 48)
+        Annotation(Some(2), 1, 2, "toluene", 42, 49)
       )
     )
   )

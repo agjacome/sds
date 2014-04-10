@@ -50,7 +50,7 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
   private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit = {
     val current = (Keywords findById keyword.id).get
     Annotations save annotation
-    Keywords save (current.copy(occurrences = current.occurrences + 1))
+    Keywords save (current copy (occurrences = current.occurrences + 1))
   }
 
   private[this] def normalize(ncbiId : String) : Future[Keyword] =
