@@ -35,10 +35,9 @@ private[annotator] class OscarNERAdapter extends NERAdapter {
   }
 
   private[this] def getKeyword(inchi : String) : Keyword =
-    (Keywords findByNormalized inchi) match {
-      case Some(keyword) => keyword
-      case None          => Keywords save Keyword(None, inchi, Compound)
-    }
+    (Keywords findByNormalized inchi) getOrElse (
+      Keywords save Keyword(None, inchi, Compound)
+    )
 
   private[this] def getAnnotation(e : NamedEntity, k : Keyword, d : Document) : Annotation =
     Annotation(None, d.id.get, k.id.get, e.getSurface, e.getStart, e.getEnd)

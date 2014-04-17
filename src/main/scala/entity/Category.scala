@@ -9,8 +9,12 @@ case object Drug     extends Category { val id = 2 }
 case object Gene     extends Category { val id = 3 }
 case object Protein  extends Category { val id = 4 }
 case object Species  extends Category { val id = 5 }
+case object DNA      extends Category { val id = 6 }
+case object RNA      extends Category { val id = 7 }
+case object CellLine extends Category { val id = 8 }
+case object CellType extends Category { val id = 9 }
 
-object Category {
+object Category extends ((String) => Category) {
 
   private lazy val values : Set[Category] = SealedValues.from[Category]
 

@@ -10,7 +10,7 @@ import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
 trait AnnotatorBaseSpec extends BaseSpec with TestKitBase with ImplicitSender with BeforeAndAfterAll with TableDrivenPropertyChecks {
 
-  implicit lazy val system = ActorSystem()
+  implicit lazy val system : ActorSystem = ActorSystem()
 
   override def afterAll : Unit =
     shutdown(system)

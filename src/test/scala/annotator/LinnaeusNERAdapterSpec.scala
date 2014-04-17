@@ -7,7 +7,6 @@ import akka.actor.{ Actor, PoisonPill, Props }
 import play.api.db.slick.DB
 import play.api.test._
 
-import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._

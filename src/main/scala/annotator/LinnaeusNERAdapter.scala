@@ -66,10 +66,9 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
     }
 
   private[this] def recoverKeyword(normalized : Sentence) : Keyword =
-    (Keywords findByNormalized normalized) match {
-      case Some(keyword) => keyword
-      case None          => Keywords save Keyword(None, normalized, Species)
-    }
+    (Keywords findByNormalized normalized) getOrElse (
+      Keywords save Keyword(None, normalized, Species)
+    )
 
 }
 
