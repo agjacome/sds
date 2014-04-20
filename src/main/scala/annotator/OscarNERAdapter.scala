@@ -8,16 +8,12 @@ import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.{ FormatType, ResolvedNamed
 import uk.ac.cam.ch.wwmm.oscar.document.NamedEntity
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 private[annotator] class OscarNERAdapter extends NERAdapter {
 
   import context._
-  import db.profile.simple._
+  import dbProfile.database
   import OscarNERAdapter._
-
-  private[this] val Keywords    = KeywordsDAO()
-  private[this] val Annotations = AnnotationsDAO()
 
   override protected def annotate(document : Document) : Future[Finished] =
     getNamedEntities(document.text) map { entities =>
@@ -34,19 +30,22 @@ private[annotator] class OscarNERAdapter extends NERAdapter {
     insertAnnotation(keyword, annotation)
   }
 
-  private[this] def getKeyword(inchi : String) : Keyword =
-    (Keywords findByNormalized inchi) getOrElse (
-      Keywords save Keyword(None, inchi, Compound)
-    )
-
   private[this] def getAnnotation(e : NamedEntity, k : Keyword, d : Document) : Annotation =
     Annotation(None, d.id.get, k.id.get, e.getSurface, e.getStart, e.getEnd)
 
-  private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit = {
-    val current = (Keywords findById keyword.id).get
-    Annotations save annotation
-    Keywords save (current copy (occurrences = current.occurrences + 1))
-  }
+  private[this] def getKeyword(inchi : String) : Keyword =
+    database withTransaction { implicit session =>
+      (Keywords findByNormalized inchi) getOrElse (
+        Keywords save Keyword(None, inchi, Compound)
+      )
+    }
+
+  private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit =
+    database withTransaction { implicit session =>
+      val current = (Keywords findById keyword.id).get
+      Annotations save annotation
+      Keywords save (current copy (occurrences = current.occurrences + 1))
+    }
 
 }
 

@@ -5,37 +5,33 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Document, DocumentId }
 
 trait DocumentsDAO extends DAO[Document, DocumentId]
 
-object DocumentsDAO extends (() => DocumentsDAO) with ((DatabaseProfile) => DocumentsDAO) {
+object DocumentsDAO extends (() => DocumentsDAO) {
 
   def apply : DocumentsDAO =
     new DocumentsDAOImpl
 
-  def apply(db : DatabaseProfile) : DocumentsDAO =
-    new DocumentsDAOImpl(db)
-
 }
 
-private class DocumentsDAOImpl (val db : DatabaseProfile = DatabaseProfile()) extends DocumentsDAO {
+private class DocumentsDAOImpl extends DocumentsDAO {
 
-  import db._
-  import db.profile._
-  import db.profile.simple._
-
-  private val documents = TableQuery[DocumentsTable]
+  import databaseProfile._
+  import databaseProfile.profile.simple._
 
   override def findById(id : DocumentId)(implicit session : Session) : Option[Document] =
-    (documents where (_.id is id)).firstOption
+    (Documents filter (_.id is id)).firstOption
 
-  protected def insert(document : Document)(implicit session : Session) : Document =
-    document copy (id = Some(documents returning (documents map (_.id)) += document))
+  protected def insert(document : Document)(implicit session : Session) : Document = {
+    val id = Some(Documents returning (Documents map (_.id)) += document)
+    document copy id
+  }
 
   protected def update(document : Document)(implicit session : Session) : Document = {
-    documents where (_.id is document.id.get) update (document)
+    Documents filter (_.id is document.id.get) update (document)
     document
   }
 
   def delete(document : Document)(implicit session : Session) : Unit =
-    (documents where (_.id is document.id.get)).delete
+    (Documents filter (_.id is document.id.get)).delete
 
 }
 

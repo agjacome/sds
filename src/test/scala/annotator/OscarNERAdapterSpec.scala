@@ -2,17 +2,16 @@ package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+
 import akka.actor.{ Actor, PoisonPill, Props }
 
 import play.api.db.slick.DB
 import play.api.test._
-import play.api.test.Helpers._
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 private[annotator] trait OscarSpecSetup extends AnnotatorBaseSpec {
 
@@ -45,27 +44,19 @@ private[annotator] trait OscarSpecSetup extends AnnotatorBaseSpec {
 
 class OscarNERAdapterSpec extends OscarSpecSetup {
 
+  import dbProfile.{ Annotations, Documents, Keywords }
+  import dbProfile.profile.simple._
+
   "The Oscar Annotator" - {
 
-    "should be able to annotate chemical compounds in Documents" in new WithApplication {
-      DatabaseProfile setProfile DB("test").driver
+    "should be able to annotate chemical compounds in Documents" - {
 
-      val db = DatabaseProfile()
-      import db.profile.simple._
-
-      val Documents   = TableQuery[db.DocumentsTable]
-      val Keywords    = TableQuery[db.KeywordsTable]
-      val Annotations = TableQuery[db.AnnotationsTable]
-
-      DB("test") withSession { implicit session =>
-        forAll (expectations) { (document, keywords, annotations) =>
-          info(s"checking validity of annotations for Document '${document.title}'")
-          db.create
-
-          val oscar = system.actorOf(Props[OscarNERAdapter])
-          oscar ! session
+      forAll (expectations) { (document, keywords, annotations) =>
+        s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
+          DatabaseProfile setDefaultDatabase DB("test")
 
           Documents += document
+          val oscar = system.actorOf(Props[OscarNERAdapter])
 
           oscar ! Annotate(document)
           expectMsg(10.seconds, Finished(document))
@@ -73,10 +64,9 @@ class OscarNERAdapterSpec extends OscarSpecSetup {
 
           Keywords.list    should contain theSameElementsAs (keywords)
           Annotations.list should contain theSameElementsAs (annotations)
-
-          db.drop
         }
       }
+
     }
 
   }

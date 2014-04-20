@@ -5,36 +5,33 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Annotation, AnnotationId }
 
 trait AnnotationsDAO extends DAO[Annotation, AnnotationId]
 
-object AnnotationsDAO extends (() => AnnotationsDAO) with ((DatabaseProfile) => AnnotationsDAO) {
+object AnnotationsDAO extends (() => AnnotationsDAO) {
 
   def apply : AnnotationsDAO =
     new AnnotationsDAOImpl
 
-  def apply(db : DatabaseProfile) : AnnotationsDAO =
-    new AnnotationsDAOImpl(db)
-
 }
 
-private class AnnotationsDAOImpl (val db : DatabaseProfile = DatabaseProfile()) extends AnnotationsDAO {
+private class AnnotationsDAOImpl extends AnnotationsDAO {
 
-  import db._
-  import db.profile._
-  import db.profile.simple._
+  import databaseProfile._
+  import databaseProfile.profile.simple._
 
-  private val annotations = TableQuery[AnnotationsTable]
+  override def findById(id : AnnotationId)(implicit sesion : Session) : Option[Annotation] =
+    (Annotations filter (_.id is id)).firstOption
 
-  override def findById(id : AnnotationId)(implicit session : Session) : Option[Annotation] =
-    (annotations where (_.id is id)).firstOption
-
-  protected def insert(annotation : Annotation)(implicit session : Session) : Annotation =
-    annotation copy (id = Some(annotations returning (annotations map (_.id)) += annotation))
+  protected def insert(annotation : Annotation)(implicit session : Session) : Annotation = {
+    val id = Some(Annotations returning (Annotations map (_.id)) += annotation)
+    annotation copy id
+  }
 
   protected def update(annotation : Annotation)(implicit session : Session) : Annotation = {
-    annotations where (_.id is annotation.id.get) update (annotation)
+    Annotations filter (_.id is annotation.id.get) update (annotation)
     annotation
   }
 
   def delete(annotation : Annotation)(implicit session : Session) : Unit =
-    (annotations where (_.id is annotation.id.get)).delete
+    (Annotations filter (_.id is annotation.id.get)).delete
 
 }
+

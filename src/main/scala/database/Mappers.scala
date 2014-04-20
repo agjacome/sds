@@ -8,7 +8,7 @@ private[database] trait Mappers { this : Profile =>
 
   import profile.simple._
 
-  implicit val sentenceColumnType =
+  implicit lazy val sentenceColumnType =
     MappedColumnType.base[Sentence, String](_.toString, Sentence(_))
 
   implicit lazy val categoryColumnType =

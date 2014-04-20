@@ -1,175 +1,100 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
-import play.api.db.slick.DB
-import play.api.test._
-
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
+import es.uvigo.esei.tfg.smartdrugsearch.database.{ DatabaseBaseSpec, DatabaseProfile }
 
-class AnnotationsDAOSpec extends BaseSpec {
+class AnnotationsDAOSpec extends DatabaseBaseSpec {
+
+  import dbProfile.{ Annotations, Documents, Keywords }
+  import dbProfile.profile.simple._
+
+  private lazy val dao = AnnotationsDAO()
 
   "The Annotations DAO" - {
 
     "should be able to perform operations in the Annotations table" - {
 
-      "insert a new Annotation" in new WithApplication {
-        DatabaseProfile setProfile DB("test").driver
+      "insert a new Annotation" in {
+        Documents += Document(None, "title", "text")
+        Keywords  += Keyword(None, "keyword", Drug)
 
-        val db = DatabaseProfile()
-        import db.profile.simple._
+        dao save Annotation(None, 1, 1, "text", 0, 4)
 
-        val documents   = TableQuery[db.DocumentsTable]
-        val keywords    = TableQuery[db.KeywordsTable]
-        val annotations = TableQuery[db.AnnotationsTable]
-        DB("test") withSession { implicit session =>
-          db.create
-
-          documents += Document(None, "title", "text")
-          keywords  += Keyword(None, "keyword", Drug)
-
-          val dao = AnnotationsDAO()
-          dao save Annotation(None, 1, 1, "text", 0, 4)
-
-          annotations.list should have size 1
-          annotations.first should have (
-            'id       (Some(AnnotationId(1))),
-            'docId    (DocumentId(1)),
-            'keyId    (KeywordId(1)),
-            'text     (Sentence("text")),
-            'startPos (0),
-            'endPos   (4)
-          )
-
-          db.drop
-        }
+        Annotations.list should have size 1
+        Annotations.first should have (
+          'id       (Some(AnnotationId(1))),
+          'docId    (DocumentId(1)),
+          'keyId    (KeywordId(1)),
+          'text     (Sentence("text")),
+          'startPos (0),
+          'endPos   (4)
+        )
       }
 
-      "update an existing Annotation" in new WithApplication {
-        DatabaseProfile setProfile DB("test").driver
+      "update an existing Annotation" in {
+        Documents   += Document(None, "title", "text")
+        Keywords    += Keyword(None, "keyword", Drug)
+        Annotations += Annotation(None, 1, 1, "text", 0, 4)
+        val annotation = Annotations.first
 
-        val db = DatabaseProfile()
-        import db.profile.simple._
+        dao save annotation.copy(text = "text updated")
 
-        val documents   = TableQuery[db.DocumentsTable]
-        val keywords    = TableQuery[db.KeywordsTable]
-        val annotations = TableQuery[db.AnnotationsTable]
-        DB("test") withSession { implicit session =>
-          db.create
-
-          documents   += Document(None, "title", "text")
-          keywords    += Keyword(None, "keyword", Drug)
-          annotations += Annotation(None, 1, 1, "text", 0, 4)
-          val annotation = annotations.first
-
-          val dao = AnnotationsDAO()
-          dao save annotation.copy(text = "text updated")
-
-          annotations.list should have size 1
-          annotations.first should have (
-            'id       (Some(AnnotationId(1))),
-            'docId    (DocumentId(1)),
-            'keyId    (KeywordId(1)),
-            'text     (Sentence("text updated")),
-            'startPos (0),
-            'endPos   (4)
-          )
-
-          db.drop
-        }
+        Annotations.list should have size 1
+        Annotations.first should have (
+          'id       (Some(AnnotationId(1))),
+          'docId    (DocumentId(1)),
+          'keyId    (KeywordId(1)),
+          'text     (Sentence("text updated")),
+          'startPos (0),
+          'endPos   (4)
+        )
       }
 
-      "delete an existing Annotation" in new WithApplication {
-        DatabaseProfile setProfile DB("test").driver
+      "delete an existing Annotation" in {
+        Documents   += Document(None, "title", "text")
+        Keywords    += Keyword(None, "keyword", Drug)
+        Annotations += Annotation(None, 1, 1, "text", 0, 4)
+        val annotation = Annotations.first
 
-        val db = DatabaseProfile()
-        import db.profile.simple._
+        dao delete annotation
 
-        val documents   = TableQuery[db.DocumentsTable]
-        val keywords    = TableQuery[db.KeywordsTable]
-        val annotations = TableQuery[db.AnnotationsTable]
-        DB("test") withSession { implicit session =>
-          db.create
-
-          documents   += Document(None, "title", "text")
-          keywords    += Keyword(None, "keyword", Drug)
-          annotations += Annotation(None, 1, 1, "text", 0, 4)
-          val annotation = annotations.first
-
-          val dao = AnnotationsDAO()
-          dao delete annotation
-
-          annotations.list should be ('empty)
-
-          db.drop
-        }
+        Annotations.list should be ('empty)
       }
 
-      "check if it contains an Annotation" in new WithApplication {
-        DatabaseProfile setProfile DB("test").driver
+      "check if it contains an Annotation" in {
+        Documents   += Document(None, "title", "text")
+        Keywords    += Keyword(None, "keyword", Drug)
+        Annotations += Annotation(None, 1, 1, "text", 0, 4)
+        val annotation = Annotations.first
 
-        val db = DatabaseProfile()
-        import db.profile.simple._
-
-        val documents   = TableQuery[db.DocumentsTable]
-        val keywords    = TableQuery[db.KeywordsTable]
-        val annotations = TableQuery[db.AnnotationsTable]
-        DB("test") withSession { implicit session =>
-          db.create
-
-          documents   += Document(None, "title", "text")
-          keywords    += Keyword(None, "keyword", Drug)
-          annotations += Annotation(None, 1, 1, "text", 0, 4)
-          val annotation = annotations.first
-
-          val dao = AnnotationsDAO()
-          (dao contains annotation) should be (true)
-
-          db.drop
-        }
+        (dao contains annotation) should be (true)
       }
 
-      "find an existing Annotation by its ID" in new WithApplication {
-        DatabaseProfile setProfile DB("test").driver
+      "find an existing Annotation by its ID" in {
+        Documents   += Document(None, "title", "text")
+        Keywords    += Keyword(None, "keyword", Drug)
+        Annotations += Annotation(None, 1, 1, "text", 0, 4)
+        val id = (Annotations map (_.id)).first
 
-        val db = DatabaseProfile()
-        import db.profile.simple._
+        (dao findById id) should be ('defined)
+        (dao findById id).value should have (
+          'id       (Some(AnnotationId(1))),
+          'docId    (DocumentId(1)),
+          'keyId    (KeywordId(1)),
+          'text     (Sentence("text")),
+          'startPos (0),
+          'endPos   (4)
+        )
 
-        val documents   = TableQuery[db.DocumentsTable]
-        val keywords    = TableQuery[db.KeywordsTable]
-        val annotations = TableQuery[db.AnnotationsTable]
-        DB("test") withSession { implicit session =>
-          db.create
-
-          documents   += Document(None, "title", "text")
-          keywords    += Keyword(None, "keyword", Drug)
-          annotations += Annotation(None, 1, 1, "text", 0, 4)
-          val id = (annotations map (_.id)).first
-
-          val dao = AnnotationsDAO()
-
-          (dao findById id) should be ('defined)
-          (dao findById id).value should have (
-            'id       (Some(AnnotationId(1))),
-            'docId    (DocumentId(1)),
-            'keyId    (KeywordId(1)),
-            'text     (Sentence("text")),
-            'startPos (0),
-            'endPos   (4)
-          )
-
-          (dao findById Some(id)) should be ('defined)
-          (dao findById Some(id)).value should have (
-            'id       (Some(AnnotationId(1))),
-            'docId    (DocumentId(1)),
-            'keyId    (KeywordId(1)),
-            'text     (Sentence("text")),
-            'startPos (0),
-            'endPos   (4)
-          )
-
-          db.drop
-        }
+        (dao findById Some(id)) should be ('defined)
+        (dao findById Some(id)).value should have (
+          'id       (Some(AnnotationId(1))),
+          'docId    (DocumentId(1)),
+          'keyId    (KeywordId(1)),
+          'text     (Sentence("text")),
+          'startPos (0),
+          'endPos   (4)
+        )
       }
 
     }

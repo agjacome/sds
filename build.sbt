@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.webjars"        %% "webjars-play"         % "2.2.1-2" ,
   "com.typesafe.slick" %% "slick"                % "2.0.1"   ,
   "com.typesafe.play"  %% "play-slick"           % "0.6.0.1" ,
-  "com.typesafe.akka"  %% "akka-actor"           % "2.3.1"   ,
+  "com.typesafe.akka"  %% "akka-actor"           % "2.2.4"   ,
   "mysql"              %  "mysql-connector-java" % "5.1.30"  ,
   "com.twitter"        %% "util-collection"      % "6.12.1"
 )
@@ -41,7 +41,7 @@ libraryDependencies ++= Seq(
 // testing dependencies
 libraryDependencies ++= Seq(
   "org.scalatest"     %% "scalatest"    % "2.1.3"   % "test" ,
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.1"   % "test" ,
+  "com.typesafe.akka" %% "akka-testkit" % "2.2.4"   % "test" ,
   "org.mockito"       %  "mockito-all"  % "1.9.5"   % "test" ,
   "com.h2database"    %  "h2"           % "1.3.175" % "test"
 )

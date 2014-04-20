@@ -6,6 +6,7 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
 private[database] trait Tables { this : Profile with Mappers =>
 
+  import profile.DDL
   import profile.simple._
 
   class DocumentsTable(val tag : Tag) extends Table[Document](tag, "documents") {
@@ -50,15 +51,16 @@ private[database] trait Tables { this : Profile with Mappers =>
 
   }
 
-  private lazy val ddl : profile.DDL =
-    TableQuery[DocumentsTable].ddl  ++
-    TableQuery[KeywordsTable].ddl   ++
-    TableQuery[AnnotationsTable].ddl
+  lazy val Documents   = TableQuery[DocumentsTable]
+  lazy val Keywords    = TableQuery[KeywordsTable]
+  lazy val Annotations = TableQuery[AnnotationsTable]
 
-  def create(implicit session : Session) : Unit =
+  lazy val ddl : DDL = Documents.ddl ++ Keywords.ddl ++ Annotations.ddl
+
+  def createTables(implicit session : Session) : Unit =
     ddl.create
 
-  def drop(implicit session : Session) : Unit =
+  def dropTables(implicit session : Session) : Unit =
     ddl.drop
 
 }

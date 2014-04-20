@@ -7,18 +7,14 @@ import scala.concurrent.{ Future, future }
 import abner.Tagger
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 private[annotator] class ABNERAdapter extends NERAdapter {
 
-  private case class Entity(str : String, cat : Category, start : Position, end : Position)
-
   import context._
-  import db.profile.simple._
+  import dbProfile.database
   import ABNERAdapter._
 
-  private[this] val Keywords    = KeywordsDAO()
-  private[this] val Annotations = AnnotationsDAO()
+  private case class Entity(str : String, cat : Category, start : Position, end : Position)
 
   override protected def annotate(document : Document) : Future[Finished] = {
     getEntities(document.text) map { entities =>
@@ -59,19 +55,22 @@ private[annotator] class ABNERAdapter extends NERAdapter {
     insertAnnotation(keyword, annotation)
   }
 
-  private[this] def getKeyword(entity : Entity) : Keyword =
-    (Keywords findByNormalized entity.str) getOrElse (
-      Keywords save Keyword(None, entity.str, entity.cat)
-    )
-
   private[this] def getAnnotation(e : Entity, k : Keyword, d : Document) : Annotation =
     Annotation(None, d.id.get, k.id.get, e.str, e.start, e.end)
 
-  private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit = {
-    val current = (Keywords findById keyword.id).get
-    Annotations save annotation
-    Keywords save (current copy (occurrences = current.occurrences + 1))
-  }
+  private[this] def getKeyword(entity : Entity) : Keyword =
+    database withTransaction { implicit session =>
+      (Keywords findByNormalized entity.str) getOrElse (
+        Keywords save Keyword(None, entity.str, entity.cat)
+      )
+    }
+
+  private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit =
+    database withTransaction { implicit session =>
+      val current = (Keywords findById keyword.id).get
+      Annotations save annotation
+      Keywords save (current copy (occurrences = current.occurrences + 1))
+    }
 
 }
 

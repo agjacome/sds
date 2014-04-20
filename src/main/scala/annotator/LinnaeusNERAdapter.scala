@@ -6,23 +6,18 @@ import scala.concurrent.duration._
 import scala.xml.{ Node, XML }
 
 import play.api.libs.ws.{ WS, Response }
-import play.api.libs.concurrent.Execution.Implicits._
 
 import uk.ac.man.entitytagger.Mention
 import uk.ac.man.entitytagger.matching.{ Matcher, Postprocessor }
 import uk.ac.man.entitytagger.matching.matchers.{ MatchPostProcessor, VariantDictionaryMatcher }
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 private[annotator] class LinnaeusNERAdapter extends NERAdapter {
 
   import context._
-  import db.profile.simple._
+  import dbProfile.database
   import LinnaeusNERAdapter._
-
-  private[this] val Keywords    = KeywordsDAO()
-  private[this] val Annotations = AnnotationsDAO()
 
   private[this] val cache = new com.twitter.util.LruMap[String, Keyword](10)
 
@@ -47,11 +42,12 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
   private[this] def getAnnotation(m : Mention, k : Keyword, d : Document) : Annotation =
     Annotation(None, d.id.get, k.id.get, m.getText, m.getStart, m.getEnd)
 
-  private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit = {
-    val current = (Keywords findById keyword.id).get
-    Annotations save annotation
-    Keywords save (current copy (occurrences = current.occurrences + 1))
-  }
+  private[this] def insertAnnotation(keyword : Keyword, annotation : Annotation) : Unit =
+    database withTransaction { implicit session =>
+      val current = (Keywords findById keyword.id).get
+      Annotations save annotation
+      Keywords save (current copy (occurrences = current.occurrences + 1))
+    }
 
   private[this] def normalize(ncbiId : String) : Future[Keyword] =
     summarize(ncbiId) map {
@@ -66,9 +62,11 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
     }
 
   private[this] def recoverKeyword(normalized : Sentence) : Keyword =
-    (Keywords findByNormalized normalized) getOrElse (
-      Keywords save Keyword(None, normalized, Species)
-    )
+    database withTransaction { implicit session =>
+      (Keywords findByNormalized normalized) getOrElse (
+        Keywords save Keyword(None, normalized, Species)
+      )
+    }
 
 }
 

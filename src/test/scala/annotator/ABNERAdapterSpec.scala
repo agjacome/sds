@@ -2,6 +2,7 @@ package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+
 import akka.actor.{ Actor, PoisonPill, Props }
 
 import play.api.db.slick.DB
@@ -11,7 +12,6 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 private[annotator] trait ABNERSpecSetup extends AnnotatorBaseSpec {
 
@@ -70,38 +70,29 @@ private[annotator] trait ABNERSpecSetup extends AnnotatorBaseSpec {
 
 class ABNERAdapterSpec extends ABNERSpecSetup {
 
+  import dbProfile.{ Annotations, Documents, Keywords }
+  import dbProfile.profile.simple._
+
   "The ABNER Annotator" - {
 
-    "should be able to annotate proteins in a Document" in new WithApplication {
-      DatabaseProfile setProfile DB("test").driver
+    "should be able to annotate proteins in a Document" - {
 
-      val db = DatabaseProfile()
-      import db.profile.simple._
-
-      val Documents   = TableQuery[db.DocumentsTable]
-      val Keywords    = TableQuery[db.KeywordsTable]
-      val Annotations = TableQuery[db.AnnotationsTable]
-
-      DB("test") withSession { implicit session =>
-        forAll (expectations) { (document, keywords, annotations) =>
-          info(s"checking validity of annotations for Document '${document.title}'")
-          db.create
-
-          val abner = system.actorOf(Props[ABNERAdapter])
-          abner ! session
+      forAll (expectations) { (document, keywords, annotations) =>
+        s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
+          DatabaseProfile setDefaultDatabase DB("test")
 
           Documents += document
+          val abner = system.actorOf(Props[ABNERAdapter])
 
           abner ! Annotate(document)
-          expectMsg(20.seconds, Finished(document))
+          expectMsg(10.seconds, Finished(document))
           abner ! PoisonPill
 
           Keywords.list    should contain theSameElementsAs (keywords)
           Annotations.list should contain theSameElementsAs (annotations)
-
-          db.drop
         }
       }
+
     }
 
   }
