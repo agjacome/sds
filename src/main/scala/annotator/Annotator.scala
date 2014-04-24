@@ -1,23 +1,32 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
 import akka.actor._
+
 import play.api.Logger
+import play.api.Configuration
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity.Document
 
 class Annotator extends Actor {
 
-  private lazy val annotators : Seq[ActorRef] = Seq(
-    context.actorOf(Props[ABNERAdapter],       name = "ABNER"),
-    context.actorOf(Props[LinnaeusNERAdapter], name = "Linnaeus"),
-    context.actorOf(Props[OscarNERAdapter],    name = "Oscar")
-  )
+  import play.api.Play.{ current => app }
+
+  private lazy val annotators : Set[ActorRef] =
+    app.configuration getConfig "annotator" match {
+      case Some(cfg) => cfg.keys flatMap (createAnnotator(cfg, _))
+      case None      => Set.empty
+    }
 
   override final def receive : Receive = {
     case document : Document     => annotate(document)
     case Finished(document)      => finished(sender, document)
     case Failed(document, cause) => failed(sender, document, cause)
   }
+
+  private[this] def createAnnotator(config : Configuration, key : String) : Option[ActorRef] =
+    config getString key map {
+      clazz => context actorOf (Props(Class forName clazz), key)
+    }
 
   private[this] def annotate(document : Document) : Unit =
     annotators foreach (_ ! Annotate(document))
