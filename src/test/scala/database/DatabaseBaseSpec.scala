@@ -1,6 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database
 
-import play.api.db.slick.{ DB, Database, Session }
+import play.api.db.slick.{ DB, Session }
 import play.api.test._
 
 import org.scalatest.BeforeAndAfter
@@ -11,14 +11,11 @@ trait DatabaseBaseSpec extends BaseSpec with BeforeAndAfter {
 
   protected lazy val dbProfile = DatabaseProfile()
 
-  protected implicit var dbSession : Session  = _
+  protected implicit var dbSession : Session = _
 
   before {
     new WithApplication {
-      val database = DB("test")
-      dbSession = database.createSession()
-
-      DatabaseProfile setDefaultDatabase database
+      dbSession = DB("test").createSession()
       dbProfile.createTables
     }
   }

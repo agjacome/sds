@@ -5,13 +5,11 @@ import scala.concurrent.duration._
 
 import akka.actor.{ Actor, PoisonPill, Props }
 
-import play.api.db.slick.DB
 import play.api.test._
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 private[annotator] trait ABNERSpecSetup extends AnnotatorBaseSpec {
 
@@ -79,8 +77,6 @@ class ABNERAdapterSpec extends ABNERSpecSetup {
 
       forAll (expectations) { (document, keywords, annotations) =>
         s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
-          DatabaseProfile setDefaultDatabase DB("test")
-
           Documents += document
           val abner = system.actorOf(Props[ABNERAdapter])
 

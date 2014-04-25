@@ -5,13 +5,11 @@ import scala.concurrent.duration._
 
 import akka.actor.{ Actor, PoisonPill, Props }
 
-import play.api.db.slick.DB
 import play.api.test._
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 private[annotator] trait OscarSpecSetup extends AnnotatorBaseSpec {
 
@@ -53,8 +51,6 @@ class OscarNERAdapterSpec extends OscarSpecSetup {
 
       forAll (expectations) { (document, keywords, annotations) =>
         s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
-          DatabaseProfile setDefaultDatabase DB("test")
-
           Documents += document
           val oscar = system.actorOf(Props[OscarNERAdapter])
 

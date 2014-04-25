@@ -5,13 +5,11 @@ import scala.concurrent.duration._
 
 import akka.actor.{ Actor, PoisonPill, Props }
 
-import play.api.db.slick.DB
 import play.api.test._
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 private[annotator] trait LinnaeusSpecSetup extends AnnotatorBaseSpec {
 
@@ -63,8 +61,6 @@ class LinnaeusNERAdapterSpec extends LinnaeusSpecSetup {
 
       forAll (expectations) { (document, keywords, annotations) =>
         s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
-          DatabaseProfile setDefaultDatabase DB("test")
-
           Documents += document
           val linnaeus = system.actorOf(Props[LinnaeusNERAdapter])
 

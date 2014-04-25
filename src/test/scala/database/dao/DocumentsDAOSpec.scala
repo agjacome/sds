@@ -1,7 +1,7 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.{ DatabaseBaseSpec, DatabaseProfile }
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseBaseSpec
 
 class DocumentsDAOSpec extends DatabaseBaseSpec {
 
