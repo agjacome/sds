@@ -1,10 +1,15 @@
 import sbt._
+import sbtscalaxb.Plugin._
+
 import Keys._
+import ScalaxbKeys._
+
 import play.Project._
+
 
 object Build {
 
-  lazy val settings = playScalaSettings ++ Seq(
+  lazy val settings = playScalaSettings ++ scalaxbSettings ++ Seq(
     confDirectory := baseDirectory.value / "conf",
 
     sourceDirectory   in Compile := baseDirectory.value / "src/main",
@@ -18,6 +23,10 @@ object Build {
     resourceDirectory in Test := baseDirectory.value / "src/test/resources",
 
     playAssetsDirectories := Seq(baseDirectory.value / "src/main/webapp")
+  ) ++ Seq(
+    sourceGenerators in Compile <+= scalaxb in Compile,
+
+    packageName in scalaxb in Compile := "soap"
   )
 
 }

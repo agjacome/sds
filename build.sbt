@@ -30,12 +30,13 @@ libraryDependencies ++= Seq(
 
 // scala/java dependencies
 libraryDependencies ++= Seq(
-  "org.webjars"        %% "webjars-play"         % "2.2.1-2" ,
-  "com.typesafe.slick" %% "slick"                % "2.0.1"   ,
-  "com.typesafe.play"  %% "play-slick"           % "0.6.0.1" ,
-  "com.typesafe.akka"  %% "akka-actor"           % "2.2.4"   ,
-  "mysql"              %  "mysql-connector-java" % "5.1.30"  ,
-  "com.twitter"        %% "util-collection"      % "6.12.1"
+  "org.webjars"             %% "webjars-play"         % "2.2.1-2" ,
+  "com.typesafe.slick"      %% "slick"                % "2.0.1"   ,
+  "com.typesafe.play"       %% "play-slick"           % "0.6.0.1" ,
+  "com.typesafe.akka"       %% "akka-actor"           % "2.2.4"   ,
+  "mysql"                   %  "mysql-connector-java" % "5.1.30"  ,
+  "com.twitter"             %% "util-collection"      % "6.12.1"  ,
+  "net.databinder.dispatch" %% "dispatch-core"        % "0.11.0"
 )
 
 // testing dependencies

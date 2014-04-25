@@ -3,15 +3,13 @@ package es.uvigo.esei.tfg.smartdrugsearch.annotator
 import scala.collection.JavaConversions._
 import scala.concurrent.{ Await, Future, future }
 import scala.concurrent.duration._
-import scala.xml.{ Node, XML }
-
-import play.api.libs.ws.{ WS, Response }
 
 import uk.ac.man.entitytagger.Mention
 import uk.ac.man.entitytagger.matching.{ Matcher, Postprocessor }
 import uk.ac.man.entitytagger.matching.matchers.{ MatchPostProcessor, VariantDictionaryMatcher }
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.util.EUtils._
 
 private[annotator] class LinnaeusNERAdapter extends NERAdapter {
 
@@ -50,15 +48,8 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
     }
 
   private[this] def normalize(ncbiId : String) : Future[Keyword] =
-    summarize(ncbiId) map {
-      summary => recoverKeyword(
-        (summary \\ "Item" filter { _ \\ "@Name" exists (_.text == "ScientificName") }).text
-      )
-    }
-
-  private[this] def summarize(ncbiId : String) : Future[Node] =
-    (webService withQueryString ("id" -> ncbiId)).get map {
-      res => (XML.loadString(res.body) \\ "DocSum").head
+    future { taxonomyScientificName(ncbiId) } map {
+      name => recoverKeyword(Sentence(name getOrElse s"NCBI Taxonomy ID: ${ncbiId}"))
     }
 
   private[this] def recoverKeyword(normalized : Sentence) : Keyword =
@@ -91,10 +82,6 @@ private object LinnaeusNERAdapter {
     null,
     new Postprocessor(Array(stopList), Array(synonyms), Array(frequencies), null, null)
   )
-
-  private lazy val webService = WS.url(
-    "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
-  ) withQueryString ("db" -> "taxonomy")
 
 }
 
