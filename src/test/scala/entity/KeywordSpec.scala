@@ -8,7 +8,7 @@ class KeywordSpec extends BaseSpec {
 
     "can be constructed" - {
       "by using an Optional KeywordId, a Sentence as normalized text, a Category and number of occurrences" in {
-        val keyOne = Keyword(None, Sentence.Empty, Drug)
+        val keyOne = Keyword(normalized = Sentence.Empty, category = Drug)
         keyOne should have (
           'id          (None),
           'normalized  (Sentence.Empty),

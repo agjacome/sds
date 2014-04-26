@@ -8,7 +8,7 @@ class AnnotationSpec extends BaseSpec {
 
     "can be constructed" - {
       "by using an Optional AnnotationId, a DocumentId, a KeywordId, a Sentence as original text and start and ending absoulte positions inside document's text" in {
-        val annotOne = Annotation(None, 10, 13, Sentence.Empty, 0, 1)
+        val annotOne = Annotation(docId = 10, keyId = 13, text = Sentence.Empty, startPos = 0, endPos = 1)
         annotOne should have (
           'id       (None),
           'docId    (DocumentId(10)),

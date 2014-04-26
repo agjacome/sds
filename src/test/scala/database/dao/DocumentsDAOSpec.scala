@@ -15,32 +15,36 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
     "should be able to perform operations in the Documents table" - {
 
       "insert a new Document" in {
-        dao save Document(None, "title", "text")
+        dao save Document(title = "title", text ="text")
 
         Documents.list should have size 1
         Documents.first should have (
-          'id    (Some(DocumentId(1))),
-          'title (Sentence("title")),
-          'text  ("text")
+          'id        (Some(DocumentId(1))),
+          'title     (Sentence("title")),
+          'text      ("text"),
+          'annotated (false),
+          'pubmedId  (None)
         )
       }
 
       "update an existing Document" in {
-        Documents += Document(None, "my title", "my text")
+        Documents += Document(title = "my title", text = "my text")
         val document = Documents.first
 
-        dao save document.copy(title = "my updated title", text = "my updated text")
+        dao save document.copy(title = "my updated title", text = "my updated text", annotated = true)
 
         Documents.list should have size 1
         Documents.first should have (
-          'id    (Some(DocumentId(1))),
-          'title (Sentence("my updated title")),
-          'text  ("my updated text")
+          'id        (Some(DocumentId(1))),
+          'title     (Sentence("my updated title")),
+          'text      ("my updated text"),
+          'annotated (true),
+          'pubmedId  (None)
         )
       }
 
       "delete an existing Document" in {
-        Documents += Document(None, "title", "text")
+        Documents += Document(title = "title", text = "text")
         val document = Documents.first
 
         dao delete document
@@ -49,28 +53,55 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
       }
 
       "check if it contains a Document" in {
-        Documents += Document(None, "title", "text")
+        Documents += Document(title = "title", text = "text")
         val document = Documents.first
 
         (dao contains document) should be (true)
       }
 
       "find an existing Document by its ID" in {
-        Documents += Document(None, "title", "text")
+        Documents += Document(title = "title", text = "text")
         val id = (Documents map (_.id)).first
 
         (dao findById id) should be ('defined)
         (dao findById id).value should have (
-          'id    (Some(DocumentId(id))),
-          'title (Sentence("title")),
-          'text  ("text")
+          'id        (Some(DocumentId(id))),
+          'title     (Sentence("title")),
+          'text      ("text"),
+          'annotated (false),
+          'pubmedId  (None)
         )
 
         (dao findById Some(id)) should be ('defined)
         (dao findById Some(id)).value should have (
-          'id    (Some(DocumentId(id))),
-          'title (Sentence("title")),
-          'text  ("text")
+          'id        (Some(DocumentId(id))),
+          'title     (Sentence("title")),
+          'text      ("text"),
+          'annotated (false),
+          'pubmedId  (None)
+        )
+      }
+
+      "find an existing document by its PumbedID" in {
+        Documents += Document(title = "title", text = "text", pubmedId = Some(12))
+        val id = PubmedId(12)
+
+        (dao findByPubmedId id) should be ('defined)
+        (dao findByPubmedId id).value should have (
+          'id        (Some(DocumentId(1))),
+          'title     (Sentence("title")),
+          'text      ("text"),
+          'annotated (false),
+          'pubmedId  (Some(id))
+        )
+
+        (dao findByPubmedId Some(id)) should be ('defined)
+        (dao findByPubmedId Some(id)).value should have (
+          'id        (Some(DocumentId(1))),
+          'title     (Sentence("title")),
+          'text      ("text"),
+          'annotated (false),
+          'pubmedId  (Some(id))
         )
       }
 

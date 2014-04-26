@@ -7,19 +7,23 @@ class DocumentSpec extends BaseSpec {
   "A Document" - {
 
     "can be constructed" - {
-      "by using an Optional DocumentId, a Sentence as title, and a String as text" in {
-        val docOne = Document(None, Sentence.Empty, "text")
+      "by using an Optional DocumentId, a Sentence as title, a String as text, a Boolean as an annotated flag, and an Optional PubmedId" in {
+        val docOne = Document(title = Sentence.Empty, text ="text")
         docOne should have (
-          'id    (None),
-          'title (Sentence.Empty),
-          'text  ("text")
+          'id         (None),
+          'title      (Sentence.Empty),
+          'text       ("text"),
+          'annotated  (false),
+          'pubmedId   (None)
         )
 
-        val docTwo = Document(Some(1), "my title", "my text document body")
-        docTwo should have (
-          'id    (Some(DocumentId(1))),
-          'title (Sentence("my title")),
-          'text  ("my text document body")
+        val docTwo = Document(Some(1), "my title", "my text document body", true, Some(123))
+        docTwo       should have (
+          'id        (Some(DocumentId(1))),
+          'title     (Sentence("my title")),
+          'text      ("my text document body"),
+          'annotated (true),
+          'pubmedId  (Some(PubmedId(123)))
         )
       }
     }

@@ -11,11 +11,13 @@ private[database] trait Tables { this : Profile with Mappers =>
 
   class DocumentsTable(val tag : Tag) extends Table[Document](tag, "documents") {
 
-    def id    = column[DocumentId]("id", O.PrimaryKey, O.AutoInc)
-    def title = column[Sentence]("title", O.NotNull)
-    def text  = column[String]("text", O.NotNull, O.DBType("TEXT"))
+    def id        = column[DocumentId]("id", O.PrimaryKey, O.AutoInc)
+    def title     = column[Sentence]("title", O.NotNull)
+    def text      = column[String]("text", O.NotNull, O.DBType("TEXT"))
+    def annotated = column[Boolean]("annotated", O.NotNull)
+    def pubmedId  = column[PubmedId]("pubmed_id", O.Nullable)
 
-    def * = (id.?, title, text) <> (Document.tupled, Document.unapply)
+    def * = (id.?, title, text, annotated, pubmedId.?) <> (Document.tupled, Document.unapply)
 
   }
 
@@ -41,11 +43,8 @@ private[database] trait Tables { this : Profile with Mappers =>
     def start = column[Position]("start", O.NotNull)
     def end   = column[Position]("end", O.NotNull)
 
-    private val docs = TableQuery[DocumentsTable]
-    private val keys = TableQuery[KeywordsTable]
-
-    def document = foreignKey("Document_FK", docId, docs)(_.id, Cascade, Cascade)
-    def keyword  = foreignKey("Keyword_FK", keyId, keys)(_.id, Cascade, Cascade)
+    def document = foreignKey("Document_FK", docId, Documents)(_.id, Cascade, Cascade)
+    def keyword  = foreignKey("Keyword_FK", keyId, Keywords)(_.id, Cascade, Cascade)
 
     def * = (id.?, docId, keyId, text, start, end) <> (Annotation.tupled, Annotation.unapply)
 

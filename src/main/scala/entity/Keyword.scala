@@ -4,7 +4,7 @@ final case class KeywordId (value : Long) extends Identifier
 final object     KeywordId extends IdentifierCompanion[KeywordId]
 
 case class Keyword (
-  val id          : Option[KeywordId],
+  val id          : Option[KeywordId] = None,
   val normalized  : Sentence,
   val category    : Category,
   val occurrences : Long = 0

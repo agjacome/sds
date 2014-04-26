@@ -3,7 +3,6 @@ package es.uvigo.esei.tfg.smartdrugsearch
 import akka.actor._
 
 import play.api._
-import play.api.db.slick.DB
 import play.libs.Akka.system
 
 import es.uvigo.esei.tfg.smartdrugsearch.annotator.Annotator
