@@ -1,5 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database
 
+import scala.slick.jdbc.meta.MTable
 import play.api.db.slick.Profile
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
@@ -55,6 +56,9 @@ private[database] trait Tables { this : Profile with Mappers =>
   lazy val Annotations = TableQuery[AnnotationsTable]
 
   lazy val ddl : DDL = Documents.ddl ++ Keywords.ddl ++ Annotations.ddl
+
+  def isDatabaseEmpty(implicit session : Session) : Boolean =
+    MTable.getTables.list.isEmpty
 
   def createTables(implicit session : Session) : Unit =
     ddl.create
