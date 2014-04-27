@@ -7,7 +7,7 @@ package object util {
   object EUtils {
 
     import scalaxb._
-    import soap._
+    import scalaxb.generated._
 
     lazy val service = (new EUtilsServiceSoapBindings with Soap11Clients with DispatchHttpClients { }).service
 

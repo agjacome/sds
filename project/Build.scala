@@ -6,7 +6,6 @@ import ScalaxbKeys._
 
 import play.Project._
 
-
 object Build {
 
   lazy val settings = playScalaSettings ++ scalaxbSettings ++ Seq(
@@ -26,7 +25,9 @@ object Build {
   ) ++ Seq(
     sourceGenerators in Compile <+= scalaxb in Compile,
 
-    packageName in scalaxb in Compile := "soap"
+    packageName in scalaxb in Compile := "scalaxb.generated",
+    wsdlSource  in scalaxb in Compile := baseDirectory.value / "src/main/resources/wsdl",
+    xsdSource   in scalaxb in Compile := baseDirectory.value / "src/main/resources/xsd"
   )
 
 }
