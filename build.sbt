@@ -8,7 +8,7 @@ versionWithGit
 
 git.baseVersion := "0.1"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
 // enable deprecation, feature and unchecked warnings info on compile
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
@@ -56,7 +56,7 @@ Build.settings
 // macros sub-project and main project with dependency on it
 lazy val macros = project.in(file("macros")).settings(
   libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % "2.10.4",
+    "org.scala-lang"  % "scala-reflect" % "2.10.4",
     "org.scalatest"  %% "scalatest"     % "2.1.3"   % "test" 
   )
 )

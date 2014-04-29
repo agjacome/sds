@@ -23,8 +23,8 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         Annotations.list should have size 1
         Annotations.first should have (
           'id       (Some(AnnotationId(1))),
-          'docId    (DocumentId(1)),
-          'keyId    (KeywordId(1)),
+          'docId    (1),
+          'keyId    (1),
           'text     (Sentence("text")),
           'startPos (0),
           'endPos   (4)
@@ -42,8 +42,8 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         Annotations.list should have size 1
         Annotations.first should have (
           'id       (Some(AnnotationId(1))),
-          'docId    (DocumentId(1)),
-          'keyId    (KeywordId(1)),
+          'docId    (1),
+          'keyId    (1),
           'text     (Sentence("text updated")),
           'startPos (0),
           'endPos   (4)
@@ -79,8 +79,8 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         (dao findById id) should be ('defined)
         (dao findById id).value should have (
           'id       (Some(AnnotationId(1))),
-          'docId    (DocumentId(1)),
-          'keyId    (KeywordId(1)),
+          'docId    (1),
+          'keyId    (1),
           'text     (Sentence("text")),
           'startPos (0),
           'endPos   (4)
@@ -89,8 +89,8 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         (dao findById Some(id)) should be ('defined)
         (dao findById Some(id)).value should have (
           'id       (Some(AnnotationId(1))),
-          'docId    (DocumentId(1)),
-          'keyId    (KeywordId(1)),
+          'docId    (1),
+          'keyId    (1),
           'text     (Sentence("text")),
           'startPos (0),
           'endPos   (4)

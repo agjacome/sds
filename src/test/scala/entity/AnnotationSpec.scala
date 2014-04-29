@@ -11,8 +11,8 @@ class AnnotationSpec extends BaseSpec {
         val annotOne = Annotation(docId = 10, keyId = 13, text = Sentence.Empty, startPos = 0, endPos = 1)
         annotOne should have (
           'id       (None),
-          'docId    (DocumentId(10)),
-          'keyId    (KeywordId(13)),
+          'docId    (10),
+          'keyId    (13),
           'text     (Sentence.Empty),
           'startPos (0),
           'endPos   (1)
@@ -21,8 +21,8 @@ class AnnotationSpec extends BaseSpec {
         val annotTwo = Annotation(Some(17), 1, 2, "a sentence", 3, 9)
         annotTwo should have (
           'id       (Some(AnnotationId(17))),
-          'docId    (DocumentId(1)),
-          'keyId    (KeywordId(2)),
+          'docId    (1),
+          'keyId    (2),
           'text     (Sentence("a sentence")),
           'startPos (3),
           'endPos   (9)

@@ -2,10 +2,10 @@ package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
-class IdentifierSpec extends BaseSpec {
+private case class TestId(value : Long) extends AnyVal with Identifier
+private object TestId extends IdentifierCompanion[TestId]
 
-  private case class TestId(value : Long) extends Identifier
-  private object TestId extends IdentifierCompanion[TestId]
+class IdentifierSpec extends BaseSpec {
 
   "An Identifier" - {
 

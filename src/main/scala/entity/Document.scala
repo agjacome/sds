@@ -1,9 +1,9 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
-final case class DocumentId (value : Long) extends Identifier
+final case class DocumentId (value : Long) extends AnyVal with Identifier
 final object     DocumentId extends IdentifierCompanion[DocumentId]
 
-final case class PubmedId (value : Long) extends Identifier
+final case class PubmedId (value : Long) extends AnyVal with Identifier
 final object     PubmedId extends IdentifierCompanion[PubmedId]
 
 case class Document (

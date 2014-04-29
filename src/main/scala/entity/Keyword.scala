@@ -1,6 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
-final case class KeywordId (value : Long) extends Identifier
+final case class KeywordId (value : Long) extends AnyVal with Identifier
 final object     KeywordId extends IdentifierCompanion[KeywordId]
 
 case class Keyword (

@@ -4,7 +4,7 @@ import scala.slick.lifted.MappedTo
 
 import play.api.mvc.{ PathBindable, QueryStringBindable }
 
-private[entity] trait Identifier extends MappedTo[Long]
+private[entity] trait Identifier extends Any with MappedTo[Long]
 
 private[entity] abstract class IdentifierCompanion[I <: Identifier] extends (Long => I) {
 

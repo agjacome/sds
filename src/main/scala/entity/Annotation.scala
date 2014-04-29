@@ -1,6 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
-final case class AnnotationId (value : Long) extends Identifier
+final case class AnnotationId (value : Long) extends AnyVal with Identifier
 final object     AnnotationId extends IdentifierCompanion[AnnotationId]
 
 case class Annotation (
