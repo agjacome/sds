@@ -25,9 +25,10 @@ object Build {
   ) ++ Seq(
     sourceGenerators in Compile <+= scalaxb in Compile,
 
-    packageName in scalaxb in Compile := "scalaxb.generated",
-    wsdlSource  in scalaxb in Compile := baseDirectory.value / "src/main/resources/wsdl",
-    xsdSource   in scalaxb in Compile := baseDirectory.value / "src/main/resources/xsd"
+    packageName  in scalaxb in Compile := "scalaxb.generated",
+    wsdlSource   in scalaxb in Compile := baseDirectory.value / "src/main/resources/wsdl",
+    xsdSource    in scalaxb in Compile := baseDirectory.value / "src/main/resources/xsd",
+    wrapContents in scalaxb in Compile += "{http://www.ncbi.nlm.nih.gov/soap/eutils/efetch_pubmed}MedlineCitationType"
   )
 
 }

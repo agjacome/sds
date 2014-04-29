@@ -17,3 +17,5 @@ src/main/resources/*
 !src/main/resources/.gitkeep
 !src/main/resources/linnaeus.tar.lzma
 !src/main/resources/abner.tar.lzma
+!src/main/resources/wsdl
+!src/main/resources/xsd

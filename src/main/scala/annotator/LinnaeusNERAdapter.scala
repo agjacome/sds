@@ -17,7 +17,7 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
   import dbProfile.database
   import LinnaeusNERAdapter._
 
-  private[this] val cache = new com.twitter.util.LruMap[String, Keyword](10)
+  private[this] val cache = new com.twitter.util.LruMap[Long, Keyword](10)
 
   override protected def annotate(document : Document) : Future[Finished] =
     obtainMentions(document.text) map { mentions =>
@@ -29,12 +29,12 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
     future { linnaeusProcessor `match` text }
 
   private[this] def saveMention(mention : Mention, document : Document) : Unit = {
-    val keyword    = getKeyword(mention.getMostProbableID.split(":").last)
+    val keyword    = getKeyword(mention.getMostProbableID.split(":").last.toLong)
     val annotation = getAnnotation(mention, keyword, document)
     insertAnnotation(keyword, annotation)
   }
 
-  private[this] def getKeyword(ncbiId : String) : Keyword =
+  private[this] def getKeyword(ncbiId : Long) : Keyword =
     cache getOrElseUpdate (ncbiId, Await.result(normalize(ncbiId), 10.seconds))
 
   private[this] def getAnnotation(m : Mention, k : Keyword, d : Document) : Annotation =
@@ -47,7 +47,7 @@ private[annotator] class LinnaeusNERAdapter extends NERAdapter {
       Keywords save (current copy (occurrences = current.occurrences + 1))
     }
 
-  private[this] def normalize(ncbiId : String) : Future[Keyword] =
+  private[this] def normalize(ncbiId : Long) : Future[Keyword] =
     future { taxonomyScientificName(ncbiId) } map {
       name => recoverKeyword(Sentence(name getOrElse s"NCBI Taxonomy ID: ${ncbiId}"))
     }
