@@ -7,8 +7,8 @@ import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 object Global extends GlobalSettings {
 
-  override def onStart(app : Application) : Unit =
-    DatabaseProfile setDefaultDatabase DB("test")(app)
+  override def onStart(app : Application) =
+    DatabaseProfile.database = DB("test")(app)
 
 }
 

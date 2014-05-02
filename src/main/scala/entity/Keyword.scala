@@ -1,13 +1,13 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 final case class KeywordId (value : Long) extends AnyVal with Identifier
-final object     KeywordId extends IdentifierCompanion[KeywordId]
+           object KeywordId extends IdentifierCompanion[KeywordId]
 
 case class Keyword (
-  val id          : Option[KeywordId] = None,
-  val normalized  : Sentence,
-  val category    : Category,
-  val occurrences : Long = 0
+  id          : Option[KeywordId] = None,
+  normalized  : Sentence,
+  category    : Category,
+  occurrences : Long = 0
 ) {
 
   require(occurrences >= 0, "Number of occurrences must be non-negative")

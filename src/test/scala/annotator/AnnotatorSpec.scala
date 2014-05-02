@@ -1,13 +1,9 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import akka.actor.{ PoisonPill, Props }
 
-import akka.actor.{ Actor, PoisonPill, Props }
-
-import play.api.test._
-
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
@@ -83,11 +79,11 @@ class AnnotatorSpec extends AnnotatorSpecSetup {
 
           val expectedKeywords  = keywords      map { k => (k.normalized, k.category, k.occurrences) }
           val actualKeywords    = Keywords.list map { k => (k.normalized, k.category, k.occurrences) }
-          expectedKeywords should contain theSameElementsAs (actualKeywords)
+          expectedKeywords should contain theSameElementsAs actualKeywords
 
           val expectedAnnotations = annotations      map { a => (a.text, a.startPos, a.endPos) }
           val actualAnnotations   = Annotations.list map { a => (a.text, a.startPos, a.endPos) }
-          expectedAnnotations should contain theSameElementsAs (actualAnnotations)
+          expectedAnnotations should contain theSameElementsAs actualAnnotations
 
           (Documents map (_.annotated)).first should be (true)
         }
@@ -96,13 +92,13 @@ class AnnotatorSpec extends AnnotatorSpecSetup {
     }
 
     "should not annotate already annotated Documents" in new WithApplication {
-      Documents += Document(title = "already annotated document", text = "the text of an already annotated document", annotated = true)
+      Documents += Document(title = "annotated document", text = "an already annotated document", annotated = true)
       val document = Documents.first
 
       val annotator = system.actorOf(Props[Annotator], "Annotator")
 
       annotator ! document
-      expectNoMsg(10.second)
+      expectNoMsg()
       annotator ! PoisonPill
 
       Keywords.list    should be ('empty)

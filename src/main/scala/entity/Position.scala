@@ -2,8 +2,6 @@ package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import scala.slick.lifted.MappedTo
 
-import play.api.mvc.{ PathBindable, QueryStringBindable }
-
 final class Position (val value : Long) extends AnyVal with Ordered[Position] with MappedTo[Long] {
 
   def compare(that : Position) : Int =
@@ -11,7 +9,7 @@ final class Position (val value : Long) extends AnyVal with Ordered[Position] wi
 
 }
 
-final object Position extends (Long => Position) {
+object Position extends (Long => Position) {
 
   import scala.language.implicitConversions
 

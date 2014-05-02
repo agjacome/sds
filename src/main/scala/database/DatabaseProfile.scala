@@ -1,25 +1,22 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database
 
-import scala.slick.driver.JdbcProfile
 import play.api.db.slick.{ Database, DB, Profile }
+import scala.slick.driver.JdbcProfile
 
-class DatabaseProfile private (val database : Database) extends Profile with Mappers with Tables {
-
-  val profile : JdbcProfile = database.driver
-
-}
+class DatabaseProfile private (val profile : JdbcProfile) extends Profile with Mappers with Tables
 
 object DatabaseProfile extends (() => DatabaseProfile) {
 
-  import play.api.Play.current
+  private var _database : Option[Database] = None
 
-  private var database : Option[Database] = None
+  def apply( ) : DatabaseProfile =
+    new DatabaseProfile(database.driver)
 
-  def apply : DatabaseProfile =
-    new DatabaseProfile(database getOrElse DB)
+  def database : Database =
+    _database getOrElse DB(play.api.Play.current)
 
-  def setDefaultDatabase(database : Database) : Unit =
-    this.database = Some(database)
+  def database_=(database : Database) : Unit =
+    _database = Some(database)
 
 }
 

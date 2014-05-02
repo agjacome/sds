@@ -16,10 +16,9 @@ case object CellType extends Category { val id = 9 }
 
 object Category extends ((String) => Category) {
 
-  private lazy val values : Set[Category] = SealedValues.from[Category]
-
-  private lazy val fromInt : Map[Int   , Category] = (values map { v => (v.id, v) }).toMap
-  private lazy val fromStr : Map[String, Category] = (values map { v => (v.toString.toLowerCase, v) }).toMap
+  private lazy val values  = SealedValues.from[Category]
+  private lazy val fromInt = (values map { v => (v.id, v) }).toMap
+  private lazy val fromStr = (values map { v => (v.toString.toLowerCase, v) }).toMap
 
   def apply(id : Int) : Category =
     fromInt(id)
@@ -28,3 +27,4 @@ object Category extends ((String) => Category) {
     fromStr(str.toLowerCase)
 
 }
+

@@ -28,8 +28,9 @@ object SealedValues {
 
       Apply(Select(
         reify(Set).tree, newTermName("apply")
-      ), children.map(sourceModuleRef(_)))
+      ), children map (sourceModuleRef(_)))
     }
   }
 
 }
+

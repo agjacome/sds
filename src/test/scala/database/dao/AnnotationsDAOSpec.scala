@@ -167,23 +167,23 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         Annotations += Annotation(None, 1, 1, "text2", 0, 4)
         val document = Document(Some(1), "title", "text")
 
-        (dao findByDocument document) should have size (2)
-        (dao findByDocument document) should contain theSameElementsAs (Seq(
+        (dao findByDocument document) should have size 2
+        (dao findByDocument document) should contain theSameElementsAs Seq(
           Annotation(Some(1), 1, 1, "text1", 0, 4),
           Annotation(Some(2), 1, 1, "text2", 0, 4)
-        ))
+        )
 
-        (dao findByDocumentId document.id) should have size (2)
-        (dao findByDocumentId document.id) should contain theSameElementsAs (Seq(
+        (dao findByDocumentId document.id) should have size 2
+        (dao findByDocumentId document.id) should contain theSameElementsAs Seq(
           Annotation(Some(1), 1, 1, "text1", 0, 4),
           Annotation(Some(2), 1, 1, "text2", 0, 4)
-        ))
+        )
 
-        (dao findByDocumentId document.id.get) should have size (2)
-        (dao findByDocumentId document.id.get) should contain theSameElementsAs (Seq(
+        (dao findByDocumentId document.id.get) should have size 2
+        (dao findByDocumentId document.id.get) should contain theSameElementsAs Seq(
           Annotation(Some(1), 1, 1, "text1", 0, 4),
           Annotation(Some(2), 1, 1, "text2", 0, 4)
-        ))
+        )
       }
 
       "find which Annotations reference a given Keyword" in {
@@ -193,23 +193,23 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         Annotations += Annotation(None, 1, 1, "text2", 0, 4)
         val keyword = Keyword(Some(1), "keyword", Drug)
 
-        (dao findByKeyword keyword) should have size (2)
-        (dao findByKeyword keyword) should contain theSameElementsAs (Seq(
+        (dao findByKeyword keyword) should have size 2
+        (dao findByKeyword keyword) should contain theSameElementsAs Seq(
           Annotation(Some(1), 1, 1, "text1", 0, 4),
           Annotation(Some(2), 1, 1, "text2", 0, 4)
-        ))
+        )
 
-        (dao findByKeywordId keyword.id) should have size (2)
-        (dao findByKeywordId keyword.id) should contain theSameElementsAs (Seq(
+        (dao findByKeywordId keyword.id) should have size 2
+        (dao findByKeywordId keyword.id) should contain theSameElementsAs Seq(
           Annotation(Some(1), 1, 1, "text1", 0, 4),
           Annotation(Some(2), 1, 1, "text2", 0, 4)
-        ))
+        )
 
-        (dao findByKeywordId keyword.id.get) should have size (2)
-        (dao findByKeywordId keyword.id.get) should contain theSameElementsAs (Seq(
+        (dao findByKeywordId keyword.id.get) should have size 2
+        (dao findByKeywordId keyword.id.get) should contain theSameElementsAs Seq(
           Annotation(Some(1), 1, 1, "text1", 0, 4),
           Annotation(Some(2), 1, 1, "text2", 0, 4)
-        ))
+        )
       }
 
     }

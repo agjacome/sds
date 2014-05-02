@@ -90,8 +90,8 @@ class SentenceSpec extends BaseSpec {
         Sentence("a sentence")       should equal (Sentence("a sentence"))
         Sentence("another sentence") should equal (Sentence("another sentence"))
 
-        Sentence("a sentence")       should not equal (Sentence("another sentence"))
-        Sentence("another sentence") should not equal (Sentence("a sentence"))
+        Sentence("a sentence")       should not equal Sentence("another sentence")
+        Sentence("another sentence") should not equal Sentence("a sentence")
       }
       "ignoring spaces between words" in {
         Sentence("  a \n\n sentence\t") should equal (Sentence("a sentence"))

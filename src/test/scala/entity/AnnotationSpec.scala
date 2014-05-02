@@ -32,15 +32,9 @@ class AnnotationSpec extends BaseSpec {
 
     "should throw an IllegalArgumentException" - {
       "when constructed with an Starting Position bigger than the Ending Position" in {
-        a [IllegalArgumentException] should be thrownBy {
-          Annotation(None, 0, 0, Sentence.Empty, 1, 0)
-        }
-        a [IllegalArgumentException] should be thrownBy {
-          Annotation(Some(3), 1, 0, "a sentence", 1, 1)
-        }
-        a [IllegalArgumentException] should be thrownBy {
-          Annotation(Some(5), 0, 3, "another sentence", 10, 5)
-        }
+        a [IllegalArgumentException] should be thrownBy { Annotation(None, 0, 0, Sentence.Empty, 1, 0)         }
+        a [IllegalArgumentException] should be thrownBy { Annotation(Some(3), 1, 0, "a sentence", 1, 1)        }
+        a [IllegalArgumentException] should be thrownBy { Annotation(Some(5), 0, 3, "another sentence", 10, 5) }
       }
     }
 

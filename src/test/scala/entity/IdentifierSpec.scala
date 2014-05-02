@@ -39,9 +39,9 @@ class IdentifierSpec extends BaseSpec {
         val idTwo   = TestId(10)
         val idThree = TestId(-1)
 
-        idOne should be < (idTwo)
-        idOne should be > (idThree)
-        idTwo should be > (idThree)
+        idOne should be < idTwo
+        idOne should be > idThree
+        idTwo should be > idThree
       }
     }
 
@@ -53,7 +53,7 @@ class IdentifierSpec extends BaseSpec {
         val ten : Long = TestId(10)
         ten should be (10)
       }
-      "explicitly with the 'value' attribute" in {
+      "explicitly by extracting the 'value' field" in {
         val one : Long = TestId(1).value
         one should be (1)
 

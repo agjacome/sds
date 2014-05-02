@@ -45,7 +45,7 @@ class EUtilsSpec extends BaseSpec {
 
     "can fetch articles from the PubMed database given a list of Pubmed IDs" in {
       val articles = EUtils fetchPubMedArticles Seq(9997, 17284678)
-      articles should have size (2)
+      articles should have size 2
 
       articles should contain theSameElementsAs List(
         (

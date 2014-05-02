@@ -29,9 +29,9 @@ class PositionSpec extends BaseSpec {
         val posTwo   = Position(1)
         val posThree = Position(10)
 
-        posOne should be < posTwo
-        posTwo should be < posThree
-        posOne should be < posThree
+        posOne should be <  posTwo
+        posTwo should be <  posThree
+        posOne should be <  posThree
         posTwo should be >= posOne
         posOne should be <= posTwo
       }

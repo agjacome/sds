@@ -16,7 +16,7 @@ private[database] trait Tables { this : Profile with Mappers =>
     def title     = column[Sentence]("title", O.NotNull)
     def text      = column[String]("text", O.NotNull, O.DBType("TEXT"))
     def annotated = column[Boolean]("annotated", O.NotNull)
-    def pubmedId  = column[PubmedId]("pubmed_id", O.Nullable)
+    def pubmedId  = column[PubMedId]("pubmed_id", O.Nullable)
 
     def * = (id.?, title, text, annotated, pubmedId.?) <> (Document.tupled, Document.unapply)
 
@@ -60,10 +60,10 @@ private[database] trait Tables { this : Profile with Mappers =>
   def isDatabaseEmpty(implicit session : Session) : Boolean =
     MTable.getTables.list.isEmpty
 
-  def createTables(implicit session : Session) : Unit =
+  def createTables( )(implicit session : Session) : Unit =
     ddl.create
 
-  def dropTables(implicit session : Session) : Unit =
+  def dropTables( )(implicit session : Session) : Unit =
     ddl.drop
 
 }

@@ -4,34 +4,28 @@ import scala.collection.concurrent.TrieMap
 import akka.actor._
 
 import play.api.Logger
-import play.api.Configuration
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity.Document
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 class Annotator extends Actor {
 
   import play.api.Play.{ current => app }
+  import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 
-  // map of (Document -> (FinishedAnnotatorsCounter, HasAnyAnnotatorFailed?))
-  private[this] lazy val finished = TrieMap[Document, (Int, Boolean)]()
-
-  private lazy val dbProfile   = DatabaseProfile()
-  private lazy val Annotations = AnnotationsDAO()
-  private lazy val Documents   = DocumentsDAO()
-  private lazy val Keywords    = KeywordsDAO()
-
-  private lazy val annotators : Set[ActorRef] =
-    app.configuration getConfig "annotator" match {
-      case Some(cfg) => cfg.keys flatMap { createAnnotator(cfg, _) }
-      case None      => Set.empty
+  private[this] val annotators = app.configuration getConfig "annotator" match {
+    case None         => Set.empty
+    case Some(config) => config.keys map {
+      key => context actorOf (Props(Class forName config.getString(key).get), key)
     }
+  }
 
-  private def createAnnotator(config : Configuration, key : String) : Option[ActorRef] =
-    config getString key map {
-      clazz => context actorOf (Props(Class forName clazz), key)
-    }
+  // map of (Document -> (CompletedAnnotatorsCounter, HasAnyAnnotatorFailed?))
+  private[this] lazy val completed = TrieMap[Document, (Int, Boolean)]()
+
+  private[this] lazy val annotations = AnnotationsDAO()
+  private[this] lazy val documents   = DocumentsDAO()
+  private[this] lazy val keywords    = KeywordsDAO()
 
 
   override final def receive : Receive = {
@@ -41,38 +35,39 @@ class Annotator extends Actor {
   }
 
 
-  private[this] def annotate(document : Document) : Unit =
-    if (document.annotated) Logger.warn(s"[${self.path.name}] Ignoring already annotated: ${document.title}")
-    else {
+  private[this] def annotate(document : Document) =
+    if (!document.annotated) {
       begin(document)
       annotators foreach { _ ! Annotate(document) }
-    }
+    } else Logger.warn(s"[${self.path.name}] Ignoring already annotated: ${document.title}")
 
-  private[this] def finished(sender : ActorRef, document : Document) : Unit = {
+  private[this] def finished(sender : ActorRef, document : Document) = {
     Logger.info(s"[${sender.path.name}] Finished: ${document.title}")
     if (hasCompleted(document)) wrapUp(document) else complete(document)
   }
 
-  private[this] def failed(sender : ActorRef, document : Document, cause : Throwable) : Unit = {
+  private[this] def failed(sender : ActorRef, document : Document, cause : Throwable) = {
     Logger.error(s"[${sender.path.name}] Failed: ${document.title}\n${cause}")
     if (hasCompleted(document)) wrapUp(document) else complete(document, true)
   }
 
 
-  private[this] def begin(document : Document) : Unit =
-    finished += (document -> (0, false))
+  private[this] def begin(document : Document) =
+    completed += (document -> (0, false))
 
-  private[this] def complete(document : Document, failed : Boolean = false) : Unit =
-    finished update (document, (finished(document)._1 + 1, failed))
+  private[this] def complete(document : Document, failed : Boolean = false) =
+    completed update (document, (completed(document)._1 + 1, failed))
 
-  private[this] def hasCompleted(document : Document) : Boolean =
-    finished(document)._1 == annotators.size - 1
+  private[this] def terminate(document : Document) =
+    completed -= document
 
-  private[this] def hasFailed(document : Document) : Boolean =
-    finished(document)._2
+  private[this] def hasCompleted(document : Document) =
+    completed(document)._1 == annotators.size - 1
 
+  private[this] def hasFailed(document : Document) =
+    completed(document)._2
 
-  private[this] def wrapUp(document : Document) : Unit = {
+  private[this] def wrapUp(document : Document) = {
     if (hasFailed(document)) {
       Logger.error(s"[${self.path.name}] Some annotator failed, restoring DB state: ${document.title}")
       deleteAnnotations(document)
@@ -80,21 +75,22 @@ class Annotator extends Actor {
       Logger.info(s"[${self.path.name}] All annotators finished: ${document.title}")
       markAsAnnotated(document)
     }
-    finished -= document
+    terminate(document)
   }
 
-  private[this] def markAsAnnotated(document : Document) : Unit =
-    dbProfile.database withSession { implicit session =>
-      Documents save document.copy(annotated = true)
+
+  private[this] def markAsAnnotated(document : Document) =
+    database withSession { implicit session =>
+      documents save document.copy(annotated = true)
     }
 
-  private[this] def deleteAnnotations(document : Document) : Unit =
-    dbProfile.database withTransaction { implicit session =>
-      Annotations findByDocument document foreach { annotation =>
-        Annotations keywordFor annotation map {
-          keyword => Keywords save keyword.copy(occurrences = keyword.occurrences - 1)
+  private[this] def deleteAnnotations(document : Document) =
+    database withTransaction { implicit session =>
+      annotations findByDocument document foreach { annotation =>
+        annotations keywordFor annotation map {
+          keyword => keywords save keyword.copy(occurrences = keyword.occurrences - 1)
         }
-        Annotations delete annotation
+        annotations delete annotation
       }
     }
 

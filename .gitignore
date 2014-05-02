@@ -2,6 +2,7 @@ sbt.sh
 
 .cache
 .classpath
+.idea
 .project
 .target
 .settings

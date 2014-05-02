@@ -1,13 +1,9 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import akka.actor.{ PoisonPill, Props }
 
-import akka.actor.{ Actor, PoisonPill, Props }
-
-import play.api.test._
-
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
@@ -81,11 +77,11 @@ class ABNERAdapterSpec extends ABNERSpecSetup {
           val abner = system.actorOf(Props[ABNERAdapter])
 
           abner ! Annotate(document)
-          expectMsg(10.seconds, Finished(document))
+          expectMsg(Finished(document))
           abner ! PoisonPill
 
-          Keywords.list    should contain theSameElementsAs (keywords)
-          Annotations.list should contain theSameElementsAs (annotations)
+          Keywords.list    should contain theSameElementsAs keywords
+          Annotations.list should contain theSameElementsAs annotations
         }
       }
 

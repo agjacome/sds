@@ -41,7 +41,7 @@ libraryDependencies ++= Seq(
 
 // testing dependencies
 libraryDependencies ++= Seq(
-  "org.scalatest"     %% "scalatest"    % "2.1.3"   % "test" ,
+  "org.scalatest"     %% "scalatest"    % "2.1.5"   % "test" ,
   "com.typesafe.akka" %% "akka-testkit" % "2.2.4"   % "test" ,
   "org.mockito"       %  "mockito-all"  % "1.9.5"   % "test" ,
   "com.h2database"    %  "h2"           % "1.3.175" % "test"
@@ -57,7 +57,7 @@ Build.settings
 lazy val macros = project.in(file("macros")).settings(
   libraryDependencies ++= Seq(
     "org.scala-lang"  % "scala-reflect" % "2.10.4",
-    "org.scalatest"  %% "scalatest"     % "2.1.3"   % "test" 
+    "org.scalatest"  %% "scalatest"     % "2.1.5"   % "test" 
   )
 )
 

@@ -84,10 +84,10 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
 
       "find an existing document by its PumbedID" in {
         Documents += Document(title = "title", text = "text", pubmedId = Some(12))
-        val id = PubmedId(12)
+        val id = PubMedId(12)
 
-        (dao findByPubmedId id) should be ('defined)
-        (dao findByPubmedId id).value should have (
+        (dao findByPubMedId id) should be ('defined)
+        (dao findByPubMedId id).value should have (
           'id        (Some(DocumentId(1))),
           'title     (Sentence("title")),
           'text      ("text"),
@@ -95,8 +95,8 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
           'pubmedId  (Some(id))
         )
 
-        (dao findByPubmedId Some(id)) should be ('defined)
-        (dao findByPubmedId Some(id)).value should have (
+        (dao findByPubMedId Some(id)) should be ('defined)
+        (dao findByPubMedId Some(id)).value should have (
           'id        (Some(DocumentId(1))),
           'title     (Sentence("title")),
           'text      ("text"),

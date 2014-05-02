@@ -23,16 +23,15 @@ class DocumentSpec extends BaseSpec {
           'title     (Sentence("my title")),
           'text      ("my text document body"),
           'annotated (true),
-          'pubmedId  (Some(PubmedId(123)))
+          'pubmedId  (Some(PubMedId(123)))
         )
       }
     }
 
     "should throw an IllegalArgumentException" - {
       "when constructed when an empty text" in {
-        a [IllegalArgumentException] should be thrownBy {
-          val invalid : Document = Document(None, Sentence.Empty, "")
-        }
+        a [IllegalArgumentException] should be thrownBy { Document(None, Sentence.Empty, "") }
+        a [IllegalArgumentException] should be thrownBy { Document(Some(7), "title", "")     }
       }
     }
 

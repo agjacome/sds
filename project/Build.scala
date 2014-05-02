@@ -8,7 +8,7 @@ import play.Project._
 
 object Build {
 
-  lazy val settings = playScalaSettings ++ scalaxbSettings ++ Seq(
+  private lazy val playSettings = playScalaSettings ++ Seq(
     confDirectory := baseDirectory.value / "conf",
 
     sourceDirectory   in Compile := baseDirectory.value / "src/main",
@@ -22,7 +22,9 @@ object Build {
     resourceDirectory in Test := baseDirectory.value / "src/test/resources",
 
     playAssetsDirectories := Seq(baseDirectory.value / "src/main/webapp")
-  ) ++ Seq(
+  )
+
+  private lazy val sbtSettings = scalaxbSettings ++ Seq(
     sourceGenerators in Compile <+= scalaxb in Compile,
 
     packageName  in scalaxb in Compile := "scalaxb.generated",
@@ -30,6 +32,8 @@ object Build {
     xsdSource    in scalaxb in Compile := baseDirectory.value / "src/main/resources/xsd",
     wrapContents in scalaxb in Compile += "{http://www.ncbi.nlm.nih.gov/soap/eutils/efetch_pubmed}MedlineCitationType"
   )
+
+  lazy val settings = playSettings ++ sbtSettings
 
 }
 

@@ -1,11 +1,10 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
 trait AnnotationsDAO extends DAO[Annotation, AnnotationId] {
 
-  import databaseProfile.profile.simple.Session
+  import dbProfile.profile.simple.Session
 
   def documentFor(id : AnnotationId)(implicit session : Session) : Option[Document]
 
@@ -25,8 +24,8 @@ trait AnnotationsDAO extends DAO[Annotation, AnnotationId] {
 
   def findByDocumentId(id : DocumentId)(implicit session : Session) : Seq[Annotation]
 
-  def findByDocumentId(id : Option[DocumentId])(implicit session : Session) : Seq[Annotation] =
-    id match {
+  def findByDocumentId(documentId : Option[DocumentId])(implicit session : Session) : Seq[Annotation] =
+    documentId match {
       case Some(id) => findByDocumentId(id)
       case None     => Seq.empty
     }
@@ -36,8 +35,8 @@ trait AnnotationsDAO extends DAO[Annotation, AnnotationId] {
 
   def findByKeywordId(id : KeywordId)(implicit session : Session) : Seq[Annotation]
 
-  def findByKeywordId(id : Option[KeywordId])(implicit session : Session) : Seq[Annotation] =
-    id match {
+  def findByKeywordId(keywordId : Option[KeywordId])(implicit session : Session) : Seq[Annotation] =
+    keywordId match {
       case Some(id) => findByKeywordId(id)
       case None     => Seq.empty
     }
@@ -49,14 +48,14 @@ trait AnnotationsDAO extends DAO[Annotation, AnnotationId] {
 
 object AnnotationsDAO extends (() => AnnotationsDAO) {
 
-  def apply : AnnotationsDAO = new AnnotationsDAOImpl
+  def apply( ) : AnnotationsDAO = new AnnotationsDAOImpl
 
 }
 
 private class AnnotationsDAOImpl extends AnnotationsDAO {
 
-  import databaseProfile._
-  import databaseProfile.profile.simple._
+  import dbProfile.Annotations
+  import dbProfile.profile.simple._
 
   def documentFor(id : AnnotationId)(implicit session : Session) : Option[Document] =
     (for { a <- Annotations if (a.id is id); d <- a.document } yield d).firstOption
@@ -73,18 +72,17 @@ private class AnnotationsDAOImpl extends AnnotationsDAO {
   def findByKeywordId(id : KeywordId)(implicit session : Session) : Seq[Annotation] =
     (for { a <- Annotations; k <- a.keyword if (k.id is id) } yield a).run
 
-  protected def insert(annotation : Annotation)(implicit session : Session) : Annotation = {
+  def delete(annotation : Annotation)(implicit session : Session) : Unit =
+    (Annotations filter (_.id is annotation.id.get)).delete
+
+  protected def insert(annotation : Annotation)(implicit session : Session) = {
     val id = Some(Annotations returning (Annotations map (_.id)) += annotation)
     annotation copy id
   }
 
-  protected def update(annotation : Annotation)(implicit session : Session) : Annotation = {
+  protected def update(annotation : Annotation)(implicit session : Session) = {
     Annotations filter (_.id is annotation.id.get) update (annotation)
     annotation
   }
 
-  def delete(annotation : Annotation)(implicit session : Session) : Unit =
-    (Annotations filter (_.id is annotation.id.get)).delete
-
 }
-

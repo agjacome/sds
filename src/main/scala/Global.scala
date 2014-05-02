@@ -12,20 +12,16 @@ object Global extends GlobalSettings {
 
   lazy val annotator = system.actorSelection(system / "Annotator")
 
-  private lazy val dbProfile = DatabaseProfile()
-
-  override def onStart(app : Application) : Unit = {
+  override def onStart(app : Application) = {
     createDatabaseTables()
     system.actorOf(Props[Annotator], "Annotator")
   }
 
-  private def createDatabaseTables( ) : Unit =
-    dbProfile.database withSession { implicit session =>
+  private def createDatabaseTables( ) =
+    DatabaseProfile.database withSession { implicit session =>
+      val dbProfile = DatabaseProfile()
       if (dbProfile.isDatabaseEmpty) {
-        Logger.info(
-          "[DB] Database empty, creating required tables now. DDL:\n" +
-          (dbProfile.ddl.createStatements mkString "\n")
-        )
+        Logger.info("[DB] Creating database schema. DDL:\n" + (dbProfile.ddl.createStatements mkString "\n"))
         dbProfile.createTables
       }
     }

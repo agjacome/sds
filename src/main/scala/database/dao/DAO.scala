@@ -1,15 +1,14 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
 import scala.language.reflectiveCalls
-import play.api.db.slick.Database
 
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 private[dao] trait DAO[Entity <: { def id : Option[EntityId] }, EntityId] {
 
-  protected val databaseProfile = DatabaseProfile()
+  protected val dbProfile = DatabaseProfile()
 
-  import databaseProfile.profile.simple._
+  import dbProfile.profile.simple.Session
 
   def findById(id : EntityId)(implicit session : Session) : Option[Entity]
 
@@ -32,4 +31,3 @@ private[dao] trait DAO[Entity <: { def id : Option[EntityId] }, EntityId] {
   def delete(entity: Entity)(implicit session : Session) : Unit
 
 }
-

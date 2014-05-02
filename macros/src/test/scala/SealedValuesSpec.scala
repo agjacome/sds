@@ -18,3 +18,4 @@ class SealedValuesSpec extends FreeSpec with Matchers {
   }
 
 }
+

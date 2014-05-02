@@ -1,19 +1,20 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 final case class DocumentId (value : Long) extends AnyVal with Identifier
-final object     DocumentId extends IdentifierCompanion[DocumentId]
+           object DocumentId extends IdentifierCompanion[DocumentId]
 
-final case class PubmedId (value : Long) extends AnyVal with Identifier
-final object     PubmedId extends IdentifierCompanion[PubmedId]
+final case class PubMedId (value : Long) extends AnyVal with Identifier
+           object PubMedId extends IdentifierCompanion[PubMedId]
 
 case class Document (
-  val id        : Option[DocumentId] = None,
-  val title     : Sentence,
-  val text      : String,
-  val annotated : Boolean            = false,
-  val pubmedId  : Option[PubmedId]   = None
+  id        : Option[DocumentId] = None,
+  title     : Sentence,
+  text      : String,
+  annotated : Boolean            = false,
+  pubmedId  : Option[PubMedId]   = None
 ) {
 
   require(!text.isEmpty, "Document text cannot be empty")
 
 }
+

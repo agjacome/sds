@@ -1,13 +1,9 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import akka.actor.{ PoisonPill, Props }
 
-import akka.actor.{ Actor, PoisonPill, Props }
-
-import play.api.test._
-
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
@@ -54,12 +50,15 @@ class OscarNERAdapterSpec extends OscarSpecSetup {
           Documents += document
           val oscar = system.actorOf(Props[OscarNERAdapter])
 
+          // OSCAR takes a while to start (and OscarNERAdapter should
+          // initialize it lazily), 10 seconds is probably enough to receive a
+          // valid response
           oscar ! Annotate(document)
           expectMsg(10.seconds, Finished(document))
           oscar ! PoisonPill
 
-          Keywords.list    should contain theSameElementsAs (keywords)
-          Annotations.list should contain theSameElementsAs (annotations)
+          Keywords.list    should contain theSameElementsAs keywords
+          Annotations.list should contain theSameElementsAs annotations
         }
       }
 

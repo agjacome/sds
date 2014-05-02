@@ -17,8 +17,6 @@ object EUtils {
   //
   // That way, the method call will be non-blocking, and the "doSomething..."
   // operation will be done once the web service call completes.
-  //
-  // Yeah, non-blocking SOAP needs to happen, ASAP.
 
   def findByTermsInPubMed(
     terms    : String,
@@ -33,9 +31,8 @@ object EUtils {
       reldate  = relDate map (_.toString),
       retStart = Some(retStart.toString),
       retMax   = Some(retMax.toString),
-      webEnv   = None, queryKey = None, usehistory = None, tool    = None,
-      email    = None, field    = None, mindate    = None, maxdate = None,
-      rettype  = None, sort     = None
+      webEnv   = None, queryKey = None, usehistory = None, tool = None, email = None, field = None,
+      mindate  = None, maxdate  = None, rettype    = None, sort = None
     ) match {
       case Right(result) => Some(result)
       case Left(fault)   => Logger.error(fault.toString); None
@@ -81,7 +78,7 @@ object EUtils {
     }
 
   private def parseScientificName(summary : ESummaryResult) =
-    (summary.DocSum flatMap (_.Item) filter (_.Name == "ScientificName")) match {
+    summary.DocSum flatMap (_.Item) filter (_.Name == "ScientificName") match {
       case item :: _ => item.ItemContent
       case Nil       => None
     }

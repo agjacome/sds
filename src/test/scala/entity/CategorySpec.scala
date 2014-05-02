@@ -7,15 +7,15 @@ class CategorySpec extends BaseSpec {
   "A Category" - {
 
     "defines values for" - {
-      "compounds"  in { val value = Compound }
-      "drugs"      in { val value = Drug     }
-      "genes"      in { val value = Gene     }
-      "proteins"   in { val value = Protein  }
-      "species"    in { val value = Species  }
-      "dna"        in { val value = DNA      }
-      "rna"        in { val value = RNA      }
-      "cell lines" in { val value = CellLine }
-      "cell types" in { val value = CellType }
+      "compounds"  in { Compound }
+      "drugs"      in { Drug     }
+      "genes"      in { Gene     }
+      "proteins"   in { Protein  }
+      "species"    in { Species  }
+      "dna"        in { DNA      }
+      "rna"        in { RNA      }
+      "cell lines" in { CellLine }
+      "cell types" in { CellType }
     }
 
     "can be constructed" - {
