@@ -61,7 +61,7 @@ class LinnaeusNERAdapterSpec extends LinnaeusSpecSetup {
           val linnaeus = system.actorOf(Props[LinnaeusNERAdapter])
 
           linnaeus ! Annotate(document)
-          expectMsg(Finished(document))
+          expectMsg(10.seconds, Finished(document))
           linnaeus ! PoisonPill
 
           Keywords.list    should contain theSameElementsAs keywords

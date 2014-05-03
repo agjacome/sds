@@ -75,14 +75,12 @@ private class AnnotationsDAOImpl extends AnnotationsDAO {
   def delete(annotation : Annotation)(implicit session : Session) : Unit =
     (Annotations filter (_.id is annotation.id.get)).delete
 
-  protected def insert(annotation : Annotation)(implicit session : Session) = {
-    val id = Some(Annotations returning (Annotations map (_.id)) += annotation)
-    annotation copy id
-  }
+  protected def insert(annotation : Annotation)(implicit session : Session) =
+    Annotations returning (Annotations map (_.id)) += annotation
 
   protected def update(annotation : Annotation)(implicit session : Session) = {
     Annotations filter (_.id is annotation.id.get) update (annotation)
-    annotation
+    annotation.id.get
   }
 
 }

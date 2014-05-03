@@ -34,14 +34,12 @@ private class DocumentsDAOImpl extends DocumentsDAO {
   def delete(document : Document)(implicit session : Session) : Unit =
     (Documents filter (_.id is document.id.get)).delete
 
-  protected def insert(document : Document)(implicit session : Session) = {
-    val id = Some(Documents returning (Documents map (_.id)) += document)
-    document copy id
-  }
+  protected def insert(document : Document)(implicit session : Session) =
+    Documents returning (Documents map (_.id)) += document
 
   protected def update(document : Document)(implicit session : Session) = {
-    Documents filter (_.id is document.id.get) update (document)
-    document
+    Documents filter (_.id is document.id.get) update document
+    document.id.get
   }
 
 }

@@ -18,12 +18,12 @@ object EUtils {
   // That way, the method call will be non-blocking, and the "doSomething..."
   // operation will be done once the web service call completes.
 
-  def findByTermsInPubMed(
-    terms    : String,
-    relDate  : Option[Int] = None,
-    retStart : Int         = 0,
-    retMax   : Int         = 100
-  ) : Option[ESearchResult] =
+  def findPubMedIDs(terms : String, relDate : Option[Int], retStart : Int, retMax : Int) : (Long, Set[Long]) = {
+    val res = searchInPubMed(terms, relDate, retStart, retMax)
+    (getCountFromResult(res), getIdListFromResult(res))
+  }
+
+  def searchInPubMed(terms : String, relDate : Option[Int], retStart : Int, retMax : Int) : Option[ESearchResult] =
     eUtilsService.run_eSearch(
       db       = Some("pubmed"),
       term     = Some(terms),
@@ -31,34 +31,35 @@ object EUtils {
       reldate  = relDate map (_.toString),
       retStart = Some(retStart.toString),
       retMax   = Some(retMax.toString),
-      webEnv   = None, queryKey = None, usehistory = None, tool = None, email = None, field = None,
-      mindate  = None, maxdate  = None, rettype    = None, sort = None
+      // here comes the bullshit: why not default all params to None and allow
+      // us scalaxb users use only whichever ones we need?
+      webEnv = None, queryKey = None, usehistory = None, tool = None, email = None, field = None, mindate = None,
+      maxdate = None, rettype = None, sort = None
     ) match {
       case Right(result) => Some(result)
       case Left(fault)   => Logger.error(fault.toString); None
     }
 
   def fetchPubMedArticles(ids : Seq[Long]) : Seq[(Long, String, String)] =
-    eUtilsService.run_eFetch(
-      Some(ids mkString ","), None, None, None, None, None, None, Some("abstract")
-    ) match {
+    eUtilsService.run_eFetch(Some(ids mkString ","), None, None, None, None, None, None, Some("abstract")) match {
       case Right(result) => parsePubMedResult(result)
       case Left(fault)   => Logger.error(fault.toString); Seq.empty
     }
 
   def taxonomyScientificName(id : Long) : Option[String] =
-    eUtilsService.run_eSummary(
-      Some("taxonomy"), Some(id.toString), None, None, None, None, None, None
-    ) match {
+    eUtilsService.run_eSummary(Some("taxonomy"), Some(id.toString), None, None, None, None, None, None) match {
       case Right(summary) => parseScientificName(summary)
       case Left(fault)    => Logger.error(fault.toString); None
     }
 
+  private def getCountFromResult(result : Option[ESearchResult]) =
+    result.fold(0L) { _.Count.fold(0L)(_.toLong) }
+
+  private def getIdListFromResult(result : Option[ESearchResult]) =
+    result.fold(Set.empty[Long]) { _.IdList.fold(Set.empty[Long])(_.Id.map(_.toLong).toSet) }
+
   private def parsePubMedResult(result : EFetchResult) =
-    result.PubmedArticleSet match {
-      case Some(articles) => parsePubMedArticleSet(articles)
-      case None           => Seq.empty
-    }
+    result.PubmedArticleSet.fold(Seq.empty[(Long, String, String)])(parsePubMedArticleSet)
 
   private def parsePubMedArticleSet(articles : PubmedArticleSet) =
     articles.pubmedarticlesetoption flatMap {

@@ -19,7 +19,7 @@ class EUtilsSpec extends BaseSpec {
     }
 
     "can search articles in the PubMed database" in {
-      val query = EUtils findByTermsInPubMed "breast cancer" flatMap (_.QueryTranslation)
+      val query = EUtils searchInPubMed ("breast cancer", None, 0, 0) flatMap (_.QueryTranslation)
 
       query       should be ('defined)
       query.value should be (
@@ -31,10 +31,10 @@ class EUtilsSpec extends BaseSpec {
 
     "can search articles in the PubMed database with Entrez Date within last given days" in {
       val lastDays = 60
-      val today    = new LocalDate(DateTimeZone.forID("EST"))
+      val today    = new LocalDate(DateTimeZone forID "America/New_York")
       val before   = today minusDays lastDays
 
-      val query = EUtils findByTermsInPubMed ("cancer", Some(lastDays)) flatMap (_.QueryTranslation)
+      val query = EUtils searchInPubMed ("cancer", Some(lastDays), 0, 0) flatMap (_.QueryTranslation)
 
       query       should be ('defined)
       query.value should be (

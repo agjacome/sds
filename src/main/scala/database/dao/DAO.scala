@@ -18,15 +18,15 @@ private[dao] trait DAO[Entity <: { def id : Option[EntityId] }, EntityId] {
   def contains(entity : Entity)(implicit session : Session) : Boolean =
     findById(entity.id).isDefined
 
-  def save(entity : Entity)(implicit session : Session) : Entity =
+  def save(entity : Entity)(implicit session : Session) : EntityId =
     entity.id match {
       case Some(_) => update(entity)
       case None    => insert(entity)
     }
 
-  protected def insert(entity : Entity)(implicit session : Session) : Entity
+  protected def insert(entity : Entity)(implicit session : Session) : EntityId
 
-  protected def update(entity : Entity)(implicit session : Session) : Entity
+  protected def update(entity : Entity)(implicit session : Session) : EntityId
 
   def delete(entity: Entity)(implicit session : Session) : Unit
 

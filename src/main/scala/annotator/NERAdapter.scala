@@ -39,7 +39,10 @@ private[annotator] trait NERAdapter extends Actor {
 
   protected def getOrStoreNewKeyword(normalized : Sentence, cat : Category) =
     database withTransaction { implicit session =>
-      (keywords findByNormalized normalized) getOrElse (keywords save Keyword(None, normalized, cat))
+      (keywords findByNormalized normalized) getOrElse {
+        val keyword = Keyword(None, normalized, cat)
+        keyword copy (id = Some(keywords save keyword))
+      }
     }
 
   protected def storeAnnotation(keyword : Keyword, annotation : Annotation) =

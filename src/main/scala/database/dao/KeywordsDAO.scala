@@ -31,14 +31,12 @@ private class KeywordsDAOImpl extends KeywordsDAO {
   def delete(keyword : Keyword)(implicit session : Session) : Unit =
     (Keywords filter (_.id is keyword.id.get)).delete
 
-  protected def insert(keyword : Keyword)(implicit session : Session) = {
-    val id = Some(Keywords returning (Keywords map (_.id)) += keyword)
-    keyword copy id
-  }
+  protected def insert(keyword : Keyword)(implicit session : Session) =
+    Keywords returning (Keywords map (_.id)) += keyword
 
   protected def update(keyword : Keyword)(implicit session : Session) = {
     Keywords filter (_.id is keyword.id.get) update (keyword)
-    keyword
+    keyword.id.get
   }
 
 }
