@@ -24,7 +24,9 @@ object Build {
     playAssetsDirectories := Seq(baseDirectory.value / "src/main/webapp")
   )
 
-  private lazy val sbtSettings = scalaxbSettings ++ Seq(
+  // scalaxbSettings uses the deprecated Project.Setting type, a conversion to
+  // Def.Setting is required to avoid a deprecation warning
+  private lazy val sbtSettings = Seq[Def.Setting[_]](scalaxbSettings : _*) ++ Seq(
     sourceGenerators in Compile <+= scalaxb in Compile,
 
     packageName  in scalaxb in Compile := "scalaxb.generated",

@@ -1,6 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.provider
 
-import play.api.db.slick.{ DB, Session }
+import play.api.db.slick.Session
 import play.api.test.WithApplication
 
 import org.scalatest.BeforeAndAfter
@@ -21,7 +21,6 @@ class PubMedProviderSpec extends BaseSpec with ScalaFutures with BeforeAndAfter 
 
   before {
     new WithApplication {
-      DatabaseProfile.database = DB("test")
       dbSession = DatabaseProfile.database.createSession()
       dbProfile.createTables()
     }

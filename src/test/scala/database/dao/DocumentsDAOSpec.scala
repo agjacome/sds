@@ -1,5 +1,7 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
+import play.api.test.WithApplication
+
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseBaseSpec
 
@@ -8,14 +10,12 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
   import dbProfile.Documents
   import dbProfile.profile.simple._
 
-  private lazy val dao = DocumentsDAO()
-
   "The Documents DAO" - {
 
     "should be able to perform operations in the Documents table" - {
 
-      "insert a new Document" in {
-        dao save Document(title = "title", text ="text")
+      "insert a new Document" in new WithApplication {
+        DocumentsDAO() save Document(title = "title", text ="text")
 
         Documents.list should have size 1
         Documents.first should have (
@@ -27,11 +27,11 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "update an existing Document" in {
+      "update an existing Document" in new WithApplication {
         Documents += Document(title = "my title", text = "my text")
         val document = Documents.first
 
-        dao save document.copy(title = "my updated title", text = "my updated text", annotated = true)
+        DocumentsDAO() save document.copy(title = "my updated title", text = "my updated text", annotated = true)
 
         Documents.list should have size 1
         Documents.first should have (
@@ -43,25 +43,27 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "delete an existing Document" in {
+      "delete an existing Document" in new WithApplication {
         Documents += Document(title = "title", text = "text")
         val document = Documents.first
 
-        dao delete document
+        DocumentsDAO() delete document
 
         Documents.list should be ('empty)
       }
 
-      "check if it contains a Document" in {
+      "check if it contains a Document" in new WithApplication {
         Documents += Document(title = "title", text = "text")
         val document = Documents.first
 
-        (dao contains document) should be (true)
+        (DocumentsDAO() contains document) should be (true)
       }
 
-      "find an existing Document by its ID" in {
+      "find an existing Document by its ID" in new WithApplication {
         Documents += Document(title = "title", text = "text")
         val id = (Documents map (_.id)).first
+
+        val dao = DocumentsDAO()
 
         (dao findById id) should be ('defined)
         (dao findById id).value should have (
@@ -82,9 +84,11 @@ class DocumentsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "find an existing document by its PumbedID" in {
+      "find an existing document by its PumbedID" in new WithApplication {
         Documents += Document(title = "title", text = "text", pubmedId = Some(12))
         val id = PubMedId(12)
+
+        val dao = DocumentsDAO()
 
         (dao findByPubMedId id) should be ('defined)
         (dao findByPubMedId id).value should have (

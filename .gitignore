@@ -1,4 +1,5 @@
-sbt.sh
+dev_run.sh
+prod_run.sh
 
 .cache
 .classpath

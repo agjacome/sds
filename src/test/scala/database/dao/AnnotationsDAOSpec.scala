@@ -1,5 +1,7 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database.dao
 
+import play.api.test.WithApplication
+
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseBaseSpec
 
@@ -8,17 +10,15 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
   import dbProfile.{ Annotations, Documents, Keywords }
   import dbProfile.profile.simple._
 
-  private lazy val dao = AnnotationsDAO()
-
   "The Annotations DAO" - {
 
     "should be able to perform operations in the Annotations table" - {
 
-      "insert a new Annotation" in {
+      "insert a new Annotation" in new WithApplication {
         Documents += Document(None, "title", "text")
         Keywords  += Keyword(None, "keyword", Drug)
 
-        dao save Annotation(None, 1, 1, "text", 0, 4)
+        AnnotationsDAO() save Annotation(None, 1, 1, "text", 0, 4)
 
         Annotations.list should have size 1
         Annotations.first should have (
@@ -31,13 +31,13 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "update an existing Annotation" in {
+      "update an existing Annotation" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text", 0, 4)
         val annotation = Annotations.first
 
-        dao save annotation.copy(text = "text updated")
+        AnnotationsDAO() save annotation.copy(text = "text updated")
 
         Annotations.list should have size 1
         Annotations.first should have (
@@ -50,31 +50,33 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "delete an existing Annotation" in {
+      "delete an existing Annotation" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text", 0, 4)
         val annotation = Annotations.first
 
-        dao delete annotation
+        AnnotationsDAO() delete annotation
 
         Annotations.list should be ('empty)
       }
 
-      "check if it contains an Annotation" in {
+      "check if it contains an Annotation" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text", 0, 4)
         val annotation = Annotations.first
 
-        (dao contains annotation) should be (true)
+        (AnnotationsDAO() contains annotation) should be (true)
       }
 
-      "find an existing Annotation by its ID" in {
+      "find an existing Annotation by its ID" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text", 0, 4)
         val id = (Annotations map (_.id)).first
+
+        val dao = AnnotationsDAO()
 
         (dao findById id) should be ('defined)
         (dao findById id).value should have (
@@ -101,11 +103,13 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
 
     "should be able to perform operations in the Annotations Foreign Keys" - {
 
-      "get the referenced Document" in {
+      "get the referenced Document" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text", 0, 4)
         val annotation = Annotation(Some(1), 1, 1, "text", 0, 4)
+
+        val dao = AnnotationsDAO()
 
         (dao documentFor annotation) should be ('defined)
         (dao documentFor annotation).value should have (
@@ -129,11 +133,13 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "get the referenced Keyword" in {
+      "get the referenced Keyword" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text", 0, 4)
         val annotation = Annotation(Some(1), 1, 1, "text", 0, 4)
+
+        val dao = AnnotationsDAO()
 
         (dao keywordFor annotation) should be ('defined)
         (dao keywordFor annotation).value should have (
@@ -160,12 +166,14 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "find which Annotations reference a given Document" in {
+      "find which Annotations reference a given Document" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text1", 0, 4)
         Annotations += Annotation(None, 1, 1, "text2", 0, 4)
         val document = Document(Some(1), "title", "text")
+
+        val dao = AnnotationsDAO()
 
         (dao findByDocument document) should have size 2
         (dao findByDocument document) should contain theSameElementsAs Seq(
@@ -186,12 +194,14 @@ class AnnotationsDAOSpec extends DatabaseBaseSpec {
         )
       }
 
-      "find which Annotations reference a given Keyword" in {
+      "find which Annotations reference a given Keyword" in new WithApplication {
         Documents   += Document(None, "title", "text")
         Keywords    += Keyword(None, "keyword", Drug)
         Annotations += Annotation(None, 1, 1, "text1", 0, 4)
         Annotations += Annotation(None, 1, 1, "text2", 0, 4)
         val keyword = Keyword(Some(1), "keyword", Drug)
+
+        val dao = AnnotationsDAO()
 
         (dao findByKeyword keyword) should have size 2
         (dao findByKeyword keyword) should contain theSameElementsAs Seq(

@@ -50,8 +50,8 @@ class OscarNERAdapterSpec extends OscarSpecSetup {
           Documents += document
           val oscar = system.actorOf(Props[OscarNERAdapter])
 
-          // OSCAR takes a while to start (and OscarNERAdapter should
-          // initialize it lazily), 10 seconds is probably enough to receive a
+          // OSCAR takes a while to start (and OscarNERAdapter should initialize
+          // it lazily), 10 seconds is probably more than enough to receive a
           // valid response
           oscar ! Annotate(document)
           expectMsg(10.seconds, Finished(document))
