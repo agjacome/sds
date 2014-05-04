@@ -60,8 +60,13 @@ class LinnaeusNERAdapterSpec extends LinnaeusSpecSetup {
           Documents += document
           val linnaeus = system.actorOf(Props[LinnaeusNERAdapter])
 
+          // LINNAEUS takes a while to start (and LinnaeusNERAdapter should
+          // initialize it lazily), and it has to perform some web service calls
+          // to normalize the representation of a Species name (using NCBI
+          // Taxonomy database). So, a wait time of 10 seconds is probably
+          // enough to receive a valid response from the actor.
           linnaeus ! Annotate(document)
-          expectMsg(Finished(document))
+          expectMsg(10.seconds, Finished(document))
           linnaeus ! PoisonPill
 
           Keywords.list    should contain theSameElementsAs keywords
