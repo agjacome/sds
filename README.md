@@ -1,6 +1,8 @@
 Búsqueda Inteligente de Nuevos Fármacos
 =======================================
 
+[![Build Status](https://travis-ci.org/agjacome/smart-drug-search.svg)](https://travis-ci.org/agjacome/smart-drug-search)
+
 Trabajo Fin de Grado (TFG) para el Grado en Ingeniería Informática de la
 Escuela Superior de Ingeniería Informática (ESEI) de la Universidad de Vigo
 (UVigo). Curso 2013-2014.
