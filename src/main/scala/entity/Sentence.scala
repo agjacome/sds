@@ -21,6 +21,8 @@ final class Sentence private (val words : Seq[String]) {
 object Sentence extends (String => Sentence) {
 
   import scala.language.implicitConversions
+  import play.api.libs.json._
+  import play.api.mvc.{ PathBindable, QueryStringBindable }
 
   lazy val Empty = new Sentence(List())
 
@@ -29,6 +31,15 @@ object Sentence extends (String => Sentence) {
 
   implicit def stringToSentence(words : String) : Sentence = Sentence(words)
   implicit def sentenceToString(words : Sentence) : String = words.toString
+
+  implicit val sentenceWrites : Writes[Sentence] = Writes { (s : Sentence) => JsString(s.toString) }
+  implicit val sentenceReads  : Reads[Sentence]  = Reads.of[String] map apply
+
+  implicit def bindPath(implicit binder : PathBindable[String]) : PathBindable[Sentence] =
+    binder transform (apply, _.toString)
+
+  implicit def bindQuery : QueryStringBindable[Sentence] =
+    QueryStringBindable.bindableString transform (apply, _.toString)
 
 }
 

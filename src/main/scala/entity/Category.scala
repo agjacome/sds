@@ -1,5 +1,8 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
+import play.api.libs.json._
+import play.api.mvc.{ PathBindable, QueryStringBindable }
+
 import es.uvigo.esei.tfg.smartdrugsearch.macros.SealedValues
 
 sealed trait Category { val id : Int }
@@ -25,6 +28,15 @@ object Category extends ((String) => Category) {
 
   def apply(str : String) : Category =
     fromStr(str.toLowerCase)
+
+  implicit val sentenceWrites : Writes[Category] = Writes { (c : Category) => JsString(c.toString) }
+  implicit val sentenceReads  : Reads[Category]  = Reads.of[String] map apply
+
+  implicit def bindPath(implicit binder : PathBindable[String]) : PathBindable[Category] =
+    binder transform (apply, _.toString.toLowerCase)
+
+  implicit def bindQuery : QueryStringBindable[Category] =
+    QueryStringBindable.bindableString transform (apply, _.toString.toLowerCase)
 
 }
 
