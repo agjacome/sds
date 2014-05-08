@@ -9,6 +9,7 @@ class LinnaeusUtils private {
   import scala.collection.JavaConversions._
   import LinnaeusUtils._
 
+  private lazy  val eUtils = EUtils()
   private[this] val cache = new LruMap[Long, String](128)
 
   def obtainMentions(text : String) : Seq[Mention] =
@@ -18,7 +19,7 @@ class LinnaeusUtils private {
     getScientificName(mention.getMostProbableID.split(":").last.toLong)
 
   private[this] def getScientificName(ncbiId : Long) =
-    cache getOrElseUpdate (ncbiId, (EUtils taxonomyScientificName ncbiId) getOrElse s"NCBI Taxonomy ID: $ncbiId")
+    cache getOrElseUpdate (ncbiId, (eUtils taxonomyScientificName ncbiId) getOrElse s"NCBI Taxonomy ID: $ncbiId")
 
 }
 

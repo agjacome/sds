@@ -9,8 +9,8 @@ class EUtilsSpec extends BaseSpec {
   "EUTils util object" - {
 
     "can get the Taxonomy Scientific Name from an NCBI Taxonomy ID" in {
-      val human = EUtils taxonomyScientificName 9606
-      val eColi = EUtils taxonomyScientificName 562
+      val human = EUtils() taxonomyScientificName 9606
+      val eColi = EUtils() taxonomyScientificName 562
 
       human       should be ('defined)
       eColi       should be ('defined)
@@ -19,7 +19,7 @@ class EUtilsSpec extends BaseSpec {
     }
 
     "can search articles in the PubMed database" in {
-      val query = EUtils searchInPubMed ("breast cancer", None, 0, 0) flatMap (_.QueryTranslation)
+      val query = EUtils() searchInPubMed ("breast cancer", None, 0, 0) flatMap (_.QueryTranslation)
 
       query       should be ('defined)
       query.value should be (
@@ -34,7 +34,7 @@ class EUtilsSpec extends BaseSpec {
       val today    = new LocalDate(DateTimeZone forID "America/New_York")
       val before   = today minusDays lastDays
 
-      val query = EUtils searchInPubMed ("cancer", Some(lastDays), 0, 0) flatMap (_.QueryTranslation)
+      val query = EUtils() searchInPubMed ("cancer", Some(lastDays), 0, 0) flatMap (_.QueryTranslation)
 
       query       should be ('defined)
       query.value should be (
@@ -44,7 +44,7 @@ class EUtilsSpec extends BaseSpec {
     }
 
     "can fetch articles from the PubMed database given a list of Pubmed IDs" in {
-      val articles = EUtils fetchPubMedArticles Seq(9997, 17284678)
+      val articles = EUtils() fetchPubMedArticles Seq(9997, 17284678)
       articles should have size 2
 
       articles should contain theSameElementsAs List(

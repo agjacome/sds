@@ -5,7 +5,7 @@ import play.api.Logger
 import scalaxb.DataRecord
 import scalaxb.generated._
 
-object EUtils {
+class EUtils private {
 
   // All methods present here are blocking, and should be wrapped inside a
   // Future whenever being reactive is a requirement, as they perform
@@ -86,3 +86,9 @@ object EUtils {
 
 }
 
+object EUtils extends (() => EUtils) {
+
+  def apply( ) : EUtils =
+    new EUtils
+
+}
