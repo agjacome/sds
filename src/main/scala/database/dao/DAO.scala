@@ -6,9 +6,9 @@ import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 private[dao] trait DAO[Entity <: { def id : Option[EntityId] }, EntityId] {
 
-  protected val dbProfile = DatabaseProfile()
+  protected lazy val dbProfile = DatabaseProfile()
 
-  import dbProfile.profile.simple.Session
+  protected type Session = dbProfile.profile.simple.Session
 
   def findById(id : EntityId)(implicit session : Session) : Option[Entity]
 

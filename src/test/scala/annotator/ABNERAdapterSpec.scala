@@ -1,11 +1,11 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
-import scala.concurrent.duration._
 import akka.actor.{ PoisonPill, Props }
 
 import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.util.ABNERUtils
 
 private[annotator] trait ABNERSpecSetup extends AnnotatorBaseSpec {
 
@@ -66,6 +66,9 @@ class ABNERAdapterSpec extends ABNERSpecSetup {
 
   import dbProfile.{ Annotations, Documents, Keywords }
   import dbProfile.profile.simple._
+
+  // Force ABNER load (because it is lazy)
+  ABNERUtils.abner
 
   "The ABNER Annotator" - {
 

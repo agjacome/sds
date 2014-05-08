@@ -6,6 +6,7 @@ import akka.actor.Actor
 import akka.pattern.pipe
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 private[annotator] sealed trait NERMessage
@@ -16,7 +17,6 @@ private[annotator] case class Failed   (document : Document, cause : Throwable) 
 private[annotator] trait NERAdapter extends Actor {
 
   import context._
-  import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 
   private lazy val documents   = DocumentsDAO()
   private lazy val keywords    = KeywordsDAO()

@@ -6,6 +6,7 @@ import akka.actor.{ PoisonPill, Props }
 import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.util.{ ABNERUtils, LinnaeusUtils, OscarUtils }
 
 private[annotator] trait AnnotatorSpecSetup extends AnnotatorBaseSpec {
 
@@ -64,17 +65,24 @@ class AnnotatorSpec extends AnnotatorSpecSetup {
   import dbProfile.{ Annotations, Documents, Keywords }
   import dbProfile.profile.simple._
 
+  // Force ABNER, OSCAR and LINNAEUS load (because they are lazy)
+  ABNERUtils.abner
+  LinnaeusUtils.linnaeus
+  OscarUtils.oscar.findResolvableEntities("")
+  OscarUtils.normalizer.parseToInchi("")
+
   "The global Annotator" - {
 
     "should be able to annotate different kinds of keywords in Documents" - {
 
       forAll (expectations) { (document, keywords, annotations) =>
         s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
+
           Documents += document
           val annotator = system.actorOf(Props[Annotator], "Annotator")
 
           annotator ! document
-          expectNoMsg(10.seconds)
+          expectNoMsg(5.seconds)
           annotator ! PoisonPill
 
           val expectedKeywords  = keywords      map { k => (k.normalized, k.category, k.occurrences) }

@@ -2,16 +2,16 @@ package es.uvigo.esei.tfg.smartdrugsearch.provider
 
 import scala.concurrent.{ Future, future }
 
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 import es.uvigo.esei.tfg.smartdrugsearch.database.dao.DocumentsDAO
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.util.EUtils._
 
-case class PubMedSearchResult(totalResults : Long, firstElement : Position, idList : Set[PubMedId])
+final case class PubMedSearchResult(totalResults : Long, firstElement : Position, idList : Set[PubMedId])
 
 class PubMedProvider private {
 
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
-  import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 
   private type FetchedDocument = (PubMedId, Sentence, String)
 
@@ -26,7 +26,7 @@ class PubMedProvider private {
 
   def download(ids : Seq[PubMedId]) : Future[Seq[DocumentId]] =
     future { fetchPubMedArticles(ids map (_.value)) } map {
-      _ map { case (id, title, text) => saveDocument(id, title, text) }
+      ids => (ids.par map { case (id, title, text) => saveDocument(id, title, text) }).seq
     }
 
   private def saveDocument(pmid : PubMedId, title : Sentence, text : String) =

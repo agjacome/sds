@@ -56,7 +56,7 @@ Build.settings
 // macros sub-project and main project with dependency on it
 lazy val macros = (project in file("macros")).settings(
   libraryDependencies ++= Seq(
-    "org.scala-lang"  % "scala-reflect" % "2.10.4",
+    "org.scala-lang"  % "scala-reflect" % scalaVersion.value,
     "org.scalatest"  %% "scalatest"     % "2.1.5"   % "test" 
   )
 )

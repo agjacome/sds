@@ -4,8 +4,6 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Document, DocumentId, PubMedId
 
 trait DocumentsDAO extends DAO[Document, DocumentId] {
 
-  import dbProfile.profile.simple.Session
-
   def findByPubMedId(id : PubMedId)(implicit session : Session) : Option[Document]
 
   def findByPubMedId(id : Option[PubMedId])(implicit session : Session) : Option[Document] =

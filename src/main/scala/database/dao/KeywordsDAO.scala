@@ -4,8 +4,6 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Keyword, KeywordId, Sentence }
 
 trait KeywordsDAO extends DAO[Keyword, KeywordId] {
 
-  import dbProfile.profile.simple.Session
-
   def findByNormalized(normalized : Sentence)(implicit session : Session) : Option[Keyword]
 
 }

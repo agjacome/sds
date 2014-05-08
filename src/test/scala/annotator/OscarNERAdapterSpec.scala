@@ -1,11 +1,11 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
-import scala.concurrent.duration._
 import akka.actor.{ PoisonPill, Props }
 
 import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.util.OscarUtils
 
 private[annotator] trait OscarSpecSetup extends AnnotatorBaseSpec {
 
@@ -41,6 +41,10 @@ class OscarNERAdapterSpec extends OscarSpecSetup {
   import dbProfile.{ Annotations, Documents, Keywords }
   import dbProfile.profile.simple._
 
+  // Force OSCAR load (because it is lazy)
+  OscarUtils.oscar.findResolvableEntities("")
+  OscarUtils.normalizer.parseToInchi("")
+
   "The Oscar Annotator" - {
 
     "should be able to annotate chemical compounds in Documents" - {
@@ -50,11 +54,8 @@ class OscarNERAdapterSpec extends OscarSpecSetup {
           Documents += document
           val oscar = system.actorOf(Props[OscarNERAdapter])
 
-          // OSCAR takes a while to start (and OscarNERAdapter should initialize
-          // it lazily), 10 seconds is probably more than enough to receive a
-          // valid response
           oscar ! Annotate(document)
-          expectMsg(10.seconds, Finished(document))
+          expectMsg(Finished(document))
           oscar ! PoisonPill
 
           Keywords.list    should contain theSameElementsAs keywords

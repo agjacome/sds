@@ -6,12 +6,12 @@ import akka.actor._
 import play.api.Logger
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity.Document
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
 
 class Annotator extends Actor {
 
   import play.api.Play.{ current => app }
-  import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
 
   private[this] val annotators = app.configuration getConfig "annotator" match {
     case None         => Set.empty
