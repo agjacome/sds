@@ -3,10 +3,11 @@ package es.uvigo.esei.tfg.smartdrugsearch.annotator
 import akka.actor.{ PoisonPill, Props }
 import play.api.test.WithApplication
 
+import es.uvigo.esei.tfg.smartdrugsearch.ActorBaseSpec
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
-class OscarAnnotatorSpec extends AnnotatorBaseSpec {
+class OscarAnnotatorSpec extends ActorBaseSpec {
 
   private[this] lazy val expectations = Table(
     ("document", "keywords", "annotations"),

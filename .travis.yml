@@ -6,7 +6,6 @@ jdk:
   - oraclejdk8
   - oraclejdk7
   - openjdk7
-  - openjdk6
 before_script:
   - tar -C src/main/resources --lzma -xvf src/main/resources/linnaeus.tar.lzma
   - tar -C src/main/resources --lzma -xvf src/main/resources/abner.tar.lzma

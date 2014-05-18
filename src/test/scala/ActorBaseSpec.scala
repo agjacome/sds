@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.esei.tfg.smartdrugsearch
 
 import scala.concurrent.duration._
 
@@ -7,9 +7,7 @@ import akka.testkit.TestKitBase
 
 import org.scalatest.BeforeAndAfterAll
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-
-trait AnnotatorBaseSpec extends BaseSpec with TestKitBase with BeforeAndAfterAll {
+trait ActorBaseSpec extends BaseSpec with TestKitBase with BeforeAndAfterAll {
 
   // required because ImplicitSender is incompatible with TestKitBase trait, it
   // has a self-type with TestKit class: this has been fixed in Akka 2.3, but
