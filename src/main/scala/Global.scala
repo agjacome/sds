@@ -10,20 +10,14 @@ import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
 object Global extends GlobalSettings {
 
-  lazy val annotator = system.actorSelection(system / "Annotator")
+  lazy val annotator = system.actorOf(Props[Annotator], "Annotator")
 
-  override def onStart(app : Application) = {
-    createDatabaseTables()
-    system.actorOf(Props[Annotator], "Annotator")
-  }
+  override def onStart(app : Application) =
+    createTables(DatabaseProfile())
 
-  private def createDatabaseTables( ) =
-    DatabaseProfile.database withSession { implicit session =>
-      val dbProfile = DatabaseProfile()
-      if (dbProfile.isDatabaseEmpty) {
-        Logger.info("[DB] Creating database schema. DDL:\n" + (dbProfile.ddl.createStatements mkString "\n"))
-        dbProfile.createTables
-      }
+  private def createTables(database : DatabaseProfile) =
+    database withSession { implicit session =>
+      if (database.isDatabaseEmpty) database.createTables()
     }
 
 }

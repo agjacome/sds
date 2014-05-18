@@ -1,23 +1,18 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
-import scala.concurrent.duration._
 import akka.actor.{ PoisonPill, Props }
-
 import play.api.test.WithApplication
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.util.{ ABNERUtils, LinnaeusUtils, OscarUtils }
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
-private[annotator] trait AnnotatorSpecSetup extends AnnotatorBaseSpec {
+class AnnotatorSpec extends AnnotatorBaseSpec {
 
-  protected def cleanSpaces(str : String) : String =
-    str.stripMargin filter (_ >= ' ')
-
-  protected val expectations = Table(
+  private[this] lazy val expectations = Table(
     ("document", "keywords", "annotations"),
     (
-      Document(
-        Some(1), cleanSpaces(
+      (
+        cleanSpaces(
           """|Additive effects of orexin B and vasoactive intestinal polypeptide
              |on LL-37-mediated antimicrobial activities"""
         ), cleanSpaces(
@@ -32,85 +27,85 @@ private[annotator] trait AnnotatorSpecSetup extends AnnotatorBaseSpec {
              |were regained by adding LL-37. Therefore, our results indicate
              |that VIP and ORXB appear to mediate bactericidal effects in
              |concert with LL-37 in the physiological context of mucosal tissue."""
-        ), false, Some(21176972)
+        )
       ),
-      Seq(
-        Keyword(Some(1), "orexin B",                                       Protein,  1),
-        Keyword(Some(2), "LL-37",                                          Protein,  2),
-        Keyword(Some(3), "ORXB or VIPalone",                               DNA,      1),
-        Keyword(Some(4), "ORXB",                                           Protein,  2),
-        Keyword(Some(5), "Pseudomonas aeruginosa",                         Species,  1),
-        Keyword(Some(6), "Staphylococcus aureus",                          Species,  1),
-        Keyword(Some(7), "InChI=1/ClH.Na/h1H;/q;+1/p-1/fCl.Na/h1h;/q-1;m", Compound, 2)
+      Set(
+        (Sentence("orexin B"),                                       Protein,  Size(1)),
+        (Sentence("LL-37"),                                          Protein,  Size(2)),
+        (Sentence("ORXB or VIPalone"),                               DNA,      Size(1)),
+        (Sentence("ORXB"),                                           Protein,  Size(2)),
+        (Sentence("Pseudomonas aeruginosa"),                         Species,  Size(1)),
+        (Sentence("Staphylococcus aureus"),                          Species,  Size(1)),
+        (Sentence("InChI=1/ClH.Na/h1H;/q;+1/p-1/fCl.Na/h1h;/q-1;m"), Compound, Size(2))
       ),
-      Seq(
-        Annotation(Some( 1), 1, 1, "orexin B",                55,  63),
-        Annotation(Some( 2), 1, 2, "LL-37",                  173, 178),
-        Annotation(Some( 3), 1, 3, "ORXB or VIPalone",       298, 314),
-        Annotation(Some( 4), 1, 4, "ORXB",                   466, 470),
-        Annotation(Some( 5), 1, 4, "ORXB",                   568, 572),
-        Annotation(Some( 6), 1, 2, "LL-37",                  627, 632),
-        Annotation(Some( 7), 1, 5, "Pseudomonas aeruginosa", 200, 222),
-        Annotation(Some( 8), 1, 6, "Staphylococcus aureus",  248, 269),
-        Annotation(Some( 9), 1, 7, "NaCl",                   335, 339),
-        Annotation(Some(10), 1, 7, "NaCl",                   386, 390)
+      Set(
+        (Sentence("orexin B"),               Position( 55), Position( 63)),
+        (Sentence("LL-37"),                  Position(173), Position(178)),
+        (Sentence("ORXB or VIPalone"),       Position(298), Position(314)),
+        (Sentence("ORXB"),                   Position(466), Position(470)),
+        (Sentence("ORXB"),                   Position(568), Position(572)),
+        (Sentence("LL-37"),                  Position(627), Position(632)),
+        (Sentence("Pseudomonas aeruginosa"), Position(200), Position(222)),
+        (Sentence("Staphylococcus aureus"),  Position(248), Position(269)),
+        (Sentence("NaCl"),                   Position(335), Position(339)),
+        (Sentence("NaCl"),                   Position(386), Position(390))
       )
     )
   )
 
-}
+  "The top-level Annotator" - {
 
-class AnnotatorSpec extends AnnotatorSpecSetup {
+    forAll (expectations) { (document, keywords, annotations) =>
 
-  import dbProfile.{ Annotations, Documents, Keywords }
-  import dbProfile.profile.simple._
+      s"should annotate correctly Document '${document._1}'" in new WithApplication {
+        val annotator = system.actorOf(Props[Annotator], "Annotator")
+        val database  = DatabaseProfile()
+        implicit val session = database.createSession()
 
-  // Force ABNER, OSCAR and LINNAEUS load (because they are lazy)
-  ABNERUtils.abner
-  LinnaeusUtils.linnaeus
-  OscarUtils.oscar.findResolvableEntities("")
-  OscarUtils.normalizer.parseToInchi("")
+        import database._
+        import database.profile.simple._
 
-  "The global Annotator" - {
+        val documentId = Documents returning Documents.map(_.id) += Document(
+          None, document._1, document._2
+        )
 
-    "should be able to annotate different kinds of keywords in Documents" - {
+        annotator ! Annotate(documentId)
+        expectNoMsg(waitTime)
+        annotator ! PoisonPill
 
-      forAll (expectations) { (document, keywords, annotations) =>
-        s"checking validity of annotations for Document '${document.title}'" in new WithApplication {
+        val storedKeywords = (Keywords map { k => (k.normalized, k.category, k.occurrences) }).list
+        storedKeywords should contain theSameElementsAs keywords
 
-          Documents += document
-          val annotator = system.actorOf(Props[Annotator], "Annotator")
+        val storedAnnotations = (Annotations map { a => (a.text, a.startPosition, a.endPosition) }).list
+        storedAnnotations should contain theSameElementsAs annotations
 
-          annotator ! document
-          expectNoMsg(5.seconds)
-          annotator ! PoisonPill
+        (Documents filter (_.id is documentId) map (_.annotated)).first should be (true)
 
-          val expectedKeywords  = keywords      map { k => (k.normalized, k.category, k.occurrences) }
-          val actualKeywords    = Keywords.list map { k => (k.normalized, k.category, k.occurrences) }
-          expectedKeywords should contain theSameElementsAs actualKeywords
-
-          val expectedAnnotations = annotations      map { a => (a.text, a.startPos, a.endPos) }
-          val actualAnnotations   = Annotations.list map { a => (a.text, a.startPos, a.endPos) }
-          expectedAnnotations should contain theSameElementsAs actualAnnotations
-
-          (Documents map (_.annotated)).first should be (true)
-        }
+        session.close()
       }
 
-    }
+      s"should not annotate Document '${document._1}' if marked as already annotated " in new WithApplication {
+        val annotator = system.actorOf(Props[Annotator], "Annotator")
+        val database  = DatabaseProfile()
+        implicit val session = database.createSession()
 
-    "should not annotate already annotated Documents" in new WithApplication {
-      Documents += Document(title = "annotated document", text = "an already annotated document", annotated = true)
-      val document = Documents.first
+        import database._
+        import database.profile.simple._
 
-      val annotator = system.actorOf(Props[Annotator], "Annotator")
+        val documentId = Documents returning Documents.map(_.id) += Document(
+          None, document._1, document._2, annotated = true
+        )
 
-      annotator ! document
-      expectNoMsg()
-      annotator ! PoisonPill
+        annotator ! Annotate(documentId)
+        expectNoMsg(waitTime)
+        annotator ! PoisonPill
 
-      Keywords.list    should be ('empty)
-      Annotations.list should be ('empty)
+        Keywords.list    should be ('empty)
+        Annotations.list should be ('empty)
+
+        session.close()
+      }
+
     }
 
   }

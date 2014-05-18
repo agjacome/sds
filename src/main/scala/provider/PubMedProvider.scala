@@ -1,40 +1,36 @@
 package es.uvigo.esei.tfg.smartdrugsearch.provider
 
-import scala.concurrent.{ Future, future }
+import scala.concurrent.{ ExecutionContext, Future }
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao.DocumentsDAO
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.util.EUtils
-
-final case class PubMedSearchResult(totalResults : Long, firstElement : Position, idList : Set[PubMedId])
+import es.uvigo.esei.tfg.smartdrugsearch.service.EUtilsService
 
 class PubMedProvider private {
 
-  import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  lazy val database = DatabaseProfile()
+  lazy val eUtils   = EUtilsService()
 
-  private type FetchedDocument = (PubMedId, Sentence, String)
+  import database.Documents
+  import database.profile.simple._
 
-  private lazy val documents = DocumentsDAO()
-  private lazy val eUtils    = EUtils()
-
-  def search(
-    searchTerms : Sentence, limitDays : Option[Int] = None, startingOn : Position = 0, countPerPage : Int = 100
+  def search(terms : Sentence, limit : Option[Size], start : Position, count : Size)(
+    implicit ec : ExecutionContext
   ) : Future[PubMedSearchResult] =
-    future { eUtils findPubMedIDs (searchTerms, limitDays, startingOn.toInt, countPerPage) } map {
-      case (totalResults, idList) => PubMedSearchResult(totalResults, startingOn, idList map PubMedId)
+    Future(eUtils findPubMedIds (terms, limit, start, count)) map {
+      case (total, ids) => PubMedSearchResult(total, start, ids)
     }
 
-  def download(ids : Seq[PubMedId]) : Future[Seq[DocumentId]] =
-    future { eUtils fetchPubMedArticles (ids map (_.value)) } map {
-      ids => (ids.par map { case (id, title, text) => saveDocument(id, title, text) }).seq
+  def download(ids : Set[PubMedId])(implicit ec : ExecutionContext) : Future[Set[DocumentId]] =
+    Future { eUtils fetchPubMedArticles ids } map {
+      documents => (documents.par map saveDocument).seq
     }
 
-  private def saveDocument(pmid : PubMedId, title : Sentence, text : String) =
+  private[this] def saveDocument(document : Document) : DocumentId =
     database withTransaction { implicit session =>
-      documents findByPubMedId pmid match {
+      (Documents findByPubMedId document.pubmedId.get).firstOption match {
         case Some(doc) => doc.id.get
-        case None      => documents save Document(None, title, text, false, Some(pmid))
+        case None      => Documents returning Documents.map(_.id) += document
       }
     }
 

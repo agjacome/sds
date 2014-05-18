@@ -7,6 +7,12 @@ final class Position (val value : Long) extends AnyVal with Ordered[Position] wi
   def compare(that : Position) : Int =
     value compare that.value
 
+  def +(that : Position) : Position =
+    Position(value + that.value)
+
+  def -(that : Position) : Position =
+    Position(value - that.value)
+
 }
 
 object Position extends (Long => Position) {

@@ -1,36 +1,58 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
+import play.api.libs.json._
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
+
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
 class KeywordSpec extends BaseSpec {
 
+  private[this] lazy val keywordGenerator = keywordTupleGenerator map Keyword.tupled
+
+  private[this] lazy val keywordTupleGenerator = for {
+    id          <- arbitrary[Option[Long]] map (_ map KeywordId)
+    normalized  <- nonEmptyStringGenerator map Sentence
+    category    <- Gen.oneOf(Compound, Drug, Gene, Protein, Species)
+    occurrences <- Gen.choose(0, Long.MaxValue) map Size
+  } yield (id, normalized, category, occurrences)
+
+  private[this] def createJson(keyword : Keyword) =
+    JsObject(Seq(
+      keyword.id map ("id" -> Json.toJson(_))
+    ).flatten ++ Seq(
+      "normalized"  -> JsString(keyword.normalized.toString),
+      "category"    -> JsString(keyword.category.toString),
+      "occurrences" -> JsNumber(keyword.occurrences.value)
+    ))
+
+
   "A Keyword" - {
 
     "can be constructed" - {
-      "by using an Optional KeywordId, a Sentence as normalized text, a Category and number of occurrences" in {
-        val keyOne = Keyword(normalized = Sentence.Empty, category = Drug)
-        keyOne should have (
-          'id          (None),
-          'normalized  (Sentence.Empty),
-          'category    (Drug),
-          'occurrences (0)
-        )
 
-        val keyTwo = Keyword(Some(3), "escherichia coli", Species, 13)
-        keyTwo should have (
-          'id          (Some(KeywordId(3))),
-          'normalized  (Sentence("escherichia coli")),
-          'category    (Species),
-          'occurrences (13)
-        )
+      "with an optional Keyword ID, a normalized text Sentence, a Category and the number of occurrences" in {
+        forAll(keywordTupleGenerator) { case (id, normalized, category, occurrences) =>
+          Keyword(id, normalized, category, occurrences) should have (
+            'id          (id),
+            'normalized  (normalized),
+            'category    (category),
+            'occurrences (occurrences.value)
+          )
+        }
       }
+
+      "by parsing a JSON object" in {
+        forAll(keywordGenerator) { keyword : Keyword =>
+          createJson(keyword).as[Keyword] should equal (keyword)
+        }
+      }
+
     }
 
-    "should throw an IllegalArgumentException" - {
-      "when constructed with a negative number of occurrences" in {
-        a [IllegalArgumentException] should be thrownBy { Keyword(None,     Sentence.Empty, Protein, -1)  }
-        a [IllegalArgumentException] should be thrownBy { Keyword(Some(10), "homo sapiens", Species, -5)  }
-        a [IllegalArgumentException] should be thrownBy { Keyword(Some(23), "ceftazidime",  Drug,    -10) }
+    "can be transformed to a JSON object" in {
+      forAll(keywordGenerator) { keyword : Keyword =>
+        (Json toJson keyword) should equal (createJson(keyword))
       }
     }
 

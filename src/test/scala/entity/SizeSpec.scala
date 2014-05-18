@@ -5,32 +5,32 @@ import org.scalacheck.Gen
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
-class PositionSpec extends BaseSpec {
+class SizeSpec extends BaseSpec {
 
-  private[this] lazy val validPositions = Gen.choose(0, Long.MaxValue / 2) map Position
+  private[this] lazy val validSizes = Gen.choose(0, Long.MaxValue / 2) map Size
 
-  "A Position" - {
+  "A Size" - {
 
     "can be constructed" - {
 
       "implicitly from a 'Long'" in {
         forAll((n : Long) => whenever(n >= 0) {
-          val pos : Position = n
-          pos should be (Position(n))
+          val size : Size = n
+          size should be (Size(n))
         })
       }
 
       "explicitly by passing a 'Long' value to its constuctor" in {
         forAll((n : Long) => whenever(n >= 0) {
-          val pos = Position(n)
-          pos.value should be (n)
+          val size = Size(n)
+          size.value should be (n)
         })
       }
 
       "by parsing a JSON Number" in {
         forAll((n : Long) => whenever(n >= 0) {
-          val pos = JsNumber(n).as[Position]
-          pos should be (Position(n))
+          val size = JsNumber(n).as[Size]
+          size should be (Size(n))
         })
       }
 
@@ -38,8 +38,8 @@ class PositionSpec extends BaseSpec {
 
     "can be compared with expected behaviour" - {
 
-      "with another Position" in {
-        forAll(validPositions, validPositions) { (x : Position, y : Position) =>
+      "with another Size" in {
+        forAll(validSizes, validSizes) { (x : Size, y : Size) =>
           if      (x.value < y.value) x should be < y
           else if (x.value > y.value) x should be > y
           else                        x should equal (y)
@@ -48,18 +48,18 @@ class PositionSpec extends BaseSpec {
 
     }
 
-    "can perform operations with another Position" - {
+    "can perform operations with another Size" - {
 
       "addition" in {
-        forAll(validPositions, validPositions) { (x : Position, y : Position) =>
-          (x + y) should be (Position(x.value + y.value))
+        forAll(validSizes, validSizes) { (x : Size, y : Size) =>
+          (x + y) should be (Size(x.value + y.value))
         }
       }
 
       "subtraction" in {
-        forAll(validPositions, validPositions) { (x : Position, y : Position) =>
-          if (x.value > y.value) (x - y) should be (Position(x.value - y.value))
-          else                   (y - x) should be (Position(y.value - x.value))
+        forAll(validSizes, validSizes) { (x : Size, y : Size) =>
+          if (x.value > y.value) (x - y) should be (Size(x.value - y.value))
+          else                   (y - x) should be (Size(y.value - x.value))
         }
       }
 
@@ -70,13 +70,13 @@ class PositionSpec extends BaseSpec {
       "a 'Long' value" - {
         "implicitly" in {
           forAll((n : Long) => whenever(n >= 0) {
-            val num : Long = Position(n)
+            val num : Long = Size(n)
             num should be (n)
           })
         }
         "explicitly" in {
           forAll((n : Long) => whenever(n >= 0) {
-            val num = Position(n).value
+            val num = Size(n).value
             num should be (n)
           })
         }
@@ -84,7 +84,7 @@ class PositionSpec extends BaseSpec {
 
       "a JSON Number" in {
         forAll((n : Long) => whenever(n >= 0) {
-          val num = Json toJson Position(n)
+          val num = Json toJson Size(n)
           num should be (JsNumber(n))
         })
       }
@@ -96,7 +96,7 @@ class PositionSpec extends BaseSpec {
       "when implicitly constructed from a negative Long" in {
         forAll((n : Long) => whenever(n < 0) {
           a [IllegalArgumentException] should be thrownBy {
-            val position : Long = Position(n)
+            val size : Long = Size(n)
           }
         })
       }
@@ -104,7 +104,7 @@ class PositionSpec extends BaseSpec {
       "when explicitly constructed with a negative Long as parameter" in {
         forAll((n : Long) => whenever(n < 0) {
           a [IllegalArgumentException] should be thrownBy {
-            val position = Position(n)
+            val size = Size(n)
           }
         })
       }

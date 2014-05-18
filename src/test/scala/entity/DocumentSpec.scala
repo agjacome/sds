@@ -1,38 +1,79 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
+import play.api.libs.json._
+import org.scalacheck.Gen
+import org.scalacheck.Arbitrary.arbitrary
+
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
 class DocumentSpec extends BaseSpec {
 
+  private[this] lazy val documentGenerator = documentTupleGenerator map Document.tupled
+
+  private[this] lazy val documentTupleGenerator = for {
+    id        <- arbitrary[Option[Long]] map (_ map DocumentId)
+    title     <- nonEmptyStringGenerator map Sentence
+    text      <- nonEmptyStringGenerator
+    annotated <- arbitrary[Boolean]
+    pubmedId  <- arbitrary[Option[Long]] map (_ map PubMedId)
+  } yield (id, title, text, annotated, pubmedId)
+
+  private[this] lazy val emptyTextDocumentTupleGenerator = for {
+    text                                <- Gen.const("")
+    (id, title, _, annotated, pubmedId) <- documentTupleGenerator
+  } yield (id, title, text, annotated, pubmedId)
+
+  private[this] def createJson(document : Document) =
+    JsObject(Seq(
+      document.id       map ("id"       -> Json.toJson(_)),
+      document.pubmedId map ("pubmedId" -> Json.toJson(_))
+    ).flatten ++ Seq(
+      "title"     -> JsString(document.title.toString),
+      "text"      -> JsString(document.text),
+      "annotated" -> JsBoolean(document.annotated)
+    ))
+
+
   "A Document" - {
 
     "can be constructed" - {
-      "by using an Optional DocumentId, a Sentence as title, a String as text, a Boolean as an annotated flag, and an Optional PubmedId" in {
-        val docOne = Document(title = Sentence.Empty, text ="text")
-        docOne should have (
-          'id         (None),
-          'title      (Sentence.Empty),
-          'text       ("text"),
-          'annotated  (false),
-          'pubmedId   (None)
-        )
 
-        val docTwo = Document(Some(1), "my title", "my text document body", true, Some(123))
-        docTwo       should have (
-          'id        (Some(DocumentId(1))),
-          'title     (Sentence("my title")),
-          'text      ("my text document body"),
-          'annotated (true),
-          'pubmedId  (Some(PubMedId(123)))
-        )
+      "with an optional Document ID, a title Sentence, a text, an annotated Boolean flag and an optional PubMed ID" in {
+        forAll(documentTupleGenerator) { case (id, title, text, annotated, pubmedId) =>
+          Document(id, title, text, annotated, pubmedId) should have (
+            'id        (id),
+            'title     (title),
+            'text      (text),
+            'annotated (annotated),
+            'pubmedId  (pubmedId)
+          )
+        }
+      }
+
+      "by parsing a JSON object" in {
+        forAll(documentGenerator) { document : Document =>
+          createJson(document).as[Document] should equal (document)
+        }
+      }
+
+    }
+
+    "can be transformed to a JSON object" in {
+      forAll(documentGenerator) { document : Document =>
+        (Json toJson document) should equal (createJson(document))
       }
     }
 
     "should throw an IllegalArgumentException" - {
-      "when constructed when an empty text" in {
-        a [IllegalArgumentException] should be thrownBy { Document(None, Sentence.Empty, "") }
-        a [IllegalArgumentException] should be thrownBy { Document(Some(7), "title", "")     }
+
+      "whenever constructed with an empty text" in {
+        forAll(emptyTextDocumentTupleGenerator) { case (id, title, text, annotated, pubmedId) =>
+          a [IllegalArgumentException] should be thrownBy {
+            val document = Document(id, title, text, annotated, pubmedId)
+          }
+        }
       }
+
     }
 
   }

@@ -1,41 +1,40 @@
 package es.uvigo.esei.tfg.smartdrugsearch.provider
 
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.test.WithApplication
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{ Seconds, Span }
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
-class PubMedProviderSpec extends BaseSpec with ScalaFutures {
+class PubMedProviderSpec extends BaseSpec {
 
-  implicit val patience = PatienceConfig(timeout = Span(5, Seconds))
+  lazy val pubmed = PubMedProvider()
 
   "The PubMed Provider" - {
 
     "can search in PubMed to retrieve a list of PubMedIDs" in {
-      whenReady(PubMedProvider() search ("peptide", countPerPage = 10)) { res =>
+      whenReady(pubmed search ("antimicrobial peptide", None, 0, 10)) { res =>
+        res.totalResults should be >= Size(0)
         res.firstElement should be (Position(0))
         res.idList       should have size 10
       }
     }
 
     "can download articles from PubMed" in new WithApplication {
-      val dbProfile = DatabaseProfile()
-      import dbProfile.Documents
-      import dbProfile.profile.simple._
+      val database = DatabaseProfile()
 
-      implicit val dbSession = DatabaseProfile.database.createSession()
-      dbProfile.createTables()
+      import database.Documents
+      import database.profile.simple._
 
-      val idList : Seq[PubMedId] = Seq(11035200, 21176972, 18803001)
+      val pubmedIds : Set[PubMedId] = Set(11035200L, 21176972L, 18803001L)
 
-      whenReady(PubMedProvider() download idList) { docs =>
-        docs should contain theSameElementsAs (Documents map (_.id)).list
+      whenReady(pubmed download pubmedIds) { documentIds =>
+        database withSession { implicit session =>
+          Documents.map(_.id).list       should contain theSameElementsAs documentIds
+          Documents.map(_.pubmedId).list should contain theSameElementsAs pubmedIds
+        }
       }
-
-      dbSession.close()
     }
 
   }

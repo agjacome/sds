@@ -1,18 +1,19 @@
 package es.uvigo.esei.tfg.smartdrugsearch.database
 
 import scala.slick.jdbc.meta.MTable
+import scala.slick.model.ForeignKeyAction._
+
 import play.api.db.slick.Profile
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
 private[database] trait Tables { this : Profile with Mappers =>
 
-  import profile.DDL
   import profile.simple._
 
-  class DocumentsTable(val tag : Tag) extends Table[Document](tag, "documents") {
+  protected final class DocumentsTable(val tag : Tag) extends Table[Document](tag, "documents") {
 
-    def id        = column[DocumentId]("id", O.PrimaryKey, O.AutoInc)
+    def id        = column[DocumentId]("document_id", O.PrimaryKey, O.AutoInc)
     def title     = column[Sentence]("title", O.NotNull)
     def text      = column[String]("text", O.NotNull, O.DBType("TEXT"))
     def annotated = column[Boolean]("annotated", O.NotNull)
@@ -22,49 +23,47 @@ private[database] trait Tables { this : Profile with Mappers =>
 
   }
 
-  class KeywordsTable(val tag : Tag) extends Table[Keyword](tag, "keywords") {
+  protected final class KeywordsTable(val tag : Tag) extends Table[Keyword](tag, "keywords") {
 
-    def id          = column[KeywordId]("id", O.PrimaryKey, O.AutoInc)
-    def normalized  = column[Sentence]("text", O.NotNull)
+    def id          = column[KeywordId]("keyword_id", O.PrimaryKey, O.AutoInc)
+    def normalized  = column[Sentence]("normalized_text", O.NotNull, O.DBType("VARCHAR(1023)"))
     def category    = column[Category]("category", O.NotNull)
-    def occurrences = column[Long]("counter", O.Default(0))
+    def occurrences = column[Size]("counter", O.Default(0L))
 
     def * = (id.?, normalized, category, occurrences) <> (Keyword.tupled, Keyword.unapply)
 
   }
 
-  class AnnotationsTable(val tag : Tag) extends Table[Annotation](tag, "annotations") {
+  protected final class AnnotationsTable(val tag : Tag) extends Table[Annotation](tag, "annotations") {
 
-    import scala.slick.model.ForeignKeyAction._
+    def id            = column[AnnotationId]("annotation_id", O.PrimaryKey, O.AutoInc)
+    def documentId    = column[DocumentId]("document_id", O.NotNull)
+    def keywordId     = column[KeywordId]("keyword_id", O.NotNull)
+    def text          = column[Sentence]("original_text", O.NotNull, O.DBType("VARCHAR(1023)"))
+    def startPosition = column[Position]("start", O.NotNull)
+    def endPosition   = column[Position]("end", O.NotNull)
 
-    def id    = column[AnnotationId]("id", O.PrimaryKey, O.AutoInc)
-    def docId = column[DocumentId]("document", O.NotNull)
-    def keyId = column[KeywordId]("keyword", O.NotNull)
-    def text  = column[Sentence]("text", O.NotNull)
-    def start = column[Position]("start", O.NotNull)
-    def end   = column[Position]("end", O.NotNull)
+    def document = foreignKey("fk_annotation_document", documentId, TableQuery[DocumentsTable])(_.id, Cascade, Cascade)
+    def keyword  = foreignKey("fk_annotation_keyword",  keywordId,  TableQuery[KeywordsTable] )(_.id, Cascade, Cascade)
 
-    def document = foreignKey("Document_FK", docId, Documents)(_.id, Cascade, Cascade)
-    def keyword  = foreignKey("Keyword_FK", keyId, Keywords)(_.id, Cascade, Cascade)
-
-    def * = (id.?, docId, keyId, text, start, end) <> (Annotation.tupled, Annotation.unapply)
+    def * = (id.?, documentId, keywordId, text, startPosition, endPosition) <> (Annotation.tupled, Annotation.unapply)
 
   }
 
-  lazy val Documents   = TableQuery[DocumentsTable]
-  lazy val Keywords    = TableQuery[KeywordsTable]
-  lazy val Annotations = TableQuery[AnnotationsTable]
+  protected final class DocumentStatsTable(val tag : Tag) extends Table[(DocumentId, KeywordId, Size)](tag, "document_stats") {
 
-  lazy val ddl : DDL = Documents.ddl ++ Keywords.ddl ++ Annotations.ddl
+    def documentId = column[DocumentId]("document_id")
+    def keywordId  = column[KeywordId]("keyword_id")
+    def counter    = column[Size]("count", O.NotNull)
 
-  def isDatabaseEmpty(implicit session : Session) : Boolean =
-    MTable.getTables.list.isEmpty
+    def key = primaryKey("pk_stats", (documentId, keywordId))
 
-  def createTables( )(implicit session : Session) : Unit =
-    ddl.create
+    def document = foreignKey("fk_stats_document", documentId, TableQuery[DocumentsTable])(_.id, Cascade, Cascade)
+    def keyword  = foreignKey("fk_stats_keyword",  keywordId,  TableQuery[KeywordsTable] )(_.id, Cascade, Cascade)
 
-  def dropTables( )(implicit session : Session) : Unit =
-    ddl.drop
+    def * = (documentId, keywordId, counter)
+
+  }
 
 }
 

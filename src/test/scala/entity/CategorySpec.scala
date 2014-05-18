@@ -1,59 +1,104 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
+import play.api.libs.json._
+import org.scalacheck.Arbitrary.arbitrary
+
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
 
 class CategorySpec extends BaseSpec {
 
+  private[this] lazy val validCategoryIds = Table(
+    ("id"          , "cat"   ),
+    (CategoryId(1) , Compound),
+    (CategoryId(2) , Drug    ),
+    (CategoryId(3) , Gene    ),
+    (CategoryId(4) , Protein ),
+    (CategoryId(5) , Species ),
+    (CategoryId(6) , DNA     ),
+    (CategoryId(7) , RNA     ),
+    (CategoryId(8) , CellLine),
+    (CategoryId(9) , CellType)
+  )
+
+  private[this] lazy val invalidCategoryIds = arbitrary[Long] suchThat {
+    num => !(validCategoryIds map (_._1.value) contains num)
+  } map CategoryId
+
+  private[this] lazy val validCategoryStr = Table(
+    ("str"      , "cat"   ),
+    ("Compound" , Compound),
+    ("Drug"     , Drug    ),
+    ("Gene"     , Gene    ),
+    ("Protein"  , Protein ),
+    ("Species"  , Species ),
+    ("DNA"      , DNA     ),
+    ("RNA"      , RNA     ),
+    ("CellLine" , CellLine),
+    ("CellType" , CellType)
+  )
+
+  private[this] lazy val invalidCategoryStr = arbitrary[String] suchThat {
+    str => !(validCategoryStr map (_._1) contains str)
+  }
+
   "A Category" - {
 
-    "defines values for" - {
-      "compounds"  in { Compound }
-      "drugs"      in { Drug     }
-      "genes"      in { Gene     }
-      "proteins"   in { Protein  }
-      "species"    in { Species  }
-      "dna"        in { DNA      }
-      "rna"        in { RNA      }
-      "cell lines" in { CellLine }
-      "cell types" in { CellType }
-    }
-
     "can be constructed" - {
-      "with an Integer representing a Category ID" in {
-        val drug = Category(2)
-        drug should be (Drug)
 
-        val species = Category(5)
-        species should be (Species)
+      "with a Category ID" in {
+        forAll(validCategoryIds) { (id : CategoryId, cat : Category) =>
+          Category(id) should be (cat)
+        }
       }
+
       "with an String representing a Category" in {
-        val drug = Category("drug")
-        drug should be (Drug)
-
-        val species = Category("species")
-        species should be (Species)
+        forAll(validCategoryStr) { (str : String, cat : Category) =>
+          Category(str) should be (cat)
+        }
       }
+
+      "by parsing a JSON String" in {
+        forAll(validCategoryStr) { (str : String, cat : Category) =>
+          JsString(str).as[Category] should be (cat)
+        }
+      }
+
     }
 
-    "can be converted to a String" in {
-      val drug = Drug.toString
-      drug should be ("Drug")
+    "can be converted" - {
 
-      val species = Species.toString
-      species should be ("Species")
+      "to a String" in {
+        forAll(validCategoryStr) { (str : String, cat : Category) =>
+          cat.toString should equal (str)
+        }
+      }
+
+      "to a JSON String" in {
+        forAll(validCategoryStr) { (str : String, cat : Category) =>
+          Json toJson cat should be (JsString(str))
+        }
+      }
+
     }
 
     "should throw a NoSuchElementException" - {
-      "when constructed from an invalid Integer ID" in {
-        a [NoSuchElementException] should be thrownBy {
-          val invalid = Category(123)
+
+      "when constructed from an invalid Category ID" in {
+        forAll(invalidCategoryIds) { (id : CategoryId) =>
+          a [NoSuchElementException] should be thrownBy {
+            val category = Category(id)
+          }
         }
       }
+
       "when constructed from an invalid String" in {
-        a [NoSuchElementException] should be thrownBy {
-          val invalid = Category("THIS_IS_AN_INVALID_CATEGORY_STRING")
+        forAll(invalidCategoryStr) { (str : String) =>
+          a [NoSuchElementException] should be thrownBy {
+            val category = Category(str)
+          }
         }
       }
+
     }
 
   }

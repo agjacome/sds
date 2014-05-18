@@ -1,98 +1,140 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
 import scala.collection.concurrent.TrieMap
+import scala.concurrent.duration._
 import akka.actor._
 
-import play.api.Logger
+import play.api.{ Configuration, Logger }
+import play.api.Play.{ current => app }
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity.Document
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile.database
-import es.uvigo.esei.tfg.smartdrugsearch.database.dao._
+import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 
-class Annotator extends Actor {
+private[annotator] trait AnnotatorBase extends Actor {
 
-  import play.api.Play.{ current => app }
+  lazy val database = DatabaseProfile()
 
-  private[this] val annotators = app.configuration getConfig "annotator" match {
-    case None         => Set.empty
-    case Some(config) => config.keys map {
-      key => context actorOf (Props(Class forName config.getString(key).get), key)
-    }
-  }
-
-  // map of (Document -> (CompletedAnnotatorsCounter, HasAnyAnnotatorFailed?))
-  private[this] lazy val completed = TrieMap[Document, (Int, Boolean)]()
-
-  private[this] lazy val annotations = AnnotationsDAO()
-  private[this] lazy val documents   = DocumentsDAO()
-  private[this] lazy val keywords    = KeywordsDAO()
-
+  import database._
+  import database.profile.simple._
 
   override final def receive : Receive = {
-    case document : Document     => annotate(document)
-    case Finished(document)      => finished(sender, document)
-    case Failed(document, cause) => failed(sender, document, cause)
+    case msg : Annotate => annotate(sender, msg)
+    case msg : Finished => finished(sender, msg)
+    case msg : Failed   => failed(sender, msg)
   }
 
+  protected def annotate(sender : ActorRef, msg : Annotate) : Unit
 
-  private[this] def annotate(document : Document) =
-    if (!document.annotated) {
-      begin(document)
-      annotators foreach { _ ! Annotate(document) }
-    } else Logger.warn(s"[${self.path.name}] Ignoring already annotated: ${document.title}")
+  protected def finished(sender : ActorRef, msg : Finished) : Unit
 
-  private[this] def finished(sender : ActorRef, document : Document) = {
-    Logger.info(s"[${sender.path.name}] Finished: ${document.title}")
-    if (hasCompleted(document)) wrapUp(document) else complete(document)
-  }
+  protected def failed(sender : ActorRef, msg : Failed) : Unit
 
-  private[this] def failed(sender : ActorRef, document : Document, cause : Throwable) = {
-    Logger.error(s"[${sender.path.name}] Failed: ${document.title}\n${cause}")
-    if (hasCompleted(document)) wrapUp(document) else complete(document, true)
-  }
-
-
-  private[this] def begin(document : Document) =
-    completed += (document -> (0, false))
-
-  private[this] def complete(document : Document, failed : Boolean = false) =
-    completed update (document, (completed(document)._1 + 1, failed))
-
-  private[this] def terminate(document : Document) =
-    completed -= document
-
-  private[this] def hasCompleted(document : Document) =
-    completed(document)._1 == annotators.size - 1
-
-  private[this] def hasFailed(document : Document) =
-    completed(document)._2
-
-  private[this] def wrapUp(document : Document) = {
-    if (hasFailed(document)) {
-      Logger.error(s"[${self.path.name}] Some annotator failed, restoring DB state: ${document.title}")
-      deleteAnnotations(document)
-    } else {
-      Logger.info(s"[${self.path.name}] All annotators finished: ${document.title}")
-      markAsAnnotated(document)
-    }
-    terminate(document)
-  }
-
-
-  private[this] def markAsAnnotated(document : Document) =
+  protected def markAnnotated(documentId : DocumentId) =
     database withSession { implicit session =>
-      documents save document.copy(annotated = true)
+      Documents filter (_.id is documentId) map (_.annotated) update true
     }
 
-  private[this] def deleteAnnotations(document : Document) =
+  protected def deleteAnnotations(documentId : DocumentId) =
     database withTransaction { implicit session =>
-      annotations findByDocument document foreach { annotation =>
-        annotations keywordFor annotation map {
-          keyword => keywords save keyword.copy(occurrences = keyword.occurrences - 1)
-        }
-        annotations delete annotation
+      decrementKeywordCounter(documentId)
+      (Annotations findByDocumentId documentId).delete
+      Documents filter (_.id is documentId) map (_.annotated) update false
+    }
+
+  private[this] def decrementKeywordCounter(documentId : DocumentId)(implicit session : Session) =
+    findDocumentKeywords(documentId) foreach {
+      case (id, (current, count)) => Keywords filter (_.id is id) map (_.occurrences) update (current - count)
+    }
+
+  private[this] def findDocumentKeywords(documentId : DocumentId)(implicit session : Session) =
+    (Annotations filter (_.documentId is documentId) flatMap {
+      a => Keywords filter (_.id is a.keywordId)
+    } groupBy identity map { case (k, ks) => k.id -> (k.occurrences, ks.length) }).list
+
+  protected final def isAnnotated(documentId  : DocumentId) =
+    database withSession { implicit session =>
+      (Documents filter (_.id is documentId) map (_.annotated)).first
+    }
+
+}
+
+private[annotator] trait AnnotatorLogging extends AnnotatorBase {
+
+  abstract override protected def annotate(sender : ActorRef, msg : Annotate) =
+    if   (!isAnnotated(msg.documentId)) super.annotate(sender,msg)
+    else Logger.warn(s"[${self.path.name}] Ignoring already annotated ${msg.documentId}")
+
+  abstract override protected def finished(sender : ActorRef, msg : Finished) = {
+    Logger.info(s"[${sender.path.name}] Finished for ${msg.documentId}")
+    super.finished(sender, msg)
+  }
+
+  abstract override protected def failed(sender : ActorRef, msg : Failed) = {
+    Logger.error(s"[${sender.path.name}] Failed for ${msg.documentId}\n${msg.cause}")
+    super.failed(sender, msg)
+  }
+
+  abstract override protected def deleteAnnotations(documentId : DocumentId) = {
+    Logger.error(s"[${self.path.name}] Some annotator failed, restoring DB for $documentId")
+    super.deleteAnnotations(documentId)
+  }
+
+  abstract override protected def markAnnotated(documentId : DocumentId) = {
+    Logger.info(s"[${self.path.name}] All annotators finished for $documentId")
+    super.markAnnotated(documentId)
+  }
+
+}
+
+private[annotator] class AnnotatorImpl extends AnnotatorBase {
+
+  // map of (DocumentId -> (CompletedAnnotatorsCounter, HasAnyAnnotatorFailed?))
+  private[this] lazy val completed = TrieMap[DocumentId, (Size, Boolean)]()
+
+  private[this] lazy val annotators = createAnnotators(app.configuration getConfig "annotator")
+
+  override protected def annotate(sender : ActorRef, msg : Annotate) =
+    if (!completed.contains(msg.documentId)) {
+      completed += (msg.documentId -> (0, false))
+      annotators foreach (_ ! msg)
+    }
+
+  override protected def finished(sender : ActorRef, msg : Finished) =
+    if (completed contains msg.documentId) {
+      if (hasCompleted(msg.documentId)) wrapUp(msg.documentId) else {
+        val (counter, failed) = completed(msg.documentId)
+        completed update (msg.documentId, (counter + 1, failed))
+      }
+    }
+
+  override protected def failed(sender : ActorRef, msg : Failed) =
+    if (completed contains msg.documentId) {
+      if (hasCompleted(msg.documentId)) wrapUp(msg.documentId) else {
+        val (counter, _) = completed(msg.documentId)
+        completed update (msg.documentId, (counter + 1, true))
+      }
+    }
+
+  private[this] def wrapUp(documentId : DocumentId) = {
+    if (hasFailed(documentId)) deleteAnnotations(documentId)
+    else markAnnotated(documentId)
+    completed -= documentId
+  }
+
+  private[this] def hasCompleted(documentId : DocumentId) =
+    completed(documentId)._1.value == annotators.size - 1
+
+  private[this] def hasFailed(documentId : DocumentId) =
+    completed(documentId)._2
+
+  private[this] def createAnnotators(subConfig : Option[Configuration]) =
+    subConfig.fold(Set.empty[ActorRef]) {
+      config => config.keys map {
+        key => context actorOf (Props(Class forName (config getString key).get), key)
       }
     }
 
 }
+
+class Annotator extends AnnotatorImpl with AnnotatorLogging
 
