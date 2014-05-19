@@ -11,7 +11,7 @@ object PubMedSearchResult extends ((Size, Position, Set[PubMedId]) => PubMedSear
   import play.api.libs.json._
   import play.api.libs.functional.syntax._
 
-  implicit val searchResultWrites : Writes[PubMedSearchResult] = (
+  implicit val pubmedSearchResultWrites : Writes[PubMedSearchResult] = (
     (__ \ 'count).write[Size]     and
     (__ \ 'first).write[Position] and
     (__ \ 'results).write[Set[PubMedId]]

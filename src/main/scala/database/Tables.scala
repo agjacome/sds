@@ -55,6 +55,7 @@ private[database] trait Tables { this : Profile with Mappers =>
     def documentId = column[DocumentId]("document_id")
     def keywordId  = column[KeywordId]("keyword_id")
     def counter    = column[Size]("count", O.NotNull)
+    def ratio      = column[Double]("ratio", O.NotNull)
 
     def key = primaryKey("pk_stats", (documentId, keywordId))
 

@@ -5,6 +5,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
+import es.uvigo.esei.tfg.smartdrugsearch.macros.SealedValues
 
 class KeywordSpec extends BaseSpec {
 
@@ -13,7 +14,7 @@ class KeywordSpec extends BaseSpec {
   private[this] lazy val keywordTupleGenerator = for {
     id          <- arbitrary[Option[Long]] map (_ map KeywordId)
     normalized  <- nonEmptyStringGenerator map Sentence
-    category    <- Gen.oneOf(Compound, Drug, Gene, Protein, Species)
+    category    <- Gen.oneOf(SealedValues.from[Category].toSeq)
     occurrences <- Gen.choose(0, Long.MaxValue) map Size
   } yield (id, normalized, category, occurrences)
 

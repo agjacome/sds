@@ -9,7 +9,7 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
 class PubMedProviderSpec extends BaseSpec {
 
-  lazy val pubmed = PubMedProvider()
+  private[this] lazy val pubmed = PubMedProvider()
 
   "The PubMed Provider" - {
 
