@@ -17,7 +17,7 @@ scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 // maven repo, and Oscar4 from Cambridge's Department of Chemistry)
 resolvers ++= Seq(
   "Renaudr's Maven Repository" at "https://github.com/renaud/maven_repo/raw/master/snapshots",
-  "Cambridge's Dpt. Chemistry" at "http://maven.ch.cam.ac.uk/content/groups/ucc/" // "http://maven.ch.cam.ac.uk/m2repo"
+  "Cambridge's Dpt. Chemistry" at "http://maven.ch.cam.ac.uk/m2repo"
 )
 
 libraryDependencies ++= Seq(

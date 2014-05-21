@@ -12,8 +12,8 @@ class AnnotatorMessageSpec extends BaseSpec {
   private[this] lazy val documentIdGenerator = arbitrary[Long] map DocumentId
 
   private[this] lazy val documentGenerator = for {
-    title <- nonEmptyStringGenerator map Sentence
-    text  <- nonEmptyStringGenerator
+    title <- Generators.nonEmptyStringGenerator map Sentence
+    text  <- Generators.nonEmptyStringGenerator
   } yield Document(None, title, text)
 
   "The Annotate message" - {

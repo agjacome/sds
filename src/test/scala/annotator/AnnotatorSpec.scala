@@ -56,7 +56,7 @@ class AnnotatorSpec extends ActorBaseSpec {
 
   "The top-level Annotator" - {
 
-    forAll (expectations) { (document, keywords, annotations) =>
+    forAll(expectations) { (document, keywords, annotations) =>
 
       s"should annotate correctly Document '${document._1}'" in new WithApplication {
         val annotator = system.actorOf(Props[Annotator], "Annotator")

@@ -13,14 +13,14 @@ class SentenceSpec extends BaseSpec {
     "can be constructed" - {
 
       "implicitly from a String" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           val s : Sentence = str
           s.words should be (str.trim split "\\s+")
         }
       }
 
       "explicitly by passing a 'String' to its constructor" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           Sentence(str).words should be (str.trim split "\\s+")
         }
       }
@@ -35,20 +35,20 @@ class SentenceSpec extends BaseSpec {
     "can be converted to a 'String'" - {
 
       "implicitly" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           val s : String = Sentence(str)
           s should equal (str.trim split "\\s+" mkString " ")
         }
       }
 
       "explicitly with the 'toString' method" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           Sentence(str).toString should equal (str.trim split "\\s+" mkString " ")
         }
       }
 
       "explicitly with the 'mkString' method using a separator between words" in {
-        forAll(nonEmptyStringGenerator, arbitrary[String]) { (str : String, sep : String) =>
+        forAll(Generators.nonEmptyStringGenerator, arbitrary[String]) { (str : String, sep : String) =>
           (Sentence(str) mkString sep) should equal (str.trim split "\\s+" mkString sep)
         }
       }
@@ -80,7 +80,7 @@ class SentenceSpec extends BaseSpec {
     "should transform the String that creates it" - {
 
       "removing all spaces that it contains" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           all(Sentence(str).words) should not include regex("\\s")
         }
       }
@@ -90,18 +90,19 @@ class SentenceSpec extends BaseSpec {
     "can be compared for equality with another Sentence" - {
 
       "in expected behaviour" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           Sentence(str) should equal (Sentence(str))
         }
-        forAll(nonEmptyStringGenerator, nonEmptyStringGenerator)((str1 : String, str2  : String) =>
-          whenever(str1.toLowerCase != str2.toLowerCase) {
-            Sentence(str1) should not equal (Sentence(str2))
-          }
-        )
+        forAll(Generators.nonEmptyStringGenerator, Generators.nonEmptyStringGenerator) {
+          (str1 : String, str2  : String) =>
+            whenever(str1.toLowerCase != str2.toLowerCase) {
+              Sentence(str1) should not equal (Sentence(str2))
+            }
+        }
       }
 
       "case-insensitively" in {
-        forAll(nonEmptyStringGenerator) { str : String =>
+        forAll(Generators.nonEmptyStringGenerator) { str : String =>
           Sentence(str.toLowerCase) should equal (Sentence(str.toUpperCase))
         }
       }

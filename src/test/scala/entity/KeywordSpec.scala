@@ -1,22 +1,11 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import play.api.libs.json._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.macros.SealedValues
+import es.uvigo.esei.tfg.smartdrugsearch.entity.Generators._
 
 class KeywordSpec extends BaseSpec {
-
-  private[this] lazy val keywordGenerator = keywordTupleGenerator map Keyword.tupled
-
-  private[this] lazy val keywordTupleGenerator = for {
-    id          <- arbitrary[Option[Long]] map (_ map KeywordId)
-    normalized  <- nonEmptyStringGenerator map Sentence
-    category    <- Gen.oneOf(SealedValues.from[Category].toSeq)
-    occurrences <- Gen.choose(0, Long.MaxValue) map Size
-  } yield (id, normalized, category, occurrences)
 
   private[this] def createJson(keyword : Keyword) =
     JsObject(Seq(
@@ -26,7 +15,6 @@ class KeywordSpec extends BaseSpec {
       "category"    -> JsString(keyword.category.toString),
       "occurrences" -> JsNumber(keyword.occurrences.value)
     ))
-
 
   "A Keyword" - {
 

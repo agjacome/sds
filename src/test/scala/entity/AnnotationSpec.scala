@@ -1,27 +1,16 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import play.api.libs.json._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen.{ choose, alphaStr }
+import org.scalacheck.Gen
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
+import es.uvigo.esei.tfg.smartdrugsearch.entity.Generators._
 
 class AnnotationSpec extends BaseSpec {
 
-  private[this] lazy val annotationGenerator = annotationTupleGenerator map Annotation.tupled
-
-  private[this] lazy val annotationTupleGenerator = for {
-    id            <- arbitrary[Option[Long]] map (_ map AnnotationId)
-    documentId    <- arbitrary[Long] map DocumentId
-    keywordId     <- arbitrary[Long] map KeywordId
-    startPosition <- choose(0, Long.MaxValue / 2) map Position
-    endPosition   <- choose(startPosition.value, Long.MaxValue) map Position
-    text          <- nonEmptyStringGenerator map Sentence
-  } yield (id, documentId, keywordId, text, startPosition, endPosition)
-
   private[this] lazy val invalidPosAnnotationTupleGenerator = for {
-    endPosition   <- choose(0, Long.MaxValue / 2) map Position
-    startPosition <- choose(endPosition.value + 1, Long.MaxValue) map Position
+    endPosition   <- Gen.choose(0, Long.MaxValue / 2) map Position
+    startPosition <- Gen.choose(endPosition.value + 1, Long.MaxValue) map Position
     (id, documentId, keywordId, text, _, _) <- annotationTupleGenerator
   } yield (id, documentId, keywordId, text, startPosition, endPosition)
 
@@ -35,7 +24,6 @@ class AnnotationSpec extends BaseSpec {
       "startPosition" -> JsNumber(annotation.startPosition.value),
       "endPosition"   -> JsNumber(annotation.endPosition.value)
     ))
-
 
   "An Annotation" - {
 

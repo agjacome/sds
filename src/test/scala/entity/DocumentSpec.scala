@@ -2,21 +2,11 @@ package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import play.api.libs.json._
 import org.scalacheck.Gen
-import org.scalacheck.Arbitrary.arbitrary
 
 import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
+import es.uvigo.esei.tfg.smartdrugsearch.entity.Generators._
 
 class DocumentSpec extends BaseSpec {
-
-  private[this] lazy val documentGenerator = documentTupleGenerator map Document.tupled
-
-  private[this] lazy val documentTupleGenerator = for {
-    id        <- arbitrary[Option[Long]] map (_ map DocumentId)
-    title     <- nonEmptyStringGenerator map Sentence
-    text      <- nonEmptyStringGenerator
-    annotated <- arbitrary[Boolean]
-    pubmedId  <- arbitrary[Option[Long]] map (_ map PubMedId)
-  } yield (id, title, text, annotated, pubmedId)
 
   private[this] lazy val emptyTextDocumentTupleGenerator = for {
     text                                <- Gen.const("")
@@ -32,7 +22,6 @@ class DocumentSpec extends BaseSpec {
       "text"      -> JsString(document.text),
       "annotated" -> JsBoolean(document.annotated)
     ))
-
 
   "A Document" - {
 

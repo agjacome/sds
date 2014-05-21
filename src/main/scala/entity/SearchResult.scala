@@ -13,16 +13,23 @@ object SearchResult extends ((Document, Set[Keyword]) => SearchResult) {
 
 }
 
-final case class SearchResults(totalCount : Size, firstElement : Position, results : Set[SearchResult])
-object SearchResults extends ((Size, Position, Set[SearchResult]) => SearchResults) {
+final case class SearchResults(
+  totalCount : Size,
+  pageNumber : Position,
+  pageSize   : Size,
+  results    : Seq[SearchResult]
+)
+
+object SearchResults extends ((Size, Position, Size, Seq[SearchResult]) => SearchResults) {
 
   import play.api.libs.json._
   import play.api.libs.functional.syntax._
 
   implicit val searchResultsWrites : Writes[SearchResults] = (
-    (__ \ 'totalCount).write[Size]       and
-    (__ \ 'firstElement).write[Position] and
-    (__ \ 'results).write[Set[SearchResult]]
+    (__ \ 'totalCount).write[Size]     and
+    (__ \ 'pageNumber).write[Position] and
+    (__ \ 'pageSize).write[Size]       and
+    (__ \ 'results).write[Seq[SearchResult]]
   ) (unlift(unapply))
 
 }

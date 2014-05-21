@@ -50,7 +50,7 @@ private[database] trait Tables { this : Profile with Mappers =>
 
   }
 
-  protected final class DocumentStatsTable(val tag : Tag) extends Table[(DocumentId, KeywordId, Size)](tag, "document_stats") {
+  protected final class DocumentStatsTable(val tag : Tag) extends Table[(DocumentId, KeywordId, Size, Double)](tag, "document_stats") {
 
     def documentId = column[DocumentId]("document_id")
     def keywordId  = column[KeywordId]("keyword_id")
@@ -62,7 +62,7 @@ private[database] trait Tables { this : Profile with Mappers =>
     def document = foreignKey("fk_stats_document", documentId, TableQuery[DocumentsTable])(_.id, Cascade, Cascade)
     def keyword  = foreignKey("fk_stats_keyword",  keywordId,  TableQuery[KeywordsTable] )(_.id, Cascade, Cascade)
 
-    def * = (documentId, keywordId, counter)
+    def * = (documentId, keywordId, counter, ratio)
 
   }
 
