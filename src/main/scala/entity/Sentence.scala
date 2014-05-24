@@ -32,8 +32,8 @@ object Sentence extends (String => Sentence) {
   implicit def stringToSentence(words : String) : Sentence = Sentence(words)
   implicit def sentenceToString(words : Sentence) : String = words.toString
 
-  implicit val sentenceWrites : Writes[Sentence] = Writes { (s : Sentence) => JsString(s.toString) }
-  implicit val sentenceReads  : Reads[Sentence]  = Reads.of[String] map apply
+  implicit val sentenceWrites = Writes { (s : Sentence) => JsString(s.toString) }
+  implicit val sentenceReads  = Reads.of[String] map apply
 
   implicit def bindPath(implicit binder : PathBindable[String]) : PathBindable[Sentence] =
     binder transform (apply, _.toString)

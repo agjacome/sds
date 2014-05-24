@@ -17,18 +17,27 @@ final case class Document (
 
 object Document extends ((Option[DocumentId], Sentence, String, Boolean, Option[PubMedId]) => Document) {
 
+  import play.api.data.Form
+  import play.api.data.Forms._
   import play.api.libs.json._
   import play.api.libs.functional.syntax._
 
-  implicit val documentWrites : Writes[Document] = (
-    (__ \ 'id).writeNullable[DocumentId] and
-    (__ \ 'title).write[Sentence]        and
-    (__ \ 'text).write[String]           and
-    (__ \ 'annotated).write[Boolean]     and
-    (__ \ 'pubmedId).writeNullable[PubMedId]
-  ) (unlift(unapply))
+  private def formApply(title : String, text : String, pubmedId : Option[Long]) : Document =
+    apply(None, title, text, false, pubmedId map PubMedId)
 
-  implicit val documentReads : Reads[Document] = (
+  private def formUnapply(document : Document) : Option[(String, String, Option[Long])] =
+    Some((document.title, document.text, document.pubmedId map (_.toLong)))
+
+  lazy val form = Form(mapping(
+    "title"    -> nonEmptyText,
+    "text"     -> nonEmptyText,
+    "pubmedId" -> optional(longNumber(min = 1L))
+  )(formApply)(formUnapply))
+
+  implicit val documentWrites = Json.writes[Document]
+
+  // make annotated an optional field in JSON object, defaulting it to false
+  implicit val documentReads = (
     (__ \ 'id).readNullable[DocumentId]     and
     (__ \ 'title).read[Sentence]            and
     (__ \ 'text).read[String]               and

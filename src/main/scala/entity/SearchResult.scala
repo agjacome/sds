@@ -6,10 +6,7 @@ object SearchResult extends ((Document, Set[Keyword]) => SearchResult) {
   import play.api.libs.json._
   import play.api.libs.functional.syntax._
 
-  implicit val searchResultWrites : Writes[SearchResult] = (
-    (__ \ 'document).write[Document] and
-    (__ \ 'keywords).write[Set[Keyword]]
-  ) (unlift(unapply))
+  implicit val searchResultWrites = Json.writes[SearchResult]
 
 }
 
@@ -25,12 +22,7 @@ object SearchResults extends ((Size, Position, Size, Seq[SearchResult]) => Searc
   import play.api.libs.json._
   import play.api.libs.functional.syntax._
 
-  implicit val searchResultsWrites : Writes[SearchResults] = (
-    (__ \ 'totalCount).write[Size]     and
-    (__ \ 'pageNumber).write[Position] and
-    (__ \ 'pageSize).write[Size]       and
-    (__ \ 'results).write[Seq[SearchResult]]
-  ) (unlift(unapply))
+  implicit val searchResultsWrites = Json.writes[SearchResults]
 
 }
 

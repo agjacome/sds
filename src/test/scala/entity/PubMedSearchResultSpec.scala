@@ -18,9 +18,9 @@ class PubMedSearchResultSpec extends BaseSpec {
 
   private[this] def createJson(pubmedSearchResult : PubMedSearchResult) =
     Json.obj(
-      "count"   -> JsNumber(pubmedSearchResult.totalResults.value),
-      "first"   -> JsNumber(pubmedSearchResult.firstElement.value),
-      "results" -> JsArray((pubmedSearchResult.idList map { id => JsNumber(id.value) }).toSeq)
+      "totalResults" -> JsNumber(pubmedSearchResult.totalResults.value),
+      "firstElement" -> JsNumber(pubmedSearchResult.firstElement.value),
+      "idList"       -> JsArray((pubmedSearchResult.idList map { id => JsNumber(id.value) }).toSeq)
     )
 
   "A PubMedSearchResult" - {

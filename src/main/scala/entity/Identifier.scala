@@ -17,8 +17,8 @@ private[entity] abstract class IdentifierCompanion[I <: Identifier] extends (Lon
   implicit def longToIdentifier(id : Long) : I = apply(id)
   implicit def identifierToLong(id : I) : Long = id.value
 
-  implicit val identifierWrites : Writes[I] = Writes { (i : I) => JsNumber(i.value) }
-  implicit val identifierReads  : Reads[I]  = Reads.of[Long] map apply
+  implicit val identifierWrites = Writes { (i : I) => JsNumber(i.value) }
+  implicit val identifierReads  = Reads.of[Long] map apply
 
   implicit def bindPath(implicit binder : PathBindable[Long]) : PathBindable[I] =
     binder transform (apply, _.value)

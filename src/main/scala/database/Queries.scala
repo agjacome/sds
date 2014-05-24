@@ -7,6 +7,11 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
 
   import profile.simple._
 
+  object Accounts extends TableQuery(new AccountsTable(_)) {
+    lazy val findById    = this findBy (_.id)
+    lazy val findByEmail = this findBy (_.email)
+  }
+
   object Documents extends TableQuery(new DocumentsTable(_)) {
     lazy val findById       = this findBy (_.id)
     lazy val findByPubMedId = this findBy (_.pubmedId)
@@ -24,9 +29,12 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     lazy val findByKeywordId  = this findBy (_.keywordId)
   }
 
-  lazy val DocumentStats = TableQuery[DocumentStatsTable]
+  object DocumentStats extends TableQuery(new DocumentStatsTable(_)) {
+    lazy val findByDocumentId = this findBy (_.documentId)
+    lazy val findByKeywordId  = this findBy (_.keywordId)
+  }
 
-  lazy val DDL = Documents.ddl ++ Keywords.ddl ++ Annotations.ddl ++ DocumentStats.ddl
+  lazy val DDL = Accounts.ddl ++ Documents.ddl ++ Keywords.ddl ++ Annotations.ddl ++ DocumentStats.ddl
 
   def isDatabaseEmpty(implicit session : Session) : Boolean =
     MTable.getTables.list.isEmpty

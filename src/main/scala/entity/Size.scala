@@ -29,8 +29,8 @@ object Size extends (Long => Size) {
   implicit def longToSize(size : Long) : Size = Size(size)
   implicit def sizeToLong(size : Size) : Long = size.value
 
-  implicit val sizeWrites : Writes[Size] = Writes { (s : Size) => JsNumber(s.value) }
-  implicit val sizeReads  : Reads[Size]  = Reads.of[Long] map apply
+  implicit val sizeWrites = Writes { (s : Size) => JsNumber(s.value) }
+  implicit val sizeReads  = Reads.of[Long] map apply
 
   implicit def bindPath(implicit binder : PathBindable[Long]) : PathBindable[Size] =
     binder transform (apply, _.value)

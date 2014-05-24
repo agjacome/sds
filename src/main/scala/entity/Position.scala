@@ -29,8 +29,8 @@ object Position extends (Long => Position) {
   implicit def longToPosition(pos : Long) : Position = Position(pos)
   implicit def positionToLong(pos : Position) : Long = pos.value
 
-  implicit val positionWrites : Writes[Position] = Writes { (p : Position) => JsNumber(p.value) }
-  implicit val positionReads  : Reads[Position]  = Reads.of[Long] map apply
+  implicit val positionWrites = Writes { (p : Position) => JsNumber(p.value) }
+  implicit val positionReads  = Reads.of[Long] map apply
 
   implicit def bindPath(implicit binder : PathBindable[Long]) : PathBindable[Position] =
     binder transform (apply, _.value)

@@ -32,8 +32,8 @@ object Category extends ((String) => Category) {
   def apply(str : String) : Category =
     fromStr(str.toLowerCase)
 
-  implicit val sentenceWrites : Writes[Category] = Writes { (c : Category) => JsString(c.toString) }
-  implicit val sentenceReads  : Reads[Category]  = Reads.of[String] map apply
+  implicit val sentenceWrites = Writes { (c : Category) => JsString(c.toString) }
+  implicit val sentenceReads  = Reads.of[String] map apply
 
   implicit def bindPath(implicit binder : PathBindable[String]) : PathBindable[Category] =
     binder transform (apply, _.toString.toLowerCase)
