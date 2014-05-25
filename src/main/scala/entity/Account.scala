@@ -1,5 +1,8 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
 import com.github.t3hnar.bcrypt._
 
 final case class AccountId (value : Long) extends AnyVal with Identifier
@@ -22,8 +25,6 @@ object Account extends ((Option[AccountId], String, String) => Account) {
 
   import play.api.data.Form
   import play.api.data.Forms._
-  import play.api.libs.json._
-  import play.api.libs.functional.syntax._
 
   lazy val form = Form(mapping(
     "email"    -> email,
@@ -44,5 +45,16 @@ object Account extends ((Option[AccountId], String, String) => Account) {
   private def formUnapply(account : Account) : Option[(String, String)] =
     Some(account.email, account.password)
 
+}
+
+final case class AccountList (
+  totalCount : Size,
+  pageNumber : Position,
+  pageSize   : Size,
+  list       : Seq[Account]
+) extends EntityList[Account]
+
+object AccountList extends ((Size, Position, Size, Seq[Account]) => AccountList) {
+  implicit val accountListWrites = Json.writes[AccountList]
 }
 

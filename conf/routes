@@ -1,3 +1,33 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
+# Routes configuration file
+
+GET     /                               es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.index
+GET     /api/jsroutes.js                es.uvigo.esei.tfg.smartdrugsearch.controller.JavaScriptRouterController.jsRoutes()
+
+POST    /api/login                      es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.login
+POST    /api/logout                     es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.logout
+GET     /api/auth_ping                  es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.authPing
+
+GET     /api/account                    es.uvigo.esei.tfg.smartdrugsearch.controller.AccountsController.list(page : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Position], count : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size])
+GET     /api/account/:id                es.uvigo.esei.tfg.smartdrugsearch.controller.AccountsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.AccountId)
+POST    /api/account                    es.uvigo.esei.tfg.smartdrugsearch.controller.AccountsController.add
+PUT     /api/account/:id                es.uvigo.esei.tfg.smartdrugsearch.controller.AccountsController.edit(id : es.uvigo.esei.tfg.smartdrugsearch.entity.AccountId)
+DELETE  /api/account/:id                es.uvigo.esei.tfg.smartdrugsearch.controller.AccountsController.delete(id : es.uvigo.esei.tfg.smartdrugsearch.entity.AccountId)
+
+GET     /api/document                   es.uvigo.esei.tfg.smartdrugsearch.controller.DocumentsController.list(page : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Position], count : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size])
+GET     /api/document/:id               es.uvigo.esei.tfg.smartdrugsearch.controller.DocumentsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.DocumentId)
+POST    /api/document                   es.uvigo.esei.tfg.smartdrugsearch.controller.DocumentsController.add
+DELETE  /api/document/:id               es.uvigo.esei.tfg.smartdrugsearch.controller.DocumentsController.delete(id : es.uvigo.esei.tfg.smartdrugsearch.entity.DocumentId)
+
+GET     /api/keyword                    es.uvigo.esei.tfg.smartdrugsearch.controller.KeywordsController.list(page : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Position], count : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size])
+GET     /api/keyword/:id                es.uvigo.esei.tfg.smartdrugsearch.controller.KeywordsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.KeywordId)
+
+GET     /api/annotation                 es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotationsController.list(page : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Position], count : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size])
+GET     /api/annotation/:id             es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotationsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.AnnotationId)
+
+GET     /api/search                     es.uvigo.esei.tfg.smartdrugsearch.controller.SearcherController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, page : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, size : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
+
+POST    /api/annotator/annotate         es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotatorController.annotate
+
+GET     /api/provider/pubmed/search     es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, limit : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size], start : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, count : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
+POST    /api/provider/pubmed/download   es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.download
+

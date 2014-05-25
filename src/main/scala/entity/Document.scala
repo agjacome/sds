@@ -1,5 +1,8 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
 final case class DocumentId (value : Long) extends AnyVal with Identifier
 object DocumentId extends IdentifierCompanion[DocumentId]
 
@@ -19,14 +22,6 @@ object Document extends ((Option[DocumentId], Sentence, String, Boolean, Option[
 
   import play.api.data.Form
   import play.api.data.Forms._
-  import play.api.libs.json._
-  import play.api.libs.functional.syntax._
-
-  private def formApply(title : String, text : String, pubmedId : Option[Long]) : Document =
-    apply(None, title, text, false, pubmedId map PubMedId)
-
-  private def formUnapply(document : Document) : Option[(String, String, Option[Long])] =
-    Some((document.title, document.text, document.pubmedId map (_.toLong)))
 
   lazy val form = Form(mapping(
     "title"    -> nonEmptyText,
@@ -44,6 +39,37 @@ object Document extends ((Option[DocumentId], Sentence, String, Boolean, Option[
     (__ \ 'annotated).readNullable[Boolean].map(_ getOrElse false) and
     (__ \ 'pubmedId).readNullable[PubMedId]
   ) (apply _)
+
+  private def formApply(title : String, text : String, pubmedId : Option[Long]) : Document =
+    apply(None, title, text, false, pubmedId map PubMedId)
+
+  private def formUnapply(document : Document) : Option[(String, String, Option[Long])] =
+    Some((document.title, document.text, document.pubmedId map (_.toLong)))
+
+}
+
+final case class DocumentList (
+  totalCount : Size,
+  pageNumber : Position,
+  pageSize   : Size,
+  list       : Seq[Document]
+) extends EntityList[Document]
+
+object DocumentList extends ((Size, Position, Size, Seq[Document]) => DocumentList) {
+
+  implicit val documentListWrites = Json.writes[DocumentList]
+
+}
+
+final case class AnnotatedDocument (
+  document    : Document,
+  annotations : Set[Annotation],
+  keywords    : Set[Keyword]
+)
+
+object AnnotatedDocument extends ((Document, Set[Annotation], Set[Keyword]) => AnnotatedDocument) {
+
+  implicit val annotatedDocumentWrites = Json.writes[AnnotatedDocument]
 
 }
 
