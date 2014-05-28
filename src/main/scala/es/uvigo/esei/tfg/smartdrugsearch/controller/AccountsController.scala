@@ -59,8 +59,8 @@ private[controller] trait AccountsController extends Controller with Authorizati
     }
 
   private[this] def editResult(id : AccountId, account : Account) =
-    withAccount(id) { _ =>
-      val edited = account.hashPassword copy (Some(id))
+    withAccount(id) { stored =>
+      val edited = stored.copy(password = account.password).hashPassword
       database withSession { implicit session => Accounts update edited }
       Ok(Json toJson edited)
     }

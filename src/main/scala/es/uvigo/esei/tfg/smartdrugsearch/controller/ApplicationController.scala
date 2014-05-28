@@ -5,6 +5,7 @@ import play.api.mvc._
 
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.esei.tfg.smartdrugsearch.view
 
 private[controller] trait ApplicationController extends Controller with Authorization {
 

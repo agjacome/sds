@@ -1,0 +1,1 @@
+define(['filter/main'], function ( ) { });

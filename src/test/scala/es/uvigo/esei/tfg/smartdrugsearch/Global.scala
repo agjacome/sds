@@ -5,7 +5,7 @@ import play.api._
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.service._
 
-object Global extends GlobalSettings {
+trait Global extends GlobalSettings {
 
   // force load of NER libraries, as they have a quite long startup time, and
   // services just load them lazily (which is bad for testing, because it slows
@@ -26,4 +26,6 @@ object Global extends GlobalSettings {
     }
 
 }
+
+object Global extends Global
 

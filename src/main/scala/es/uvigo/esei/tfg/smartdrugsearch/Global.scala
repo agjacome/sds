@@ -18,7 +18,7 @@ import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity.Account
 import es.uvigo.esei.tfg.smartdrugsearch.service.{ ComputeStats, DocumentStatsService }
 
-object Global extends GlobalSettings {
+trait Global extends GlobalSettings {
 
   lazy val annotator     = system.actorOf(Props[Annotator], "Annotator")
   lazy val documentStats = system.actorOf(Props[DocumentStatsService], "DocumentStatsComputer")
@@ -57,4 +57,6 @@ object Global extends GlobalSettings {
   }
 
 }
+
+object Global extends Global
 

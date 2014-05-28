@@ -45,7 +45,7 @@ private[annotator] trait AnnotatorAdapter extends Actor {
     database withTransaction { implicit session =>
       (Keywords filter (_.normalized is normalized) map (_.id)).firstOption getOrElse {
         val keyword = Keyword(None, normalized, category)
-        Keywords returning Keywords.map(_.id) += keyword
+        Keywords += keyword
       }
     }
 

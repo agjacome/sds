@@ -30,6 +30,7 @@ libraryDependencies ++= Seq(
 
 // scala/java dependencies
 libraryDependencies ++= Seq(
+  "org.webjars"             %  "webjars-locator"      % "0.14"    ,
   "org.webjars"             %% "webjars-play"         % "2.2.1-2" ,
   "com.typesafe.slick"      %% "slick"                % "2.0.2"   ,
   "com.typesafe.play"       %% "play-slick"           % "0.6.0.1" ,
@@ -37,6 +38,16 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"       %% "akka-actor"           % "2.2.4"   ,
   "net.databinder.dispatch" %% "dispatch-core"        % "0.11.0"  ,
   "mysql"                   %  "mysql-connector-java" % "5.1.30"
+)
+
+// javascript/css/html dependencies
+libraryDependencies ++= Seq(
+  "org.webjars" % "underscorejs"         % "1.6.0-3" ,
+  "org.webjars" % "jquery"               % "1.11.1"  ,
+  "org.webjars" % "angularjs"            % "1.2.16-2" exclude("org.webjars", "jquery") ,
+  "org.webjars" % "bootstrap"            % "3.1.1-1"  exclude("org.webjars", "jquery") ,
+  "org.webjars" % "angular-ui-bootstrap" % "0.11.0-2" ,
+  "org.webjars" % "font-awesome"         % "4.1.0"
 )
 
 // testing dependencies

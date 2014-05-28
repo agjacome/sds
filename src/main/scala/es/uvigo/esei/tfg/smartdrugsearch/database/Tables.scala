@@ -17,6 +17,8 @@ private[database] trait Tables { this : Profile with Mappers =>
     def email    = column[String]("email", O.NotNull)
     def password = column[String]("password", O.NotNull)
 
+    def unique_email = index("idx_accounts_unique_email", email, unique = true)
+
     def * = (id.?, email, password) <> (Account.tupled, Account.unapply)
 
   }

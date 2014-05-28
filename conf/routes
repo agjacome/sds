@@ -31,3 +31,6 @@ POST    /api/annotator/annotate         es.uvigo.esei.tfg.smartdrugsearch.contro
 GET     /api/provider/pubmed/search     es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, limit : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size], start : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, count : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
 POST    /api/provider/pubmed/download   es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.download
 
+GET     /assets/*file                   es.uvigo.esei.tfg.smartdrugsearch.controller.AssetsController.at(path = "/src/main/webapp", file)
+GET     /webjars/*file                  es.uvigo.esei.tfg.smartdrugsearch.controller.WebJarAssetsController.at(file)
+

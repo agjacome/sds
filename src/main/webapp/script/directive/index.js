@@ -1,0 +1,1 @@
+define(['directive/main'], function ( ) { });
