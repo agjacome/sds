@@ -1,5 +1,5 @@
 define([
-    'angular', 'directive/main', 'filter/main', 'service/main'
+    'angular', 'directive/index', 'filter/index', 'service/index',
 ], function(angular) {
     'use strict';
 

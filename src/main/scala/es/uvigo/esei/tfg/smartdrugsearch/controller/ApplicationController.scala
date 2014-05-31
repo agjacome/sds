@@ -14,7 +14,7 @@ private[controller] trait ApplicationController extends Controller with Authoriz
   import database._
   import database.profile.simple._
 
-  def index : Action[AnyContent] =
+  def index(any : String) : Action[AnyContent] =
     Action {
       Ok(view.html.index())
     }

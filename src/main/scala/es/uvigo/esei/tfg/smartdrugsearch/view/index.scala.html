@@ -4,9 +4,10 @@
     @import play.api.Play.{ current => app }
     @import org.webjars.RequireJS
     @import es.uvigo.esei.tfg.smartdrugsearch.controller._
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <base href="/">
 
     <title data-ng-bind="pageTitle"></title>
 
@@ -16,10 +17,24 @@
     <link rel="stylesheet" media="all" href="@routes.WebJarAssetsController.at(WebJarAssetsController.locate("font-awesome.min.css"))" />
     <link rel="stylesheet" media="all" href="@routes.AssetsController.at("style/main.css")">
 
+    @Html("""
+    <!-- http://trentwalton.com/2013/01/16/windows-phone-8-viewport-fix/ -->
+    <script>
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+          var msViewportStyle = document.createElement("style");
+          msViewportStyle.appendChild(
+            document.createTextNode("@-ms-viewport{width:auto!important}")
+          );
+          document.getElementsByTagName("head")[0].
+            appendChild(msViewportStyle);
+        }
+    </script>
+    """)
+
 </head>
 <body>
     <div class="container">
-        <ng-view></ng-view>
+        <div data-ng-view></div>
     </div>
 
     <script>

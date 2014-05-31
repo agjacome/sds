@@ -1,1 +1,5 @@
-define(['service/main'], function ( ) { });
+define([
+    './main',
+    './documentService',
+    './searchService',
+], function( ) { });

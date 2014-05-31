@@ -30,14 +30,15 @@ libraryDependencies ++= Seq(
 
 // scala/java dependencies
 libraryDependencies ++= Seq(
-  "org.webjars"             %  "webjars-locator"      % "0.14"    ,
-  "org.webjars"             %% "webjars-play"         % "2.2.1-2" ,
+  "com.typesafe.akka"       %% "akka-actor"           % "2.2.4"   ,
   "com.typesafe.slick"      %% "slick"                % "2.0.2"   ,
+  "org.webjars"             %% "webjars-play"         % "2.2.1-2" ,
+  "org.webjars"             %  "webjars-locator"      % "0.14"    ,
   "com.typesafe.play"       %% "play-slick"           % "0.6.0.1" ,
   "com.github.t3hnar"       %% "scala-bcrypt"         % "2.4"     ,
-  "com.typesafe.akka"       %% "akka-actor"           % "2.2.4"   ,
   "net.databinder.dispatch" %% "dispatch-core"        % "0.11.0"  ,
-  "mysql"                   %  "mysql-connector-java" % "5.1.30"
+  "mysql"                   %  "mysql-connector-java" % "5.1.30"  ,
+  "org.postgresql"          %  "postgresql"           % "9.3-1101-jdbc41"
 )
 
 // javascript/css/html dependencies
@@ -55,7 +56,7 @@ libraryDependencies ++= Seq(
   "org.scalatest"     %% "scalatest"    % "2.1.5"  % "test" ,
   "org.scalacheck"    %% "scalacheck"   % "1.11.4" % "test" ,
   "com.typesafe.akka" %% "akka-testkit" % "2.2.4"  % "test" ,
-  "org.mockito"       %  "mockito-all"  % "1.9.5"  % "test"
+  "org.mockito"       %  "mockito-core" % "1.9.5"  % "test"
 )
 
 // Play framework extra dependencies

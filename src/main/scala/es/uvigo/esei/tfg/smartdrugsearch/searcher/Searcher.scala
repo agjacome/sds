@@ -54,7 +54,7 @@ class Searcher {
     }
 
   private[this] def sortDocumentsByStats(keywordIds : Set[KeywordId])(implicit session : Session) =
-    groupDocumentStats(keywordIds) sortBy { r => (r._2, r._3, r._4) } map (_._1)
+    groupDocumentStats(keywordIds) sortBy { r => (r._2.desc, r._3.desc, r._4.desc) } map (_._1)
 
   private[this] def groupDocumentStats(keywordIds : Set[KeywordId])(implicit session : Session) =
     joinDocumentsWithStats(keywordIds) groupBy (_._2) map {

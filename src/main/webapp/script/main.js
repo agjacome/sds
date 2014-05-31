@@ -2,13 +2,12 @@
     'use strict';
 
     requirejs.config({
-        paths: {
-            jsRoutes: '/api/jsroutes',
+        shim : {
+            'jsRoutes': { deps : [ ], exports : 'jsRoutes' }
         },
-        shim: {
-            jsRoutes: { exports: 'jsRoutes' }
+        paths : {
+            'jsRoutes': '/api/jsroutes',
         },
-        packages: [ 'controller', 'service', 'filter', 'directive' ],
     });
 
     requirejs.onError = function(err) {
@@ -24,8 +23,10 @@
         'underscorejs',
         'bootstrap',
         'ui-bootstrap',
+        'ui-bootstrap-tpls',
         './app',
-        './routes'
+        './routes',
+        './util'
     ], function(angular) {
 
         angular.bootstrap(document, ['smart-drug-search']);

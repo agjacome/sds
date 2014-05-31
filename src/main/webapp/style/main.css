@@ -1,8 +1,59 @@
-body {
-    background-color: #ececec;
-    border-top: 0.5em #ffb232 solid;
+@import "document.css";
+@import "home.css";
+@import "search.css";
+
+/* http://trentwalton.com/2013/01/16/windows-phone-8-viewport-fix/ */
+@-webkit-viewport { width : device-width }
+@-moz-viewport { width : device-width }
+@-ms-viewport { width : device-width }
+@-o-viewport { width : device-width }
+@viewport { width : device-width }
+
+* {
+  -webkit-border-radius : 0 !important;
+     -moz-border-radius : 0 !important;
+          border-radius : 0 !important;
 }
 
-.logo-big {
-    margin-top: 12em;
+body {
+    background-color : #f1f1f1;
+    border-top       : 0.5em #ffb232 solid;
 }
+
+.result-list a.title {
+    color : #333;
+}
+
+.pagination li a,
+.pagination li a:hover,
+.pagination li a:focus,
+.pagination li a:active {
+    color : #333;
+}
+
+.pagination .active,
+.pagination .active a,
+.pagination .active a:hover,
+.pagination .active a:focus,
+.pagination .active a:active {
+    border-color     : #ccc;
+    background-color : #ffb232;
+}
+
+.keyword {
+    border    : 1px solid #ccc;
+    color     : #fff;
+    display   : inline-block;
+    font-size : 1.1em;
+    overflow  : hidden;
+    padding   : 0 1em;
+}
+
+.compound { background-color : #59ABE3; }
+.gene     { background-color : #BF55EC; }
+.protein  { background-color : #F39C12; }
+.species  { background-color : #2ECC71; }
+.dna      { background-color : #E74C3C; }
+.rna      { background-color : #95A5A6; }
+.cellline { background-color : #96281B; }
+.celltype { background-color : #34495E; }

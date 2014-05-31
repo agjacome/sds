@@ -1,5 +1,8 @@
 package es.uvigo.esei.tfg.smartdrugsearch.controller
 
+import scala.concurrent.duration._
+
+import play.api.cache.Cached
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
@@ -13,14 +16,18 @@ private[controller] trait DocumentsController extends Controller with Authorizat
   import database._
   import database.profile.simple._
 
-  def list(pageNumber : Option[Position], pageSize : Option[Size]) : Action[AnyContent] =
-    Action {
-     listResult(pageNumber getOrElse 1, pageSize getOrElse 50) 
+  lazy val cacheTime = app.configuration getMilliseconds "application.cacheTime" map (
+    _.milliseconds.toSeconds.toInt
+  ) getOrElse 300
+
+  def list(pageNumber : Option[Position], pageSize : Option[Size]) : Cached =
+    Cached(_ => s"documentList($pageNumber, $pageSize)", cacheTime) {
+      Action(listResult(pageNumber getOrElse 1, pageSize getOrElse 50))
     }
 
-  def get(id : DocumentId) : Action[AnyContent] =
-    Action {
-      withAnnotatedDocument(id) { document => Ok(Json toJson document) }
+  def get(id : DocumentId) : Cached =
+    Cached(_ => s"documentGet($id)", cacheTime) {
+      Action(withAnnotatedDocument(id) { document => Ok(Json toJson document) })
     }
 
   def add : Action[JsValue] =

@@ -1,1 +1,1 @@
-define(['filter/main'], function ( ) { });
+define(['./main'], function( ) { });

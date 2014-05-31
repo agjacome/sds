@@ -1,1 +1,4 @@
-define(['directive/main'], function ( ) { });
+define([
+    './main',
+    './dynamic',
+], function( ) { });

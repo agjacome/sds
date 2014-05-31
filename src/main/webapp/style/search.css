@@ -1,0 +1,19 @@
+@media(min-height : 200px) {
+    .search-logo {
+        margin-top : 1em;
+    }
+
+    .search-logo h1 a {
+        display         : block;
+        height          : 57px;
+        max-width       : 407px;
+        margin          : 0 auto;
+        background      : url("/assets/image/logo-small.png") no-repeat center bottom;
+        background-size : contain;
+    }
+}
+
+.search .form-control:focus {
+    border-color : #ccc;
+    box-shadow   : none;
+}

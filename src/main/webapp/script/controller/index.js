@@ -1,1 +1,7 @@
-define(['controller/main'], function ( ) { });
+define([
+    './main',
+    './homeController',
+    './documentShowController',
+    './searchController',
+    './searchResultsController',
+], function( ) { });

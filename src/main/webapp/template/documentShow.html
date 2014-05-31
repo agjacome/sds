@@ -1,0 +1,25 @@
+<div data-ng-include src='"/assets/template/searchBar.html"'></div>
+<div data-ng-if="error" class="row">
+    <div class="col-xs-12">
+        <div class="alert alert-danger">
+            <strong>ERROR:</strong> {{ errorMessage }}
+        </div>
+    </div>
+</div>
+<div data-ng-if="success" class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-default document-panel">
+            <div class="panel-heading">
+                <h4 data-ng-bind="document.title"></h4>
+            </div>
+            <div class="panel-body">
+                <p data-ng-bind-html="document.trustedHtmlText" data-dynamic></p>
+            </div>
+            <div data-ng-show="document.pubmedId" class="panel-footer">
+                <a data-ng-href="http://www.ncbi.nlm.nih.gov/pubmed/{{ document.pubmedId }}" class="btn btn-default">
+                    <span class="fa fa-external-link fa-lg"></span> PubMedID: {{ document.pubmedId }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

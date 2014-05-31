@@ -1,7 +1,6 @@
 # Routes configuration file
 
-GET     /                               es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.index
-GET     /api/jsroutes.js                es.uvigo.esei.tfg.smartdrugsearch.controller.JavaScriptRouterController.jsRoutes()
+GET     /                               es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.index(any : String = "none")
 
 POST    /api/login                      es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.login
 POST    /api/logout                     es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.logout
@@ -34,3 +33,4 @@ POST    /api/provider/pubmed/download   es.uvigo.esei.tfg.smartdrugsearch.contro
 GET     /assets/*file                   es.uvigo.esei.tfg.smartdrugsearch.controller.AssetsController.at(path = "/src/main/webapp", file)
 GET     /webjars/*file                  es.uvigo.esei.tfg.smartdrugsearch.controller.WebJarAssetsController.at(file)
 
+GET     /*any                           es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.index(any)
