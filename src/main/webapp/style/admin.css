@@ -1,0 +1,9 @@
+.document-list .table td {
+    vertical-align : middle;
+}
+
+.document-list thead a, 
+.document-list a.title {
+    color : #333;
+}
+

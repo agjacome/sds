@@ -1,1 +1,4 @@
-define(['./main'], function( ) { });
+define([
+    './main',
+    './truncate',
+], function( ) { });

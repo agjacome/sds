@@ -1,5 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
+
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
 import es.uvigo.esei.tfg.smartdrugsearch.service.{ ABNEREntity, ABNERService }
 

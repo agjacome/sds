@@ -1,46 +1,41 @@
-<div data-ng-include src='"/assets/template/searchBar.html"'></div>
-<div data-ng-if="error" class="row">
-    <div class="col-xs-12">
-        <div class="alert alert-danger">
-            <strong>ERROR:</strong> {{ errorMessage }}
+<div data-ng-include src='"assets/template/smallLogo.html"'></div>
+<div data-ng-include src='"assets/template/searchBar.html"'></div>
+<div data-ng-include src='"assets/template/errorMessage.html"'></div>
+
+<div data-ng-show="results">
+    <div class="row text-center">
+        <div class="col-xs-12">
+            <div class="well well-sm">
+                Found a total of <strong>{{ results.totalCount }}</strong> results for "<span ng-bind="terms"></span>".
+            </div>
         </div>
     </div>
-</div>
-<div data-ng-if="success" class="row text-center">
-    <div class="col-xs-12">
-        <div class="well well-sm">
-            Found a total of <strong><span ng-bind="results.totalCount"></span></strong> results for "<span ng-bind="terms"></span>".
+    <div class="row pagination-row text-center">
+        <div class="col-xs-12">
+            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
         </div>
     </div>
-</div>
-<div data-ng-if="success" class="row result-list">
-    <div class="col-xs-12">
-        <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.results">
-            <a href="" data-ng-click="goToDocument(r.document)" class="title">
-                <div class="panel-body">{{ r.document.title }}</div>
-            </a>
-            <div class="panel-footer">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-3" data-ng-repeat="k in r.keywords | orderBy: 'occurrences'">
-                        <span data-ng-class="['keyword', k.category.toLowerCase()]" data-tooltip="{{ k.category }}">
-                            {{ k.normalized }}
-                        </span>
+    <div class="row result-list">
+        <div class="col-xs-12">
+            <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.results">
+                <a href="" data-ng-click="goToDocument(r.document)" class="title">
+                    <div class="panel-body">{{ r.document.title }}</div>
+                </a>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-3" data-ng-repeat="k in r.keywords | orderBy: 'occurrences'">
+                            <span data-ng-class="['keyword', k.category.toLowerCase()]" data-tooltip="{{ k.category }}">
+                                {{ k.normalized }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row pagination-row text-center">
-    <div class="col-xs-12">
-        <div data-pagination
-            data-ng-model="pageNumber"
-            data-ng-change="pageChanged()"
-            data-total-items="results.totalCount"
-            data-items-per-page="countPerPage"
-            data-boundary-links="true"
-            data-max-size="maxSize"
-            class="pagination-sm"
-        ></div>
+    <div class="row pagination-row text-center">
+        <div class="col-xs-12">
+            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
+        </div>
     </div>
 </div>

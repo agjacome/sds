@@ -16,7 +16,7 @@ private[controller] trait AnnotatorController extends Controller with Authorizat
 
   def annotate( ) : Action[JsValue] =
     AuthorizedAction(parse.json) { _ => request =>
-      request.body.validate[Set[DocumentId]] fold (
+      (request.body \ "ids").validate[Set[DocumentId]] fold (
         errors => BadRequest(Json obj ("err" -> errors.toString)),
         annotateIds
       )

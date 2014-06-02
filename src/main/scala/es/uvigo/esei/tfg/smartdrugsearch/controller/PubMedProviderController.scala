@@ -25,7 +25,7 @@ private[controller] trait PubMedProviderController extends Controller with Autho
 
   def download( ) : Action[JsValue] =
     AuthorizedAsyncAction(parse.json) { _ => request =>
-      request.body.validate[Set[PubMedId]] fold (
+      (request.body \ "ids").validate[Set[PubMedId]] fold (
         errors => Future { BadRequest(Json obj ("err" -> errors.toString)) },
         downloadIds
       )

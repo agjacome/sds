@@ -4,7 +4,7 @@
         height          : 57px;
         max-width       : 407px;
         margin          : 0 auto;
-        background      : url("/assets/image/logo-small.png") no-repeat center bottom;
+        background      : url("../image/logo-small.png") no-repeat center bottom;
         background-size : contain;
     }
 }
@@ -15,24 +15,24 @@
         height          : 179px;
         max-width       : 425px;
         margin          : 0 auto;
-        background      : url("/assets/image/logo-big.png") no-repeat center bottom;
+        background      : url("../image/logo-big.png") no-repeat center bottom;
         background-size : contain;
     }
 }
 
-@media(min-height : 200px) { .home-container { margin-top :   1em; } }
-@media(min-height : 400px) { .home-container { margin-top :   5em; } }
-@media(min-height : 600px) { .home-container { margin-top :  10em; } }
+@media(min-height : 200px) { .home-container { margin-top :  1em; } }
+@media(min-height : 400px) { .home-container { margin-top :  5em; } }
+@media(min-height : 600px) { .home-container { margin-top : 10em; } }
 
 .home-logo img {
     height    : auto;
     max-width : 90%;
 }
 
-@media(max-height : 100px) { .home-search { margin-top :     0; } }
-@media(min-height : 100px) { .home-search { margin-top : 1.5em; } }
+@media(max-height : 200px) { .home-search { margin-top :     0; } }
+@media(min-height : 200px) { .home-search { margin-top : 1.5em; } }
 
-.home-search .input-group {
+.home-search .input-group, .home-search .alert {
     width  : 95%;
     margin : 0 auto;
 }

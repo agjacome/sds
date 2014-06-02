@@ -23,7 +23,12 @@ private[annotator] trait AnnotatorBase extends Actor {
     case msg : Failed   => failed(sender, msg)
   }
 
-  protected def annotate(sender : ActorRef, msg : Annotate) : Unit
+  protected def annotate(sender : ActorRef, msg : Annotate) : Unit =
+    database withSession { implicit session =>
+      // TODO: this is an ugly hack to block simultaneous requests to annotate
+      // this document; solution: add a "blocked" flag to the document table
+      Documents filter (_.id is msg.documentId) map (_.annotated) update true
+    }
 
   protected def finished(sender : ActorRef, msg : Finished) : Unit
 

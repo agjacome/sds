@@ -1,0 +1,42 @@
+<div class="container text-center" data-ng-controller="FooterController">
+    <div class="row">
+        <div class="col-xs-offset-1 col-xs-2">
+            <div data-ng-hide="loggedIn">
+                <a class="text-muted" href='login' data-tooltip="Sign In">
+                    <span class="fa fa-sign-in fa-lg"></span>
+                    <span class="hidden-xs">Sign In</a>
+                </a>
+            </div>
+            <div data-ng-show="loggedIn">
+                <a class="text-muted" href='admin' data-tooltip="Admin Panel">
+                    <span class="fa fa-user-md fa-lg"></span>
+                    <span class="hidden-xs">Admin</a>
+                </a>
+            </div>
+        </div>
+        <div class="col-xs-2">
+            <a class="text-muted" href='' data-tooltip="API Reference">
+                <span class="fa fa-cogs fa-lg"></span>
+                <span class="hidden-xs">API</span>
+            </a>
+        </div>
+        <div class="col-xs-2">
+            <a class="text-muted" href='https://github.com/agjacome/smart-drug-search' data-tooltip="Github">
+                <span class="fa fa-github fa-lg"></span>
+                <span class="hidden-xs">Github</span>
+            </a>
+        </div>
+        <div class="col-xs-2">
+            <a class="text-muted" href='' data-tooltip="Help">
+                <span class="fa fa-question fa-lg"></span>
+                <span class="hidden-xs">Help</span>
+            </a>
+        </div>
+        <div class="col-xs-2">
+            <a class="text-muted" href='' data-tooltip="About">
+                <span class="fa fa-info fa-lg"></span>
+                <span class="hidden-xs">About</a>
+            </a>
+        </div>
+    </div>
+</div>

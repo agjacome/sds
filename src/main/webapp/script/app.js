@@ -21,9 +21,27 @@ define([
     ]);
 
     app.run(['$location', '$rootScope', function($location, $rootScope) {
+
+        var keepError = false;
+
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
+            if (keepError) keepError = false; else $rootScope.error = false;
             $rootScope.pageTitle = current.$$route.pageTitle || 'SmartDrugSearch';
         });
+
+        $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
+            keepError        = true;
+            $rootScope.error = true;
+
+            if (rejection.status === 401) {
+                $rootScope.errorMessage = 'You do not have enough privileges to perform the requested action.';
+                $location.path('/login');
+            } else {
+                $rootScope.errorMessage = 'Cannot perform the requested action.';
+                $location.path('/');
+            }
+        });
+
     }]);
 
     return app;

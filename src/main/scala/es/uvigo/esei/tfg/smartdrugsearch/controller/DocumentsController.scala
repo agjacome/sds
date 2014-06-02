@@ -20,10 +20,8 @@ private[controller] trait DocumentsController extends Controller with Authorizat
     _.milliseconds.toSeconds.toInt
   ) getOrElse 300
 
-  def list(pageNumber : Option[Position], pageSize : Option[Size]) : Cached =
-    Cached(_ => s"documentList($pageNumber, $pageSize)", cacheTime) {
-      Action(listResult(pageNumber getOrElse 1, pageSize getOrElse 50))
-    }
+  def list(pageNumber : Option[Position], pageSize : Option[Size]) : Action[AnyContent] =
+    Action(listResult(pageNumber getOrElse 1, pageSize getOrElse 50))
 
   def get(id : DocumentId) : Cached =
     Cached(_ => s"documentGet($id)", cacheTime) {
@@ -48,7 +46,7 @@ private[controller] trait DocumentsController extends Controller with Authorizat
       val total  = Size(Documents.count)
       val toTake = pageSize.toInt
       val toDrop = (pageNumber.toInt - 1) * toTake
-      val list   = (Documents drop toDrop take toTake).list
+      val list   = (Documents sortBy(_.id) drop toDrop take toTake).list
       Ok(Json toJson DocumentList(total, pageNumber, pageSize, list))
     }
 

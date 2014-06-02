@@ -36,7 +36,7 @@ private[controller] trait ApplicationController extends Controller with Authoriz
 
   def logout : Action[AnyContent] =
     Action(_.headers get authTokenHeader map { token =>
-        Redirect("/") discardingToken token
+        Ok discardingToken token
     } getOrElse BadRequest(Json obj ("err" -> "No token is set")))
 
   private[this] def createLoginResponse(email : String, password : String) =

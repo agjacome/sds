@@ -36,13 +36,11 @@
     <div class="container">
         <div data-ng-view></div>
     </div>
+    <div class="footer">
+        <div data-ng-include='"@routes.AssetsController.at("template/footer.html")"'></div>
+    </div>
 
-    <script>
-        @Html(
-            RequireJS.getSetupJavaScript(routes.WebJarAssetsController.at("").url,
-            app.configuration.getString("application.contentUrl").orNull)
-        )
-    </script>
+    <script>@Html(RequireJS.getSetupJavaScript(routes.WebJarAssetsController.at("").url, null))</script>
     <script data-main="@routes.AssetsController.at("script/main")" src="@routes.WebJarAssetsController.at(WebJarAssetsController.locate("require.min.js"))"></script>
 </body>
 </html>

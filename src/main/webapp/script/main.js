@@ -1,15 +1,6 @@
 (function(requirejs) {
     'use strict';
 
-    requirejs.config({
-        shim : {
-            'jsRoutes': { deps : [ ], exports : 'jsRoutes' }
-        },
-        paths : {
-            'jsRoutes': '/api/jsroutes',
-        },
-    });
-
     requirejs.onError = function(err) {
         console.log(err);
     };

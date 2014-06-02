@@ -1,7 +1,11 @@
 define([
     './main',
-    './homeController',
+    './adminBarController',
+    './adminDocumentsController',
+    './authorizationController',
     './documentShowController',
+    './footerController',
+    './homeController',
     './searchController',
     './searchResultsController',
 ], function( ) { });
