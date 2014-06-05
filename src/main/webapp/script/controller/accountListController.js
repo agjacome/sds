@@ -26,7 +26,7 @@ define(['./main'], function(controller) {
         service.delete({ id : account.id }).$promise.then(
             function(data) {
                 if (currentId === account.id) location.path('/logout');
-                else list(AccountService, $scope, $rootScope);
+                else list(service, scope, rootScope);
             },
             function(error) {
                 rootScope.error        = true;

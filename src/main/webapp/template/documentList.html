@@ -48,7 +48,8 @@
                             <a class="btn btn-primary" href="" data-ng-click="annotateDocument(d)" data-ng-disabled="d.blocked || d.annotated">
                                 <span class="fa fa-pencil-square-o fa-lg"></span> Annotate
                             </a>
-                            <a class="btn btn-warning" href="" data-ng-click="deleteDocument(d)">
+                            <a class="btn btn-warning" href=""
+                                data-ng-click="deleteDocument(d)" data-ng-disabled="d.blocked">
                                 <span class="fa fa-trash-o fa-lg"></span> Delete
                             </a>
                         </td>

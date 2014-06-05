@@ -57,8 +57,12 @@ private[controller] trait DocumentsController extends Controller with Authorizat
 
   private[this] def deleteResult(document : Document) =
     database withSession { implicit session =>
-      Documents -= document
-      NoContent
+      if (document.blocked)
+        Forbidden(Json obj ("err" -> "Cannot delete a document with an ongoing annotation process."))
+      else {
+        Documents -= document
+        NoContent
+      }
     }
 
   private[this] def withDocument(id : DocumentId)(f : Document => SimpleResult) =
