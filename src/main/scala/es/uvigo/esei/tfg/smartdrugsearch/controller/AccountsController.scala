@@ -58,7 +58,7 @@ private[controller] trait AccountsController extends Controller with Authorizati
       if ((Accounts filter (_.email is account.email)).exists.run)
         BadRequest(Json obj ("err" -> "Email already exists in database"))
       else
-        Created(Json obj ("id" -> (Accounts += account)))
+        Created(Json obj ("id" -> (Accounts += account.hashPassword)))
     }
 
   private[this] def editResult(id : AccountId, account : Account) =

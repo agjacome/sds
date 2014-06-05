@@ -10,12 +10,6 @@ define(['./main'], function(controller) {
                 function(data) { $scope.accountEmail = data.email; }
             );
 
-            $scope.getClass = function(path) {
-                if ($location.path().substr(0, path.length) === path)
-                    return 'active';
-                return '';
-            };
-
             $scope.goTo = function(path) {
                 $location.path(path);
             };

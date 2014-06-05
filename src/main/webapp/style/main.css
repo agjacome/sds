@@ -28,6 +28,11 @@ body {
     margin-bottom    : 3.5em;
 }
 
+.form-control:focus {
+    border-color : #ccc;
+    box-shadow   : none;
+}
+
 .footer {
     position         : absolute;
     bottom           : 0;
@@ -45,10 +50,6 @@ body {
     text-decoration : none;
 }
 
-.result-list a.title {
-    color : #333;
-}
-
 .pagination li a,
 .pagination li a:hover,
 .pagination li a:focus,
@@ -63,15 +64,6 @@ body {
 .pagination .active a:active {
     border-color     : #ccc;
     background-color : #ffb232;
-}
-
-.keyword {
-    border    : 1px solid #ccc;
-    color     : #fff;
-    display   : inline-block;
-    font-size : 1.1em;
-    overflow  : hidden;
-    padding   : 0 1em;
 }
 
 .compound { background-color : #59ABE3; }

@@ -3,7 +3,8 @@ define(['./main'], function(service) {
 
     service.factory('AccountService', ['$resource', function($resource) {
         return $resource('api/account/:id', { id : '@id' }, {
-            query : { isArray : false },
+            query  : { isArray : false },
+            update : { method  : 'PUT' },
         });
     }]);
 

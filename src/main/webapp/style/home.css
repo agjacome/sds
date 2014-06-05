@@ -32,12 +32,8 @@
 @media(max-height : 200px) { .home-search { margin-top :     0; } }
 @media(min-height : 200px) { .home-search { margin-top : 1.5em; } }
 
-.home-search .input-group, .home-search .alert {
+search .input-group, .home-search .alert {
     width  : 95%;
     margin : 0 auto;
 }
 
-.home-search .form-control:focus {
-    border-color : #ccc;
-    box-shadow   : none;
-}

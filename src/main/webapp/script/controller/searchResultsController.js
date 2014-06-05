@@ -5,8 +5,8 @@ define(['./main'], function(controller) {
     var MAX_PAGINATION_LINKS =  5;
 
     var minimizeCompounds = function(results) {
-        results.forEach(function(res) {
-            res.keywords.forEach(function(keyword) {
+        _.each(results, function(result) {
+            _.each(result.keywords, function(keyword) {
                 if (keyword.category === 'Compound')
                     keyword.normalized = keyword.normalized.split('/')[1];
             });
@@ -14,20 +14,23 @@ define(['./main'], function(controller) {
     };
 
     var search = function(service, scope, rootScope) {
+        scope.loading = true;
         service.search(scope.terms, scope.pageNumber, COUNT_PER_PAGE).then(
             function(response) {
+                scope.loading   = false;
                 rootScope.error = false;
                 scope.results   = response.data;
                 minimizeCompounds(response.data.results);
             },
             function(error) {
+                scope.loading          = false;
                 rootScope.error        = true;
                 rootScope.errorMessage = error.data.err;
             }
         );
     };
 
-    controller.controller('SearchResultsController', [
+    var searchResultsController = [
         '$scope', '$location', '$rootScope', '$routeParams', '$window', 'SearchService',
         function($scope, $location, $rootScope, $routeParams, $window, SearchService) {
 
@@ -53,6 +56,8 @@ define(['./main'], function(controller) {
             search(SearchService, $scope, $rootScope);
 
         }
-    ]);
+    ];
+
+    controller.controller('SearchResultsController', searchResultsController);
 
 });

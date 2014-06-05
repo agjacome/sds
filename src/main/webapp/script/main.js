@@ -7,14 +7,10 @@
 
     require([
         'angular',
-        'angular-cookies',
-        'angular-resource',
-        'angular-route',
         'jquery',
         'underscorejs',
         'bootstrap',
-        'ui-bootstrap',
-        'ui-bootstrap-tpls',
+        'angular',
         './app',
         './routes',
         './util'

@@ -1,11 +1,16 @@
 define([
     './main',
+    './accountEditController',
+    './accountListController',
+    './accountNewController',
     './adminBarController',
-    './adminDocumentsController',
     './authorizationController',
     './documentShowController',
+    './documentListController',
+    './documentNewController',
     './footerController',
     './homeController',
+    './pubmedProviderController',
     './searchController',
     './searchResultsController',
 ], function( ) { });

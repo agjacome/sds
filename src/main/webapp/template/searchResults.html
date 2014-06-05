@@ -2,6 +2,11 @@
 <div data-ng-include src='"assets/template/searchBar.html"'></div>
 <div data-ng-include src='"assets/template/errorMessage.html"'></div>
 
+<div data-ng-hide="results" class="row text-center result-spinner">
+    <div class="col-xs-12">
+        <span class="text-muted fa fa-spin fa-spinner fa-3x"></span>
+    </div>
+</div>
 <div data-ng-show="results">
     <div class="row text-center">
         <div class="col-xs-12">
@@ -15,10 +20,15 @@
             <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
         </div>
     </div>
-    <div class="row result-list">
+    <div data-ng-show="loading" class="row text-center">
+        <div class="col-xs-12">
+            <span class="text-muted fa fa-spin fa-spinner fa-3x"></span>
+        </div>
+    </div>
+    <div data-ng-hide="loading" class="row result-list">
         <div class="col-xs-12">
             <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.results">
-                <a href="" data-ng-click="goToDocument(r.document)" class="title">
+                <a href='' data-ng-click="goToDocument(r.document)" class="title">
                     <div class="panel-body">{{ r.document.title }}</div>
                 </a>
                 <div class="panel-footer">

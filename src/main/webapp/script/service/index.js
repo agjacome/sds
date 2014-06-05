@@ -4,5 +4,6 @@ define([
     './annotatorService',
     './authorizationService',
     './documentService',
+    './pubmedProviderService',
     './searchService',
 ], function( ) { });

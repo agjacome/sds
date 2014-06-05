@@ -10,10 +10,10 @@
                 <div data-ng-include src='"assets/template/errorMessage.html"'></div>
                 <form name="loginForm" accept-charset="UTF-8" role="form" data-ng-enter='login()'>
                     <fieldset>
-                        <div class="form-group" data-ng-class="{ 'has-error': credentials.email != '' && loginForm.email.$invalid }">
+                        <div class="form-group col-xs-12" data-ng-class="{ 'has-error': credentials.email != '' && loginForm.email.$invalid }">
                             <input name="email" placeholder="E-mail" class="form-control" data-ng-model="credentials.email" type="email" required autofocus>
                         </div>
-                        <div class="form-group" data-ng-class="{ 'has-error': credentials.password != '' && loginForm.password.$error.required }">
+                        <div class="form-group col-xs-12" data-ng-class="{ 'has-error': credentials.password != '' && loginForm.password.$error.required }">
                             <input name="password" placeholder="Password" class="form-control" data-ng-model="credentials.password" type="password" required>
                         </div>
                         <div class="text-center">

@@ -5,7 +5,7 @@ define(['./main'], function(service) {
         return {
             search : function(terms, page, size) {
                 return $http.get('api/search', {
-                    params: {
+                    params : {
                         query : terms,
                         page  : page,
                         size  : size

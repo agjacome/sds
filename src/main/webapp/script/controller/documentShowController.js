@@ -13,19 +13,17 @@ define(['./main'], function(controller) {
     };
 
     var minimizeCompounds = function(keywords) {
-        keywords.forEach(function(keyword) {
+        _.each(keywords, function(keyword) {
             if (keyword.category === 'Compound')
                 keyword.normalized = keyword.normalized.split('/')[1];
         });
     };
 
     var annotateDocumentText = function(doc, keywords, annotations) {
-        filterDuplicateStartPositions(annotations).forEach(
-            function(annotation) {
-                var keyword = findById(keywords, annotation.keywordId);
-                doc.text    = addAnnotation(doc.text, annotation, keyword);
-            }
-        );
+        _.each(filterDuplicateStartPositions(annotations), function(annotation) {
+            var keyword = findById(keywords, annotation.keywordId);
+            doc.text    = addAnnotation(doc.text, annotation, keyword);
+        });
     };
 
     var filterDuplicateStartPositions = function(annotations) {
@@ -34,8 +32,12 @@ define(['./main'], function(controller) {
         var noDuplicated   = [ ];
         var startPositions = [ ];
 
-        annotations.sort(cmp).forEach(function(annotation) {
-            if (startPositions.indexOf(annotation.startPosition) === -1) {
+        _.each(annotations.sort(cmp), function(annotation) {
+            var isEmpty  = !_.size(startPositions);
+            var contains = _.indexOf(startPositions, annotation.startPosition) >= 0;
+            var overlaps = _.last(startPositions) < annotation.endPosition;
+
+            if (isEmpty || (!contains && !overlaps)) {
                 startPositions.push(annotation.startPosition);
                 noDuplicated.push(annotation);
             }
@@ -59,12 +61,10 @@ define(['./main'], function(controller) {
     };
 
     var findById = function(array, id) {
-        var index = array.map(function(k) { return k.id; }).indexOf(id);
-        if (index !== -1) return array[index];
+        return _.findWhere(array, { 'id' : id });
     };
 
-
-    controller.controller('DocumentShowController', [
+    var documentShowController = [
         '$scope', '$location', '$routeParams', '$rootScope', '$sce', 'DocumentService',
         function($scope, $location, $routeParams, $rootScope, $sce, DocumentService) {
 
@@ -88,6 +88,8 @@ define(['./main'], function(controller) {
             );
 
         }
-    ]);
+    ];
+
+    controller.controller('DocumentShowController', documentShowController);
 
 });

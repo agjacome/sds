@@ -1,40 +1,32 @@
 define(['./main'], function(controller) {
-    'use strict';
+    'use strcit';
 
-    var COUNT_PER_PAGE       = 20;
+    var COUNT_PER_PAGE       = 10;
     var MAX_PAGINATION_LINKS = 5;
 
     var list = function(service, scope, rootScope) {
+        scope.loading = true;
         service.query({
             page : scope.pageNumber, count : COUNT_PER_PAGE
         }).$promise.then(
             function(data) {
+                scope.loading   = false;
                 rootScope.error = false;
                 scope.listing   = data;
             },
             function(error) {
-                rootScope.error = true;
+                scope.loading          = false;
+                rootScope.error        = true;
                 rootScope.errorMessage = error.data.err;
             }
         );
     };
 
-    var deleteDocument = function(service, document, scope, rootScope) {
-        service.delete({ id : document.id }).$promise.then(
+    var deleteAccount = function(service, account, currentId, scope, rootScope, location) {
+        service.delete({ id : account.id }).$promise.then(
             function(data) {
-                list(service, scope, rootScope);
-            },
-            function(error) {
-                rootScope.error = true;
-                rootScope.errorMessage = error.data.err;
-            }
-        );
-    };
-
-    var annotateDocument = function(service, document, scope, rootScope) {
-        service.annotate({ ids : [document.id] }).then(
-            function(data) {
-                document.annotated = true;
+                if (currentId === account.id) location.path('/logout');
+                else list(AccountService, $scope, $rootScope);
             },
             function(error) {
                 rootScope.error        = true;
@@ -46,7 +38,7 @@ define(['./main'], function(controller) {
     var modalController = [
         '$scope', '$modalInstance', function($scope, $modalInstance) {
 
-            $scope.message       = "Are you sure you want to permanently delete the selected document?";
+            $scope.message       = "Are you sure you want to permanently delete the seleced account?";
             $scope.okMessage     = "Yes, I'm sure";
             $scope.cancelMessage = "Cancel";
 
@@ -61,9 +53,9 @@ define(['./main'], function(controller) {
         }
     ];
 
-    var adminDocumentsController = [
-        '$scope', '$location', '$routeParams', '$rootScope', '$window', '$modal', 'AnnotatorService', 'DocumentService',
-        function($scope, $location, $routeParams, $rootScope, $window, $modal, AnnotatorService, DocumentService) {
+    var accountListController = [
+        '$scope', '$location', '$rootScope', '$window', '$modal', 'AccountService', 'AuthorizationService',
+        function($scope, $location, $rootScope, $window, $modal, AccountService, AuthorizationService) {
 
             $scope.ordering     = 'id';
             $scope.countPerPage = COUNT_PER_PAGE;
@@ -71,34 +63,38 @@ define(['./main'], function(controller) {
             $scope.pageNumber   = 1;
 
             $scope.pageChanged = function( ) {
-                list(DocumentService, $scope, $rootScope);
+                list(AccountService, $scope, $rootScope);
                 $window.scrollTo(0, 0);
             };
 
-            $scope.goToDocument = function(document) {
-                $location.path('/document/' + document.id);
+            $scope.editAccount = function(account) {
+                $location.path('/admin/account/edit/' + account.id);
             };
 
-            $scope.annotateDocument = function(document) {
-                annotateDocument(AnnotatorService, document, $scope, $rootScope);
+            $scope.cannotDelete = function(account) {
+                return $scope.listing.totalCount === 1;
             };
 
-            $scope.deleteDocument = function(document) {
+            $scope.deleteAccount = function(account) {
+                if ($scope.cannotDelete(account)) return;
+
+                var currentId = AuthorizationService.accountId();
+
                 var modal = $modal.open({
                     templateUrl : 'assets/template/confirmationDialog.html',
                     controller  : modalController,
                 });
 
                 modal.result.then(function( ) {
-                    deleteDocument(DocumentService, document, $scope, $rootScope);
+                    deleteAccount(AccountService, account, currentId, $scope, $rootScope, $location);
                 });
             };
 
-            list(DocumentService, $scope, $rootScope);
+            list(AccountService, $scope, $rootScope);
 
         }
     ];
 
-    controller.controller('AdminDocumentsController', adminDocumentsController);
+    controller.controller('AccountListController', accountListController);
 
 });

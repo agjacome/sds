@@ -65,8 +65,43 @@ define(['app'], function(app) {
 
             $routeProvider.when('/admin/documents', {
                 pageTitle   : 'Documents :: Admin Panel :: SmartDrugSearch',
-                templateUrl : 'assets/template/adminDocuments.html',
-                controller  : 'AdminDocumentsController',
+                templateUrl : 'assets/template/documentList.html',
+                controller  : 'DocumentListController',
+                resolve     : { authorize : checkAuthorization },
+            });
+
+            $routeProvider.when('/admin/document/new', {
+                pageTitle   : 'New Document :: Admin Panel :: SmartDrugSearch',
+                templateUrl : 'assets/template/documentNew.html',
+                controller  : 'DocumentNewController',
+                resolve     : { authorize : checkAuthorization },
+            });
+
+            $routeProvider.when('/admin/provider/pubmed', {
+                pageTitle   : 'PubMed Provider :: Admin Panel :: SmartDrugSearch',
+                templateUrl : 'assets/template/pubmedProvider.html',
+                controller  : 'PubMedProviderController',
+                resolve     : { authorize : checkAuthorization },
+            });
+
+            $routeProvider.when('/admin/accounts', {
+                pageTitle   : 'Accounts :: Admin Panel :: SmartDrugSearch',
+                templateUrl : 'assets/template/accountList.html',
+                controller  : 'AccountListController',
+                resolve     : { authorize : checkAuthorization },
+            });
+
+            $routeProvider.when('/admin/account/new', {
+                pageTitle   : 'Create Account :: Admin Panel :: SmartDrugSearch',
+                templateUrl : 'assets/template/accountNew.html',
+                controller  : 'AccountNewController',
+                resolve     : { authorize : checkAuthorization },
+            });
+
+            $routeProvider.when('/admin/account/edit/:id', {
+                pageTitle   : ' :: Edit Account :: Admin Panel :: SmartDrugSearch',
+                templateUrl : 'assets/template/accountEdit.html',
+                controller  : 'AccountEditController',
                 resolve     : { authorize : checkAuthorization },
             });
 

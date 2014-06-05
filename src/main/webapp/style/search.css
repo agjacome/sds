@@ -13,7 +13,23 @@
     }
 }
 
-.search .form-control:focus {
-    border-color : #ccc;
-    box-shadow   : none;
+.result-list a.title {
+    color : #333;
+}
+
+.result-spinner {
+    margin-top : 3em;
+}
+
+.keyword {
+    border    : 1px solid #ccc;
+    color     : #fff;
+    display   : inline-block;
+    font-size : 1.1em;
+    overflow  : hidden;
+    padding   : 0 1em;
+}
+
+.keyword:hover {
+    cursor : pointer;
 }
