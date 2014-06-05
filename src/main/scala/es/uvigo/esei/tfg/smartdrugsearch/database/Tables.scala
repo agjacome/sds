@@ -30,8 +30,9 @@ private[database] trait Tables { this : Profile with Mappers =>
     def text      = column[String]("text", O.NotNull, O.DBType("TEXT"))
     def annotated = column[Boolean]("annotated", O.NotNull)
     def pubmedId  = column[PubMedId]("pubmed_id", O.Nullable)
+    def blocked   = column[Boolean]("blocked", O.NotNull, O.Default(false))
 
-    def * = (id.?, title, text, annotated, pubmedId.?) <> (Document.tupled, Document.unapply)
+    def * = (id.?, title, text, pubmedId.?, annotated, blocked) <> (Document.tupled, Document.unapply)
 
   }
 

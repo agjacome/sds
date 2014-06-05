@@ -5,6 +5,7 @@ import play.api.Logger
 import scalaxb._
 import scalaxb.generated._
 
+import org.jsoup.Jsoup
 import com.google.common.annotations.VisibleForTesting
 
 import es.uvigo.esei.tfg.smartdrugsearch.entity._
@@ -81,8 +82,8 @@ class EUtilsService private {
   private[this] def parseArticleType(medline : MedlineCitationType) =
     medline.Article.Abstract map {
       abstrakt => Document(
-        title    = medline.Article.ArticleTitle.value,
-        text     = abstrakt.AbstractText.head.value,
+        title    = (Jsoup parse medline.Article.ArticleTitle.value).text,
+        text     = (Jsoup parse abstrakt.AbstractText.head.value).text,
         pubmedId = Some(medline.PMID.value.toLong)
       )
     }

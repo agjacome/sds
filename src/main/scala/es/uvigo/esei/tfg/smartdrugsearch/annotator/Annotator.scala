@@ -18,32 +18,43 @@ private[annotator] trait AnnotatorBase extends Actor {
   import database.profile.simple._
 
   override final def receive : Receive = {
-    case msg : Annotate => annotate(sender, msg)
-    case msg : Finished => finished(sender, msg)
-    case msg : Failed   => failed(sender, msg)
+    case msg : Annotate => annotate(sender, msg.documentId)
+    case msg : Finished => finished(sender, msg.documentId)
+    case msg : Failed   => failed(sender, msg.documentId, msg.cause)
   }
 
-  protected def annotate(sender : ActorRef, msg : Annotate) : Unit =
+  protected def annotate(sender : ActorRef, documentId : DocumentId) : Unit
+
+  protected def finished(sender : ActorRef, documentId : DocumentId) : Unit
+
+  protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) : Unit
+
+  protected final def isAnnotated(documentId  : DocumentId) =
     database withSession { implicit session =>
-      // TODO: this is an ugly hack to block simultaneous requests to annotate
-      // this document; solution: add a "blocked" flag to the document table
-      Documents filter (_.id is msg.documentId) map (_.annotated) update true
+      (Documents filter (_.id is documentId) map (_.annotated)).first
     }
 
-  protected def finished(sender : ActorRef, msg : Finished) : Unit
-
-  protected def failed(sender : ActorRef, msg : Failed) : Unit
-
-  protected def markAnnotated(documentId : DocumentId) =
+  protected final def isBlocked(documentId : DocumentId) =
     database withSession { implicit session =>
-      Documents filter (_.id is documentId) map (_.annotated) update true
+      (Documents filter (_.id is documentId) map (_.blocked)).first
+    }
+
+  protected def markAnnotated(documentId : DocumentId, annotated : Boolean) =
+    database withSession { implicit session =>
+      Documents filter (_.id is documentId) map (_.annotated) update annotated
+    }
+
+  protected def markBlocked(documentId : DocumentId, blocked : Boolean) =
+    database withSession { implicit session =>
+      Documents filter (_.id is documentId) map (_.blocked) update blocked
     }
 
   protected def deleteAnnotations(documentId : DocumentId) =
     database withTransaction { implicit session =>
       decrementKeywordCounter(documentId)
       (Annotations findByDocumentId documentId).delete
-      Documents filter (_.id is documentId) map (_.annotated) update false
+      markAnnotated(documentId, false)
+      markBlocked(documentId, false)
     }
 
   private[this] def decrementKeywordCounter(documentId : DocumentId)(implicit session : Session) =
@@ -56,27 +67,25 @@ private[annotator] trait AnnotatorBase extends Actor {
       a => Keywords filter (_.id is a.keywordId)
     } groupBy identity map { case (k, ks) => k.id -> (k.occurrences, ks.length) }).list
 
-  protected final def isAnnotated(documentId  : DocumentId) =
-    database withSession { implicit session =>
-      (Documents filter (_.id is documentId) map (_.annotated)).first
-    }
-
 }
 
 private[annotator] trait AnnotatorLogging extends AnnotatorBase {
 
-  abstract override protected def annotate(sender : ActorRef, msg : Annotate) =
-    if   (!isAnnotated(msg.documentId)) super.annotate(sender,msg)
-    else Logger.warn(s"[${self.path.name}] Ignoring already annotated ${msg.documentId}")
+  abstract override protected def annotate(sender : ActorRef, documentId : DocumentId) =
+    if (isAnnotated(documentId))
+      Logger.warn(s"[${self.path.name}] Ignorning already annotated ${documentId}")
+    else if (isBlocked(documentId))
+      Logger.warn(s"[${self.path.name}] Ignornig blocked (currentyl annotating) ${documentId}")
+    else super.annotate(sender, documentId);
 
-  abstract override protected def finished(sender : ActorRef, msg : Finished) = {
-    Logger.info(s"[${sender.path.name}] Finished for ${msg.documentId}")
-    super.finished(sender, msg)
+  abstract override protected def finished(sender : ActorRef, documentId : DocumentId) = {
+    Logger.info(s"[${sender.path.name}] Finished for ${documentId}")
+    super.finished(sender, documentId)
   }
 
-  abstract override protected def failed(sender : ActorRef, msg : Failed) = {
-    Logger.error(s"[${sender.path.name}] Failed for ${msg.documentId}\n${msg.cause}")
-    super.failed(sender, msg)
+  abstract override protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) = {
+    Logger.error(s"[${sender.path.name}] Failed for ${documentId}\n${cause}")
+    super.failed(sender, documentId, cause)
   }
 
   abstract override protected def deleteAnnotations(documentId : DocumentId) = {
@@ -84,9 +93,9 @@ private[annotator] trait AnnotatorLogging extends AnnotatorBase {
     super.deleteAnnotations(documentId)
   }
 
-  abstract override protected def markAnnotated(documentId : DocumentId) = {
-    Logger.info(s"[${self.path.name}] All annotators finished for $documentId")
-    super.markAnnotated(documentId)
+  abstract override protected def markAnnotated(documentId : DocumentId, annotated : Boolean) = {
+    if (annotated) Logger.info(s"[${self.path.name}] All annotators finished for $documentId")
+    super.markAnnotated(documentId, annotated)
   }
 
 }
@@ -98,31 +107,29 @@ private[annotator] class AnnotatorImpl extends AnnotatorBase {
 
   private[this] lazy val annotators = createAnnotators(app.configuration getConfig "annotator")
 
-  override protected def annotate(sender : ActorRef, msg : Annotate) =
-    if (!completed.contains(msg.documentId)) {
-      completed += (msg.documentId -> (0, false))
-      annotators foreach (_ ! msg)
+  override protected def annotate(sender : ActorRef, documentId : DocumentId) = {
+    markBlocked(documentId, true)
+    completed += (documentId -> (0, false))
+    annotators foreach (_ ! Annotate(documentId))
+  }
+
+  override protected def finished(sender : ActorRef, documentId : DocumentId) =
+    if (hasCompleted(documentId)) wrapUp(documentId) else {
+      val (counter, failed) = completed(documentId)
+      completed update (documentId, (counter + 1, failed))
     }
 
-  override protected def finished(sender : ActorRef, msg : Finished) =
-    if (completed contains msg.documentId) {
-      if (hasCompleted(msg.documentId)) wrapUp(msg.documentId) else {
-        val (counter, failed) = completed(msg.documentId)
-        completed update (msg.documentId, (counter + 1, failed))
-      }
-    }
-
-  override protected def failed(sender : ActorRef, msg : Failed) =
-    if (completed contains msg.documentId) {
-      if (hasCompleted(msg.documentId)) wrapUp(msg.documentId) else {
-        val (counter, _) = completed(msg.documentId)
-        completed update (msg.documentId, (counter + 1, true))
-      }
+  override protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) =
+    if (hasCompleted(documentId)) wrapUp(documentId) else {
+      val (counter, _) = completed(documentId)
+      completed update (documentId, (counter + 1, true))
     }
 
   private[this] def wrapUp(documentId : DocumentId) = {
-    if (hasFailed(documentId)) deleteAnnotations(documentId)
-    else markAnnotated(documentId)
+    if (hasFailed(documentId)) deleteAnnotations(documentId) else {
+      markAnnotated(documentId, true)
+      markBlocked(documentId, false)
+    }
     completed -= documentId
   }
 

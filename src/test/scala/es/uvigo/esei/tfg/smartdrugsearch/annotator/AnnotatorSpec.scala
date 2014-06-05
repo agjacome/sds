@@ -80,12 +80,13 @@ class AnnotatorSpec extends ActorBaseSpec {
         val storedAnnotations = (Annotations map { a => (a.text, a.startPosition, a.endPosition) }).list
         storedAnnotations should contain theSameElementsAs annotations
 
+        (Documents filter (_.id is documentId) map (_.blocked)).first should be (false)
         (Documents filter (_.id is documentId) map (_.annotated)).first should be (true)
 
         session.close()
       }
 
-      s"should not annotate Document '${document._1}' if marked as already annotated " in new WithApplication {
+      s"should not annotate Document '${document._1}' if marked as already annotated" in new WithApplication {
         val annotator = system.actorOf(Props[Annotator], "Annotator")
         val database  = DatabaseProfile()
         implicit val session = database.createSession()
@@ -95,6 +96,28 @@ class AnnotatorSpec extends ActorBaseSpec {
 
         val documentId = Documents returning Documents.map(_.id) += Document(
           None, document._1, document._2, annotated = true
+        )
+
+        annotator ! Annotate(documentId)
+        expectNoMsg(waitTime)
+        annotator ! PoisonPill
+
+        Keywords.list    should be ('empty)
+        Annotations.list should be ('empty)
+
+        session.close()
+      }
+
+      s"should not annotate Document '${document._1}' if marked as blocked" in new WithApplication {
+        val annotator = system.actorOf(Props[Annotator], "Annotator")
+        val database  = DatabaseProfile()
+        implicit val session = database.createSession()
+
+        import database._
+        import database.profile.simple._
+
+        val documentId = Documents returning Documents.map(_.id) += Document(
+          None, document._1, document._2, blocked = true
         )
 
         annotator ! Annotate(documentId)

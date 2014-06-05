@@ -2,6 +2,8 @@ package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.data.Form
+import play.api.data.Forms._
 
 import com.github.t3hnar.bcrypt._
 
@@ -23,21 +25,16 @@ final case class Account (id : Option[AccountId], email : String, password : Str
 
 object Account extends ((Option[AccountId], String, String) => Account) {
 
-  import play.api.data.Form
-  import play.api.data.Forms._
-
-  lazy val form = Form(mapping(
-    "email"    -> email,
-    "password" -> nonEmptyText
-  )(formApply)(formUnapply))
-
   // do not write passwords!!
   implicit val accountWrites = (
     (__ \ 'id).writeNullable[AccountId] and
     (__ \ 'email).write[String]
   ) ((account : Account) => (account.id, account.email))
 
-  implicit val accountReads = Json.reads[Account]
+  lazy val form = Form(mapping(
+    "email"    -> email,
+    "password" -> nonEmptyText
+  )(formApply)(formUnapply))
 
   private def formApply(email : String, password : String) : Account =
     apply(None, email, password)
@@ -45,16 +42,5 @@ object Account extends ((Option[AccountId], String, String) => Account) {
   private def formUnapply(account : Account) : Option[(String, String)] =
     Some(account.email, account.password)
 
-}
-
-final case class AccountList (
-  totalCount : Size,
-  pageNumber : Position,
-  pageSize   : Size,
-  list       : Seq[Account]
-) extends EntityList[Account]
-
-object AccountList extends ((Size, Position, Size, Seq[Account]) => AccountList) {
-  implicit val accountListWrites = Json.writes[AccountList]
 }
 

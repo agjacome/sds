@@ -17,9 +17,10 @@ object Generators {
     id        <- arbitrary[Option[Long]] map (_ map DocumentId)
     title     <- nonEmptyStringGenerator map Sentence
     text      <- nonEmptyStringGenerator
-    annotated <- arbitrary[Boolean]
     pubmedId  <- arbitrary[Option[Long]] map (_ map PubMedId)
-  } yield (id, title, text, annotated, pubmedId)
+    annotated <- arbitrary[Boolean]
+    blocked   <- arbitrary[Boolean]
+  } yield (id, title, text, pubmedId, annotated, blocked)
 
   lazy val keywordGenerator = keywordTupleGenerator map Keyword.tupled
 

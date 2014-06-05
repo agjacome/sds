@@ -55,21 +55,25 @@ private[controller] trait AccountsController extends Controller with Authorizati
 
   private[this] def addResult(account : Account) =
     database withSession { implicit session =>
-      Created(Json toJson (Accounts += account))
+      if ((Accounts filter (_.email is account.email)).exists.run)
+        BadRequest(Json obj ("err" -> "Email already exists in database"))
+      else
+        Created(Json obj ("id" -> (Accounts += account)))
     }
 
   private[this] def editResult(id : AccountId, account : Account) =
-    withAccount(id) { stored =>
-      val edited = stored.copy(password = account.password).hashPassword
-      database withSession { implicit session => Accounts update edited }
-      Ok(Json toJson edited)
+    withAccount(id) { _ =>
+      database withSession { implicit session =>
+        Accounts filter (_.id is id) map (_.password) update account.hashPassword.password
+        NoContent
+      }
     }
 
   private[this] def deleteResult(account : Account) =
     database withSession { implicit session =>
       if (Accounts.count > 1) {
         Accounts -= account
-        Ok(Json toJson account)
+        NoContent
       } else BadRequest(Json obj ("err" -> "Cannot delete all accounts"))
     }
 

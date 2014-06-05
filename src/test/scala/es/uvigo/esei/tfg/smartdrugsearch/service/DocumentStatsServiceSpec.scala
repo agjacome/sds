@@ -75,19 +75,19 @@ private[service] trait DocumentStatsServiceSpecExpectations extends ActorBaseSpe
     (
       "Huge Test Set",
       Seq(
-        Document(Some( 1), "[The therapeutic efficacy of cycloferon and the pharmacological activity of interferon inducers]."                                 , "irrelevant to this test", true, Some(24754075)),
-        Document(Some( 2), "An 'Upp'-turn in bacteriocin receptor identification."                                                                             , "irrelevant to this test", true, Some(24811684)),
-        Document(Some( 3), "Expression and purification of cyto-insectotoxin (Cit1a) using silkworm larvae targeting for an antimicrobial therapeutic agent."  , "irrelevant to this test", true, Some(24728600)),
-        Document(Some( 4), "Cationic Bioactive Peptide from the Seeds of Benincasa hispida."                                                                   , "irrelevant to this test", true, Some(24834076)),
-        Document(Some( 5), "Colonization and Infection of the Skin by S. aureus: Immune System Evasion and the Response to Cationic Antimicrobial Peptides."   , "irrelevant to this test", true, Some(24840573)),
-        Document(Some( 6), "Hydrophobicity and Helicity Regulate Antifungal Activity of 14-Helical β-Peptides."                                                , "irrelevant to this test", true, Some(24837702)),
-        Document(Some( 7), "Therapeutic potential of adenovirus-mediated delivery of β-defensin 2 for experimental otitis media."                              , "irrelevant to this test", true, Some(24842664)),
-        Document(Some( 8), "Effects of residue 5-point mutation and N-terminus hydrophobic residues on temporin-SHc physicochemical and biological properties.", "irrelevant to this test", true, Some(24842084)),
-        Document(Some( 9), "LL-37-derived peptides eradicate multidrug-resistant Staphylococcus aureus from thermally wounded human skin equivalents."         , "irrelevant to this test", true, Some(24841266)),
-        Document(Some(10), "Membrane curvature modulation of protein activity determined by NMR."                                                              , "irrelevant to this test", true, Some(24835017)),
-        Document(Some(11), "Genetic basis for Mycobacterium avium hominissuis resistance to host antimicrobial peptides."                                      , "irrelevant to this test", true, Some(24836414)),
-        Document(Some(12), "Forkhead, a new cross regulator of metabolism and innate immunity downstream of TOR in Drosophila."                                , "irrelevant to this test", true, Some(24842780)),
-        Document(Some(13), "Additivity and Synergy Between an Antimicrobial Peptide and Inhibitory Ions."                                                      , "irrelevant to this test", true, Some(24841756))
+        Document(Some( 1), "[The therapeutic efficacy of cycloferon and the pharmacological activity of interferon inducers]."                                 , "irrelevant to this test", Some(24754075), true, false),
+        Document(Some( 2), "An 'Upp'-turn in bacteriocin receptor identification."                                                                             , "irrelevant to this test", Some(24811684), true, false),
+        Document(Some( 3), "Expression and purification of cyto-insectotoxin (Cit1a) using silkworm larvae targeting for an antimicrobial therapeutic agent."  , "irrelevant to this test", Some(24728600), true, false),
+        Document(Some( 4), "Cationic Bioactive Peptide from the Seeds of Benincasa hispida."                                                                   , "irrelevant to this test", Some(24834076), true, false),
+        Document(Some( 5), "Colonization and Infection of the Skin by S. aureus: Immune System Evasion and the Response to Cationic Antimicrobial Peptides."   , "irrelevant to this test", Some(24840573), true, false),
+        Document(Some( 6), "Hydrophobicity and Helicity Regulate Antifungal Activity of 14-Helical β-Peptides."                                                , "irrelevant to this test", Some(24837702), true, false),
+        Document(Some( 7), "Therapeutic potential of adenovirus-mediated delivery of β-defensin 2 for experimental otitis media."                              , "irrelevant to this test", Some(24842664), true, false),
+        Document(Some( 8), "Effects of residue 5-point mutation and N-terminus hydrophobic residues on temporin-SHc physicochemical and biological properties.", "irrelevant to this test", Some(24842084), true, false),
+        Document(Some( 9), "LL-37-derived peptides eradicate multidrug-resistant Staphylococcus aureus from thermally wounded human skin equivalents."         , "irrelevant to this test", Some(24841266), true, false),
+        Document(Some(10), "Membrane curvature modulation of protein activity determined by NMR."                                                              , "irrelevant to this test", Some(24835017), true, false),
+        Document(Some(11), "Genetic basis for Mycobacterium avium hominissuis resistance to host antimicrobial peptides."                                      , "irrelevant to this test", Some(24836414), true, false),
+        Document(Some(12), "Forkhead, a new cross regulator of metabolism and innate immunity downstream of TOR in Drosophila."                                , "irrelevant to this test", Some(24842780), true, false),
+        Document(Some(13), "Additivity and Synergy Between an Antimicrobial Peptide and Inhibitory Ions."                                                      , "irrelevant to this test", Some(24841756), true, false)
       ),
       Seq(
         Keyword(Some( 1), "interferon"                                                                                                                                                                                                                                                                                                                                                                                               , Protein ,  1),

@@ -9,9 +9,8 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity.Generators._
 class DocumentSpec extends BaseSpec {
 
   private[this] lazy val emptyTextDocumentTupleGenerator = for {
-    text                                <- Gen.const("")
-    (id, title, _, annotated, pubmedId) <- documentTupleGenerator
-  } yield (id, title, text, annotated, pubmedId)
+    (id, title, _, pubmedId, annotated, blocked) <- documentTupleGenerator
+  } yield (id, title, "", pubmedId, annotated, blocked)
 
   private[this] def createJson(document : Document) =
     JsObject(Seq(
@@ -20,28 +19,24 @@ class DocumentSpec extends BaseSpec {
     ).flatten ++ Seq(
       "title"     -> JsString(document.title.toString),
       "text"      -> JsString(document.text),
-      "annotated" -> JsBoolean(document.annotated)
+      "annotated" -> JsBoolean(document.annotated),
+      "blocked"   -> JsBoolean(document.blocked)
     ))
 
   "A Document" - {
 
     "can be constructed" - {
 
-      "with an optional Document ID, a title Sentence, a text, an annotated Boolean flag and an optional PubMed ID" in {
-        forAll(documentTupleGenerator) { case (id, title, text, annotated, pubmedId) =>
-          Document(id, title, text, annotated, pubmedId) should have (
+      "with an optional Document ID, a title Sentence, a text, an optional PubMed ID and annotated and blocked flags" in {
+        forAll(documentTupleGenerator) { case (id, title, text, pubmedId, annotated, blocked) =>
+          Document(id, title, text, pubmedId, annotated, blocked) should have (
             'id        (id),
             'title     (title),
             'text      (text),
+            'pubmedId  (pubmedId),
             'annotated (annotated),
-            'pubmedId  (pubmedId)
+            'blocked   (blocked)
           )
-        }
-      }
-
-      "by parsing a JSON object" in {
-        forAll(documentGenerator) { document : Document =>
-          createJson(document).as[Document] should equal (document)
         }
       }
 
@@ -56,9 +51,9 @@ class DocumentSpec extends BaseSpec {
     "should throw an IllegalArgumentException" - {
 
       "whenever constructed with an empty text" in {
-        forAll(emptyTextDocumentTupleGenerator) { case (id, title, text, annotated, pubmedId) =>
+        forAll(emptyTextDocumentTupleGenerator) { case (id, title, text, pubmedId, annotated, blocked) =>
           a [IllegalArgumentException] should be thrownBy {
-            val document = Document(id, title, text, annotated, pubmedId)
+            val document = Document(id, title, text, pubmedId, annotated, blocked)
           }
         }
       }

@@ -17,10 +17,7 @@ GET     /api/document/:id               es.uvigo.esei.tfg.smartdrugsearch.contro
 POST    /api/document                   es.uvigo.esei.tfg.smartdrugsearch.controller.DocumentsController.add
 DELETE  /api/document/:id               es.uvigo.esei.tfg.smartdrugsearch.controller.DocumentsController.delete(id : es.uvigo.esei.tfg.smartdrugsearch.entity.DocumentId)
 
-GET     /api/keyword                    es.uvigo.esei.tfg.smartdrugsearch.controller.KeywordsController.list(page : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Position], count : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size])
 GET     /api/keyword/:id                es.uvigo.esei.tfg.smartdrugsearch.controller.KeywordsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.KeywordId)
-
-GET     /api/annotation                 es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotationsController.list(page : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Position], count : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size])
 GET     /api/annotation/:id             es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotationsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.AnnotationId)
 
 GET     /api/search                     es.uvigo.esei.tfg.smartdrugsearch.controller.SearcherController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, page : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, size : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)

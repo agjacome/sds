@@ -31,12 +31,6 @@ class KeywordSpec extends BaseSpec {
         }
       }
 
-      "by parsing a JSON object" in {
-        forAll(keywordGenerator) { keyword : Keyword =>
-          createJson(keyword).as[Keyword] should equal (keyword)
-        }
-      }
-
     }
 
     "can be transformed to a JSON object" in {

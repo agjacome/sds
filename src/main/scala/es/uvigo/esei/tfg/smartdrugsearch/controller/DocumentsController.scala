@@ -52,13 +52,13 @@ private[controller] trait DocumentsController extends Controller with Authorizat
 
   private[this] def addResult(document : Document) =
     database withSession { implicit session =>
-      Created(Json toJson (Documents += document))
+      Created(Json obj ("id" -> (Documents += document)))
     }
 
   private[this] def deleteResult(document : Document) =
     database withSession { implicit session =>
       Documents -= document
-      Ok(Json toJson document)
+      NoContent
     }
 
   private[this] def withDocument(id : DocumentId)(f : Document => SimpleResult) =

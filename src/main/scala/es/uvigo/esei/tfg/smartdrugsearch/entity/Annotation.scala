@@ -21,20 +21,7 @@ final case class Annotation (
 
 object Annotation extends ((Option[AnnotationId], DocumentId, KeywordId, Sentence, Position, Position) => Annotation) {
 
-  implicit val annotationFormat = Json.format[Annotation]
-
-}
-
-final case class AnnotationList (
-  totalCount : Size,
-  pageNumber : Position,
-  pageSize   : Size,
-  list       : Seq[Annotation]
-) extends EntityList[Annotation]
-
-object AnnotationList extends ((Size, Position, Size, Seq[Annotation]) => AnnotationList) {
-
-  implicit val annotationListWrites = Json.writes[AnnotationList]
+  implicit val annotationWrites = Json.writes[Annotation]
 
 }
 

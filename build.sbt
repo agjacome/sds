@@ -36,6 +36,7 @@ libraryDependencies ++= Seq(
   "org.webjars"             %  "webjars-locator"      % "0.14"    ,
   "com.typesafe.play"       %% "play-slick"           % "0.6.0.1" ,
   "com.github.t3hnar"       %% "scala-bcrypt"         % "2.4"     ,
+  "org.jsoup"               %  "jsoup"                % "1.7.3"   ,
   "net.databinder.dispatch" %% "dispatch-core"        % "0.11.0"  ,
   "mysql"                   %  "mysql-connector-java" % "5.1.30"  ,
   "org.postgresql"          %  "postgresql"           % "9.3-1101-jdbc41"

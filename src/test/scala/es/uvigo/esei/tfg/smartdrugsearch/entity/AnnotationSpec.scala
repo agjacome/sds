@@ -42,12 +42,6 @@ class AnnotationSpec extends BaseSpec {
         }
       }
 
-      "by parsin a JSON object" in {
-        forAll(annotationGenerator) { annotation : Annotation =>
-          createJson(annotation).as[Annotation] should equal (annotation)
-        }
-      }
-
     }
 
     "can be transformed to a JSON object" in {
