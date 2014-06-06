@@ -14,9 +14,9 @@ private[controller] trait PubMedProviderController extends Controller with Autho
 
   lazy val pubmed = PubMedProvider()
 
-  def search(query : Sentence, limit : Option[Size], start : Position, count : Size) : Action[AnyContent] =
+  def search(query : Sentence, limit : Option[Size], pageNumber : Position, pageSize : Size) : Action[AnyContent] =
     AuthorizedAsyncAction() { _ => _ =>
-      pubmed.search(query, limit, start, count) map {
+      pubmed.search(query, limit, pageNumber, pageSize) map {
         results => Ok(Json toJson results)
       } recover {
         case e : Throwable => InternalServerError(Json obj ("err" -> e.getMessage))

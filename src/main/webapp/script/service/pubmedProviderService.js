@@ -3,13 +3,13 @@ define(['./main'], function(service) {
 
     service.factory('PubMedProviderService', ['$http', function($http) {
         return {
-            search : function(terms, limit, count, start) {
+            search : function(terms, limit, page, count) {
                 return $http.get('api/provider/pubmed/search', {
                     params : {
                         query : query,
                         limit : limit,
+                        page  : page,
                         count : count,
-                        start : start,
                     }
                 });
             },

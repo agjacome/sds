@@ -14,10 +14,11 @@ class PubMedProviderSpec extends BaseSpec {
   "The PubMed Provider" - {
 
     "can search in PubMed to retrieve a list of PubMedIDs" in {
-      whenReady(pubmed search ("antimicrobial peptide", None, 0, 10)) { res =>
-        res.totalResults should be >= Size(0)
-        res.firstElement should be (Position(0))
-        res.idList       should have size 10
+      whenReady(pubmed search ("antimicrobial peptide", None, 1, 10)) { res =>
+        res.totalCount should be >= Size(0)
+        res.pageNumber should be (Position(1))
+        res.pageSize   should be (Size(10))
+        res.list       should have size 10
       }
     }
 

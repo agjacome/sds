@@ -20,7 +20,7 @@ define(['./main'], function(controller) {
                 scope.loading   = false;
                 rootScope.error = false;
                 scope.results   = response.data;
-                minimizeCompounds(response.data.results);
+                minimizeCompounds(response.data.list);
             },
             function(error) {
                 scope.loading          = false;

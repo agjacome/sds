@@ -14,11 +14,11 @@ class PubMedProvider private {
   import database.Documents
   import database.profile.simple._
 
-  def search(terms : Sentence, limit : Option[Size], start : Position, count : Size)(
+  def search(terms : Sentence, limit : Option[Size], pageNumber : Position, pageSize : Size)(
     implicit ec : ExecutionContext
-  ) : Future[PubMedSearchResult] =
-    Future(eUtils findPubMedIds (terms, limit, start, count)) map {
-      case (total, ids) => PubMedSearchResult(total, start, ids)
+  ) : Future[PubMedIdList] =
+    Future(eUtils findPubMedIds (terms, limit, (pageNumber - 1) * pageSize, pageSize)) map {
+      case (total, ids) => PubMedIdList(total, pageNumber, pageSize, ids.toSeq)
     }
 
   def download(ids : Set[PubMedId])(implicit ec : ExecutionContext) : Future[Set[DocumentId]] =

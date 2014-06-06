@@ -27,7 +27,7 @@
     </div>
     <div data-ng-hide="loading" class="row result-list">
         <div class="col-xs-12">
-            <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.results">
+            <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.list">
                 <a href='' data-ng-click="goToDocument(r.document)" class="title">
                     <div class="panel-body">{{ r.document.title }}</div>
                 </a>

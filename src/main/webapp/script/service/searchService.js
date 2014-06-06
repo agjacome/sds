@@ -3,12 +3,12 @@ define(['./main'], function(service) {
 
     service.factory('SearchService', ['$http', function($http) {
         return {
-            search : function(terms, page, size) {
+            search : function(terms, page, count) {
                 return $http.get('api/search', {
                     params : {
                         query : terms,
                         page  : page,
-                        size  : size
+                        count : count
                     }
                 });
             }

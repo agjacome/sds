@@ -26,7 +26,7 @@ class Searcher {
     Future sequence { searchers map (_ search terms) } map (_.flatten)
 
   private[this] def getSearchResults(keywords : Set[Keyword], pageNumber : Position, pageSize : Size) =
-    SearchResults(countDocuments(keywords), pageNumber, pageSize, getSearchResultList(
+    SearchResultList(countDocuments(keywords), pageNumber, pageSize, getSearchResultList(
       queryDocuments(keywords, (pageNumber.toInt - 1) * pageSize.toInt, pageSize.toInt), keywords
     ))
 

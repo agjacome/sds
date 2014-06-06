@@ -20,11 +20,11 @@ DELETE  /api/document/:id               es.uvigo.esei.tfg.smartdrugsearch.contro
 GET     /api/keyword/:id                es.uvigo.esei.tfg.smartdrugsearch.controller.KeywordsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.KeywordId)
 GET     /api/annotation/:id             es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotationsController.get(id : es.uvigo.esei.tfg.smartdrugsearch.entity.AnnotationId)
 
-GET     /api/search                     es.uvigo.esei.tfg.smartdrugsearch.controller.SearcherController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, page : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, size : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
+GET     /api/search                     es.uvigo.esei.tfg.smartdrugsearch.controller.SearcherController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, page : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, count : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
 
 POST    /api/annotator/annotate         es.uvigo.esei.tfg.smartdrugsearch.controller.AnnotatorController.annotate
 
-GET     /api/provider/pubmed/search     es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, limit : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size], start : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, count : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
+GET     /api/provider/pubmed/search     es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.search(query : es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence, limit : Option[es.uvigo.esei.tfg.smartdrugsearch.entity.Size], page : es.uvigo.esei.tfg.smartdrugsearch.entity.Position, count : es.uvigo.esei.tfg.smartdrugsearch.entity.Size)
 POST    /api/provider/pubmed/download   es.uvigo.esei.tfg.smartdrugsearch.controller.PubMedProviderController.download
 
 GET     /assets/*file                   es.uvigo.esei.tfg.smartdrugsearch.controller.AssetsController.at(path = "/src/main/webapp", file)

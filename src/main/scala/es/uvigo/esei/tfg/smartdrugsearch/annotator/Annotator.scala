@@ -75,7 +75,7 @@ private[annotator] trait AnnotatorLogging extends AnnotatorBase {
     if (isAnnotated(documentId))
       Logger.warn(s"[${self.path.name}] Ignorning already annotated ${documentId}")
     else if (isBlocked(documentId))
-      Logger.warn(s"[${self.path.name}] Ignornig blocked (currentyl annotating) ${documentId}")
+      Logger.warn(s"[${self.path.name}] Ignornig blocked (currently annotating) ${documentId}")
     else super.annotate(sender, documentId);
 
   abstract override protected def finished(sender : ActorRef, documentId : DocumentId) = {
