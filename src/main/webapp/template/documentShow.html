@@ -13,7 +13,7 @@
                     <p data-ng-bind-html="document.text" data-dynamic></p>
                 </div>
                 <div data-ng-show="document.pubmedId" class="panel-footer">
-                    <a data-ng-href="http://www.ncbi.nlm.nih.gov/pubmed/{{ document.pubmedId }}" class="btn btn-default">
+                    <a target="_blank" data-ng-href="http://www.ncbi.nlm.nih.gov/pubmed/{{ document.pubmedId }}" class="btn btn-default">
                         <span class="fa fa-external-link fa-lg"></span> PubMedID: {{ document.pubmedId }}
                     </a>
                 </div>

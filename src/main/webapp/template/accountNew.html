@@ -3,7 +3,10 @@
 <div data-ng-include src='"assets/template/errorMessage.html"'></div>
 
 <div class="row">
-    <div class="col-xs-12">
+    <div data-ng-show="loading" class="col-xs-12 text-center">
+        <span class="text-muted fa fa-spin fa-spinner fa-3x"></span>
+    </div>
+    <div data-ng-hide="loading" class="col-xs-12">
         <form name="accountForm" accept-charset="UTF-8" role="form" data-ng-enter="createAccount()">
             <div class="panel panel-default">
                 <div class="panel-heading">

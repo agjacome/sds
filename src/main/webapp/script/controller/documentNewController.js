@@ -4,7 +4,6 @@ define(['./main'], function(controller) {
         scope.loading = true;
         service.save(scope.document).$promise.then(
             function(data) {
-               scope.loading   = false;
                rootScope.error = false;
                location.path('/document/' + data.id);
             },
@@ -27,7 +26,8 @@ define(['./main'], function(controller) {
             };
 
             $scope.createDocument = function( ) {
-                createDocument(DocumentService, $scope, $rootScope, $location);
+                if ($scope.documentForm.$valid)
+                    createDocument(DocumentService, $scope, $rootScope, $location);
             };
 
         }

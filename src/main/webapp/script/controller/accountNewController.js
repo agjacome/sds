@@ -5,7 +5,6 @@ define(['./main'], function(controller) {
         scope.loading = true;
         service.save(scope.account).$promise.then(
             function(data) {
-                scope.loading   = false;
                 rootScope.error = false;
                 location.path('/admin/accounts');
             },
@@ -27,7 +26,8 @@ define(['./main'], function(controller) {
             };
 
             $scope.createAccount = function() {
-                createAccount(AccountService, $scope, $rootScope, $location);
+                if ($scope.accountForm.$valid)
+                    createAccount(AccountService, $scope, $rootScope, $location);
             };
 
         }

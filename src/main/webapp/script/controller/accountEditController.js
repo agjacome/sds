@@ -55,7 +55,8 @@ define(['./main'], function(controller) {
             };
 
             $scope.editAccount = function( ) {
-                editAccount(AccountService, $scope, $rootScope, $location, currentId);
+                if ($scope.accountForm.$valid)
+                    editAccount(AccountService, $scope, $rootScope, $location, currentId);
             };
 
             getAccount(AccountService, accountId, $scope, $rootScope);
