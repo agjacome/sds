@@ -39,7 +39,6 @@ define(['./main'], function(controller) {
                     list       : response.data.list,
                     totalCount : response.data.totalCount,
                 };
-                console.log(scope.searchResults);
             },
             function(response) {
                 scope.loading          = false;

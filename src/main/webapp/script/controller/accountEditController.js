@@ -27,8 +27,6 @@ define(['./main'], function(controller) {
             function(data) {
                 scope.loading   = false;
                 rootScope.error = false;
-                console.log(scope.account.id);
-                console.log(currentId);
                 if (scope.account.id === currentId) location.path('/logout');
                 else location.path('/admin/accounts');
             },
