@@ -91,7 +91,7 @@
             </xs:choice>
             <xs:element name="Abstract" type="tns:AbstractType" minOccurs="0"/>
             <!-- xs:element name="Affiliation" type="tns:AffiliationType" minOccurs="0"/ -->
-            <xs:element name="Affiliation" type="xs:string" minOccurs="0"/>
+            <xs:element name="AffiliationInfo" type="xs:string" minOccurs="0"/>
             <xs:element name="AuthorList" type="tns:AuthorListType" minOccurs="0"/>
             <xs:element ref="tns:Language" maxOccurs="unbounded"/>
             <xs:element name="DataBankList" type="tns:DataBankListType" minOccurs="0"/>
@@ -193,7 +193,7 @@
             -->
             <xs:element name="NameID" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Identifier" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="Affiliation" type="xs:string" minOccurs="0"/>
+            <xs:element name="AffiliationInfo" type="xs:string" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="ValidYN" default="Y">
             <xs:simpleType>
@@ -618,7 +618,7 @@
             <xs:element name="NameID" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Identifier" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
             <!-- xs:element name="Affiliation" type="tns:AffiliationType" minOccurs="0"/ -->
-            <xs:element name="Affiliation" type="xs:string" minOccurs="0"/>
+            <xs:element name="AffiliationInfo" type="xs:string" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="ValidYN" default="Y">
             <xs:simpleType>
