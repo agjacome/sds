@@ -20,6 +20,7 @@ import es.uvigo.esei.tfg.smartdrugsearch.service.{ ComputeStats, DocumentStatsSe
 
 trait Global extends GlobalSettings {
 
+  lazy val appRoot       = current.configuration.getString("application.context").getOrElse("")
   lazy val annotator     = system.actorOf(Props[Annotator], "Annotator")
   lazy val documentStats = system.actorOf(Props[DocumentStatsService], "DocumentStatsComputer")
 
@@ -32,7 +33,12 @@ trait Global extends GlobalSettings {
     Future { InternalServerError(Json obj ("err" -> s"Server Error: ${error.getMessage}")) }
 
   override def onHandlerNotFound(request : RequestHeader) =
-    Future { NotFound(Json obj ("err" -> s"Path not found: ${request.path}")) }
+    Future {
+      if (request.path == s"${appRoot}/")
+        MovedPermanently(s"${appRoot}")
+      else
+        NotFound(Json obj ("err" -> s"Path not found: ${request.path}"))
+    }
 
   override def onBadRequest(request : RequestHeader, error : String) =
     Future { BadRequest(Json obj ("err" -> s"Bad Request: $error")) }

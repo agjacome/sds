@@ -1,6 +1,7 @@
 # Routes configuration file
 
 GET     /                               es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.index(any : String = "none")
+GET     /*path/                         es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.untrail(path)
 
 POST    /api/login                      es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.login
 POST    /api/logout                     es.uvigo.esei.tfg.smartdrugsearch.controller.ApplicationController.logout

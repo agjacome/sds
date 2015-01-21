@@ -26,7 +26,7 @@ define([
 
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
             if (keepError) keepError = false; else $rootScope.error = false;
-            $rootScope.pageTitle = current.$$route.pageTitle || 'SmartDrugSearch';
+            $rootScope.pageTitle = (current.$$route && current.$$route.pageTitle) || 'SmartDrugSearch';
         });
 
         $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
@@ -41,6 +41,11 @@ define([
                 $location.path('/');
             }
         });
+
+        $rootScope.go = function(path) {
+            $location.path(path);
+        }
+
 
     }]);
 

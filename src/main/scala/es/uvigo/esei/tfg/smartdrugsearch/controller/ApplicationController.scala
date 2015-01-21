@@ -1,5 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.controller
 
+import play.api.Play.current
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
@@ -9,6 +10,7 @@ import es.uvigo.esei.tfg.smartdrugsearch.view
 
 private[controller] trait ApplicationController extends Controller with Authorization {
 
+  lazy val appRoot   = current.configuration.getString("application.context").getOrElse("")
   lazy val database  = DatabaseProfile()
 
   import database._
@@ -17,6 +19,11 @@ private[controller] trait ApplicationController extends Controller with Authoriz
   def index(any : String) : Action[AnyContent] =
     Action {
       Ok(view.html.index())
+    }
+
+  def untrail(path : String) : Action[AnyContent] =
+    Action {
+      MovedPermanently(s"${appRoot}/${path}")
     }
 
   def login : Action[JsValue] =
