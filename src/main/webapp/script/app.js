@@ -44,6 +44,7 @@ define([
 
         $rootScope.go = function(path) {
             $location.path(path);
+            $location.url($location.path());
         }
 
 
