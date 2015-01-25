@@ -36,6 +36,21 @@ define(['app'], function(app) {
                 controller  : 'HomeController',
             });
 
+            $routeProvider.when('/about', {
+                pageTitle   : 'About :: SmartDrugSearch',
+                templateUrl : 'assets/template/about.html',
+            });
+
+            $routeProvider.when('/api', {
+                pageTitle   : 'API Documentation :: SmartDrugSearch',
+                templateUrl : 'assets/template/api.html',
+            });
+
+            $routeProvider.when('/help', {
+                pageTitle   : 'Help :: SmartDrugSearch',
+                templateUrl : 'assets/template/help.html',
+            });
+
             $routeProvider.when('/search', {
                 pageTitle   : ' :: SmartDrugSearch',
                 templateUrl : 'assets/template/searchResults.html',
