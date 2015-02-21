@@ -1,2 +1,302 @@
 <div data-ng-include src='"assets/template/smallLogo.html"'></div>
 <div data-ng-include src='"assets/template/errorMessage.html"'></div>
+
+<div class=...>
+    <div class="col-xs-12">
+        <div class="well well-sm">
+            <h4>SmartDrugSearch API</h4>
+            <p>
+                A public REST API is provided, free of any charge, in order to
+                allow external applications to integrate any of the features
+                that SDS provides. This page contains a table describing any
+                existing operation accessible through this API. Some of those
+                operations require administrator privileges, and thus cannot be
+                accessed by the general public.
+            </p>
+            <p>
+                We do not have any rate limits at the moment, but if any
+                incorrect behavior is detected or if the number of received
+                petitions or consumed bandwidth is too high (under our
+                considerations), the acessing IP Address will be immediately
+                banned.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="row api-methods-list">
+    <div class="col-xs-12 table-responsive">
+        <table class="table table-stripped table-condensed">
+            <thead>
+                <tr>
+                    <td><strong>Function</strong></td>
+                    <td><strong>Method</strong></td>
+                    <td><strong>Content</strong></td>
+                    <td><strong>Response example</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Search</td>
+                    <td>GET /api/search</td>
+                    <td>
+                        Query parameters:
+                        <ul>
+                            <li>'query': search terms</li>
+                            <li>'page': page number</li>
+                            <li>'count': articles per page</li>
+                        </ul>
+                        Example:
+                        <a href="api/search?query=amp&page=1&count=3"><pre>/api/search?query=amp&page=1&count=3</pre></a>
+                    </td>
+                    <td>
+                        HTTP 200 Ok
+                        <pre>{
+    "totalCount": 8,
+    "pageNumber": 1,
+    "pageSize": 3,
+    "list": [
+        {
+            "document": {
+                "id": 111,
+                "pubmedId": ...,
+                "annotated": true,
+                "blocked": false,
+                "title": ...
+                "text": ...,
+            },
+            "keywords": [
+                {
+                    "id": 978,
+                    "category": "Protein",
+                    "normalized": ...,
+                    "occurrences": 1
+                },
+                ...
+            ]
+        },
+        ...
+    ]
+}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>List articles</td>
+                    <td>GET /api/document</td>
+                    <td>
+                        Query parameters:
+                        <ul>
+                            <li>'page': page number</li>
+                            <li>'count': articles per page</li>
+                        </ul>
+                        Example:
+                        <a href="api/document?page=1&count=3"><pre>/api/document?page=1&count=3</pre></a>
+                    </td>
+                    <td>
+                        HTTP 200 Ok
+                        <pre>{
+    "totalCount": 256,
+    "pageNumber": 1,
+    "pageSize": 3,
+    "list": [
+        {
+            "id": 1,
+            "pubmedId": ...,
+            "annotated": true,
+            "blocked": false,
+            "text": ...
+            "title": ...
+        },
+        ...
+    ]
+}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Get article</td>
+                    <td>GET /api/document/:id</td>
+                    <td>
+                        Path parameters:
+                        <ul>
+                            <li>'id': article id as integer</li>
+                        </ul>
+                        Example:
+                        <a href="api/document/12"><pre>/api/document/12</pre></a>
+                    </td>
+                    <td>
+                        HTTP 200 Ok
+                        <pre>{
+    "document": {
+        "id": 12,
+        "pubmedId": 25596326,
+        "annotated": true,
+        "blocked": false,
+        "text": ...
+        "title": ...
+    },
+    "keywords": [
+        {
+            "id": 47,
+            "category": "CellType",
+            "normalized": ...
+            "occurrences": 6
+        },
+        ...
+    ]
+    "annotations": [
+        {
+            "id": 104,
+            "documentId": 12,
+            "keywordId": 65,
+            "startPosition": 950,
+            "endPosition": 974,
+            "text": ...
+        },
+        ...
+    ]
+}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Create article<br>
+                        <em>Privileged operation</em>
+                    </td>
+                    <td>POST /api/document</td>
+                    <td>
+                        POST content (http body, json):
+                        <pre>{
+    "pubmedId": ...,
+    "title": ...,
+    "text": ...
+}</pre>
+                    <td>
+                        HTTP 201 Created
+                        <pre>{ "id": 723 }</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Delete article<br>
+                        <em>Privileged operation</em>
+                    </td>
+                    <td>DELETE /api/document/:id</td>
+                    <td>
+                        Path parameters:
+                        <ul><li>'id': article id as integer</li></ul>
+                    </td>
+                    <td>
+                        HTTP 204 No Content
+                    </td>
+                </tr>
+                <tr>
+                    <td>Get keyword</td>
+                    <td>GET /api/keyword/:id</td>
+                    <td>
+                        Path parameters:
+                        <ul>
+                            <li>'id': keyword id as integer</li>
+                        </ul>
+                        Example:
+                        <a href="api/keyword/92"><pre>/api/keyword/92</pre></a>
+                    </td>
+                    <td>
+                        Http 200 Ok
+                        <pre>{
+    "id": 92,
+    "category": "Species",
+    "normalized": "Paenibacillus ehimensis",
+    "occurrences": 2
+}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Get annotation</td>
+                    <td>GET /api/annotation/:id</td>
+                    <td>
+                        Path parameters:
+                        <ul>
+                            <li>'id': annotation id as integer</li>
+                        </ul>
+                        Example:
+                        <a href="api/annotation/121"><pre>/api/annotation/121</pre></a>
+                    </td>
+                    <td>
+                        Http 200 Ok
+                        <pre>{
+    "id": 121,
+    "documentId": 17,
+    "keywordId": 76,
+    "startPosition": 316,
+    "endPosition": 348,
+    "text": "3-hydroxy-4-methyl-hexanoic acid"
+}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Administrator login</td>
+                    <td>POST /api/login</td>
+                    <td>
+                        POST content (http body, json):
+                        <pre>{
+    "email": ...,
+    "password": ...
+}</pre>
+                    </td>
+                    <td>
+                        Http 200 Ok
+                        <pre>{
+    "accountId": ...,
+    "authToken": ...
+}</pre>
+                        <em>Every following privileged action must contain that<br>
+                        "authToken" inside a "X-XSRF-TOKEN" header.</em>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Administrator logout<br>
+                        <em>Privileged opeartion</em>
+                    </td>
+                    <td>POST /api/logout</td>
+                    <td>No content</td>
+                    <td>
+                        Http 200 Ok<br>
+                        <em>The XSRF-TOKEN will be discarded, and a new one should<br>
+                        be requested in order to perform any following<br>
+                        privileged operation.</em>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        List accounts<br>
+                        <em>Privileged opeartion</em>
+                    </td>
+                    <td>GET /api/account</td>
+                    <td>
+                        Query parameters:
+                        <ul>
+                            <li>'page': page number</li>
+                            <li>'count': accounts per page</li>
+                        </ul>
+                        Example:
+                        <a href="api/account?page=1&count=3"><pre>/api/account?page=1&count=3</pre></a>
+                    </td>
+                    <td>
+                        Http 200 Ok
+                        <pre>{
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 3,
+    "list": [
+        {
+            "id": 1,
+            "email": "admin@smartdrugsearch"
+        }
+    ]
+}</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
