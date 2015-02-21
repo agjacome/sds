@@ -76,7 +76,7 @@ import ScalaxbKeys._
 
 lazy val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbSettings : _*).settings(
 
-  confDirectory := baseDirectory.value / "conf" ,
+  confDirectory := baseDirectory.value / "src/main/resources/conf" ,
 
   sourceDirectory   in Compile := baseDirectory.value / "src/main"           ,
   scalaSource       in Compile := baseDirectory.value / "src/main/scala"     ,
