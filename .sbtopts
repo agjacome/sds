@@ -5,4 +5,3 @@
 -Xss20M
 -XX:MaxPermSize=2400m
 -XX:+CMSClassUnloadingEnabled
-
