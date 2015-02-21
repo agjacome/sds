@@ -10,7 +10,8 @@ before_script:
   - tar -C src/main/resources --lzma -xvf src/main/resources/abner.tar.lzma
 notifications:
   email:
-    - agjacome@esei.uvigo.es
-   on_success: change
-   on_failure: always
-   on_start: false
+    recipients:
+      - agjacome@esei.uvigo.es
+    on_success: change
+    on_failure: always
+    on_start: false
