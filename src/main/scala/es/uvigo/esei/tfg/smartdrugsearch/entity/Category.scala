@@ -3,8 +3,6 @@ package es.uvigo.esei.tfg.smartdrugsearch.entity
 import play.api.libs.json._
 import play.api.mvc.{ PathBindable, QueryStringBindable }
 
-import es.uvigo.esei.tfg.smartdrugsearch.macros.SealedValues
-
 final case class CategoryId (value : Long) extends AnyVal with Identifier
 object CategoryId extends IdentifierCompanion[CategoryId]
 
@@ -22,7 +20,7 @@ case object CellType extends Category { val id = CategoryId(9) }
 
 object Category extends ((String) => Category) {
 
-  private lazy val values  = SealedValues.from[Category]
+  private lazy val values  = Set(Compound, Drug, Gene, Protein, Species, DNA, RNA, CellLine, CellType)
   private lazy val fromId  = (values map { v => (v.id, v) }).toMap
   private lazy val fromStr = (values map { v => (v.toString.toLowerCase, v) }).toMap
 
