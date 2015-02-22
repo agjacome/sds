@@ -74,7 +74,7 @@ libraryDependencies ++= Seq(
 import PlayKeys._
 import ScalaxbKeys._
 
-lazy val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbSettings : _*).settings(
+lazy val sds = (project in file(".")).enablePlugins(PlayScala, SbtWeb).settings(scalaxbSettings : _*).settings(
 
   confDirectory := baseDirectory.value / "src/main/resources/conf" ,
 
@@ -82,17 +82,18 @@ lazy val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbS
   scalaSource       in Compile := baseDirectory.value / "src/main/scala"     ,
   javaSource        in Compile := baseDirectory.value / "src/main/java"      ,
   resourceDirectory in Compile := baseDirectory.value / "src/main/resources" ,
+  sourceDirectory   in Test    := baseDirectory.value / "src/test"           ,
+  scalaSource       in Test    := baseDirectory.value / "src/test/scala"     ,
+  javaSource        in Test    := baseDirectory.value / "src/test/java"      ,
+  resourceDirectory in Test    := baseDirectory.value / "src/test/resources" ,
 
-  sourceDirectory   in Test := baseDirectory.value / "src/test"           ,
-  scalaSource       in Test := baseDirectory.value / "src/test/scala"     ,
-  javaSource        in Test := baseDirectory.value / "src/test/java"      ,
-  resourceDirectory in Test := baseDirectory.value / "src/test/resources" ,
+  unmanagedResourceDirectories in Assets := Seq(baseDirectory.value / "src/main/webapp") ,
+  pipelineStages := Seq(rjs, digest, gzip) ,
 
-  dispatchVersion in (Compile, scalaxb) := "0.11.2" ,
-  packageName     in (Compile, scalaxb) := "scalaxb.generated"                             ,
-  wsdlSource      in (Compile, scalaxb) := baseDirectory.value / "src/main/resources/wsdl" ,
-  xsdSource       in (Compile, scalaxb) := baseDirectory.value / "src/main/resources/xsd"  ,
-
+  dispatchVersion  in (Compile, scalaxb) := "0.11.2" ,
+  packageName      in (Compile, scalaxb) := "scalaxb.generated"                             ,
+  wsdlSource       in (Compile, scalaxb) := baseDirectory.value / "src/main/resources/wsdl" ,
+  xsdSource        in (Compile, scalaxb) := baseDirectory.value / "src/main/resources/xsd"  ,
   sourceGenerators in Compile <+= scalaxb in Compile ,
 
   shellPrompt := { state => name.value + " » " }
