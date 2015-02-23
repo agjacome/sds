@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.controller
+package es.uvigo.ei.sing.sds.controller
 
 import play.api.http.LazyHttpErrorHandler
 import controllers._
@@ -7,7 +7,7 @@ import controllers._
 // WebJarAssets classes in the Play's "controllers" route package. This way, all
 // controllers is normalized to exist inside the same package. This way, all
 // those crazy inconsistencies of usign "controllers" and
-// "es.uvigo.esei.tfg.smartdrugsearch.controller" in both the routes
+// "es.uvigo.ei.sing.sds.controller" in both the routes
 // configuration file and in the views a removed.
 
 object AssetsController       extends AssetsBuilder(LazyHttpErrorHandler)

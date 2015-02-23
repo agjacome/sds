@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.entity
+package es.uvigo.ei.sing.sds.entity
 
 final case class SearchResult(document : Document, keywords : Set[Keyword])
 

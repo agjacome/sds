@@ -1,10 +1,10 @@
-package es.uvigo.esei.tfg.smartdrugsearch.provider
+package es.uvigo.ei.sing.sds.provider
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.service.EUtilsService
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.service.EUtilsService
 
 class PubMedProvider private {
 

@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch
+package es.uvigo.ei.sing.sds
 
 import play.api._
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.service._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.service._
 
 trait Global extends GlobalSettings {
 

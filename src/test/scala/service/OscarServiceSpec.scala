@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
@@ -8,8 +8,8 @@ import org.mockito.Mockito.when
 
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities._
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.BaseSpec
+import es.uvigo.ei.sing.sds.entity._
 
 class OscarServiceSpec extends BaseSpec {
 

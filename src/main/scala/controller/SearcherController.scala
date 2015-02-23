@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.controller
+package es.uvigo.ei.sing.sds.controller
 
 import scala.concurrent.duration._
 
@@ -6,8 +6,8 @@ import play.api.cache.Cached
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.searcher.Searcher
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.searcher.Searcher
 
 private[controller] trait SearcherController extends Controller {
 

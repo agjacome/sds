@@ -1,7 +1,7 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity.DocumentId
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity.DocumentId
 
 private[annotator] sealed trait AnnotatorMessage {
 

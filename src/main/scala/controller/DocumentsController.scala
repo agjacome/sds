@@ -1,12 +1,12 @@
-package es.uvigo.esei.tfg.smartdrugsearch.controller
+package es.uvigo.ei.sing.sds.controller
 
 import scala.concurrent.duration._
 
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
 
 private[controller] trait DocumentsController extends Controller with Authorization {
 

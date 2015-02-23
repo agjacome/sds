@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -9,8 +9,8 @@ import play.api.test.WithApplication
 
 import uk.ac.man.entitytagger.Mention
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.BaseSpec
+import es.uvigo.ei.sing.sds.entity._
 
 class LinnaeusServiceSpec extends BaseSpec {
 

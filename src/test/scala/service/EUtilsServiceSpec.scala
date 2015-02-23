@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import org.joda.time.{ DateTimeZone, LocalDate }
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.BaseSpec
+import es.uvigo.ei.sing.sds.entity._
 
 class EUtilsServiceSpec extends BaseSpec {
 

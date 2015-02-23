@@ -1,8 +1,8 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.service.{ ABNEREntity, ABNERService }
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.service.{ ABNEREntity, ABNERService }
 
 private[annotator] class ABNERAnnotator extends AnnotatorAdapter {
 

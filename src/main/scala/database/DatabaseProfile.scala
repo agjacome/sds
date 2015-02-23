@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.database
+package es.uvigo.ei.sing.sds.database
 
 import play.api.db.slick.{ Database, DB, Profile }
 

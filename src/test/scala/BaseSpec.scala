@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch
+package es.uvigo.ei.sing.sds
 
 import org.scalatest._
 import org.scalatest.concurrent.{ Futures, ScalaFutures }

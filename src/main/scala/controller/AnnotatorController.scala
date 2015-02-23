@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.controller
+package es.uvigo.ei.sing.sds.controller
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -6,9 +6,9 @@ import scala.util.Try
 import play.api.mvc._
 import play.api.libs.json.{ Json, JsValue }
 
-import es.uvigo.esei.tfg.smartdrugsearch.annotator.Annotate
-import es.uvigo.esei.tfg.smartdrugsearch.entity.DocumentId
-import es.uvigo.esei.tfg.smartdrugsearch.Global.annotator
+import es.uvigo.ei.sing.sds.annotator.Annotate
+import es.uvigo.ei.sing.sds.entity.DocumentId
+import es.uvigo.ei.sing.sds.Global.annotator
 
 private[controller] trait AnnotatorController extends Controller with Authorization {
 

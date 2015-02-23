@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.entity
+package es.uvigo.ei.sing.sds.entity
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 
-import es.uvigo.esei.tfg.smartdrugsearch.macros.SealedValues
+import es.uvigo.ei.sing.sds.macros.SealedValues
 
 object Generators {
 

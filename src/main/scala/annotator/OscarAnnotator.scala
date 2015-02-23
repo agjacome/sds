@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.ResolvedNamedEntity
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.service.OscarService
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.service.OscarService
 
 private[annotator] class OscarAnnotator extends AnnotatorAdapter {
 

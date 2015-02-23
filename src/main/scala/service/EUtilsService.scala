@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import play.api.Logger
 
@@ -8,7 +8,7 @@ import scalaxb.generated._
 import org.jsoup.Jsoup
 import com.google.common.annotations.VisibleForTesting
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.entity._
 
 class EUtilsService private {
 

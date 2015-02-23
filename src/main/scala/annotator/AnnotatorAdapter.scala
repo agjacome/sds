@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
@@ -11,8 +11,8 @@ import akka.pattern.pipe
 import play.api.cache.Cache
 import play.api.Play.current
 
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
 
 private[annotator] trait AnnotatorAdapter extends Actor {
 

@@ -1,11 +1,11 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.test.WithApplication
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.BaseSpec
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
 
 class AnnotatorMessageSpec extends BaseSpec {
 

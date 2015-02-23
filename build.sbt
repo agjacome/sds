@@ -16,10 +16,10 @@ scalacOptions ++= Seq(
   "-Xlint",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard",
-  "-Ywarn-unused-import"
-  // "-Yno-adapted-args", // not respected by scalaxb, so it cannot be used
-  // "-Xfatal-warnings",  // scalaxb generated code emits warnings
+  "-Ywarn-value-discard"
+  // "-Ywarn-unused-import" // play's auto-imports on twirl and routes
+  // "-Yno-adapted-args",   // not respected by scalaxb
+  // "-Xfatal-warnings",    // scalaxb generated code emits warnings
 )
 
 resolvers ++= Seq(

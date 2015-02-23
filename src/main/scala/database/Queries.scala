@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.database
+package es.uvigo.ei.sing.sds.database
 
 import scala.slick.jdbc.meta.MTable
 import play.api.db.slick.Profile
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
+import es.uvigo.ei.sing.sds.entity._
 
 private[database] trait Queries { this : Profile with Tables with Mappers =>
 

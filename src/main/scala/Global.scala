@@ -1,10 +1,10 @@
-package es.uvigo.esei.tfg.smartdrugsearch
+package es.uvigo.ei.sing.sds
 
 import akka.actor._
-import es.uvigo.esei.tfg.smartdrugsearch.annotator.Annotator
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
-import es.uvigo.esei.tfg.smartdrugsearch.entity.Account
-import es.uvigo.esei.tfg.smartdrugsearch.service.{ComputeStats, DocumentStatsService}
+import es.uvigo.ei.sing.sds.annotator.Annotator
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity.Account
+import es.uvigo.ei.sing.sds.service.{ComputeStats, DocumentStatsService}
 import play.api.Play.current
 import play.api.libs.concurrent.Akka.system
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

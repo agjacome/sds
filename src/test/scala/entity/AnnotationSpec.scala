@@ -1,10 +1,10 @@
-package es.uvigo.esei.tfg.smartdrugsearch.entity
+package es.uvigo.ei.sing.sds.entity
 
 import play.api.libs.json._
 import org.scalacheck.Gen
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.entity.Generators._
+import es.uvigo.ei.sing.sds.BaseSpec
+import es.uvigo.ei.sing.sds.entity.Generators._
 
 class AnnotationSpec extends BaseSpec {
 

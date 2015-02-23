@@ -1,12 +1,12 @@
-package es.uvigo.esei.tfg.smartdrugsearch.searcher
+package es.uvigo.ei.sing.sds.searcher
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
 import play.api.Play.{ current => app }
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
 
 class Searcher {
 

@@ -1,13 +1,13 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import scala.concurrent.duration._
 import akka.actor.{ PoisonPill, Props }
 
 import play.api.test.WithApplication
 
-import es.uvigo.esei.tfg.smartdrugsearch.ActorBaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.ActorBaseSpec
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
 
 class DocumentStatsServiceSpec extends ActorBaseSpec with DocumentStatsServiceSpecExpectations {
 

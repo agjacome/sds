@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import akka.actor._
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
 
 private[service] sealed trait DocumentStatsServiceMessage
 case object ComputeStats extends DocumentStatsServiceMessage

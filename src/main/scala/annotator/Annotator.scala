@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 import scala.collection.concurrent.TrieMap
 import akka.actor._
@@ -6,8 +6,8 @@ import akka.actor._
 import play.api.{ Configuration, Logger }
 import play.api.Play.{ current => app }
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
 
 private[annotator] trait AnnotatorBase extends Actor {
 

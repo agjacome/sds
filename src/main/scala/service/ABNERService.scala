@@ -1,11 +1,11 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import scala.annotation.tailrec
 import scala.concurrent.{ ExecutionContext, Future }
 
 import abner.Tagger
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity.{ Category, Position, Sentence }
+import es.uvigo.ei.sing.sds.entity.{ Category, Position, Sentence }
 
 final case class ABNEREntity(txt : Sentence, cat : Category, start : Position, end : Position)
 

@@ -1,12 +1,12 @@
-package es.uvigo.esei.tfg.smartdrugsearch.controller
+package es.uvigo.ei.sing.sds.controller
 
 import scala.concurrent.Future
 
 import play.api.mvc._
 import play.api.libs.json.{ Json, JsValue }
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.provider.PubMedProvider
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.provider.PubMedProvider
 
 private[controller] trait PubMedProviderController extends Controller with Authorization {
 

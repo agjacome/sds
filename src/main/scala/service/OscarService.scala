@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -6,7 +6,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import uk.ac.cam.ch.wwmm.oscar.Oscar
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.{ FormatType, ResolvedNamedEntity }
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence
+import es.uvigo.ei.sing.sds.entity.Sentence
 
 class OscarService private {
 

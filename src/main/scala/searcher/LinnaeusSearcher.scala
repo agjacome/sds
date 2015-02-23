@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.searcher
+package es.uvigo.ei.sing.sds.searcher
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.service.LinnaeusService
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.service.LinnaeusService
 
 private[searcher] class LinnaeusSearcher extends SearcherAdapter {
 

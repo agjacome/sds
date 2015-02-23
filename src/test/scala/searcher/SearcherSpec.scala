@@ -1,6 +1,6 @@
-package es.uvigo.esei.tfg.smartdrugsearch.searcher
+package es.uvigo.ei.sing.sds.searcher
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
+import es.uvigo.ei.sing.sds.BaseSpec
 
 class SearcherSpec extends BaseSpec {
 

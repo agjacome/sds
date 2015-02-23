@@ -1,11 +1,11 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 import akka.actor.{ PoisonPill, Props }
 import play.api.test.WithApplication
 
-import es.uvigo.esei.tfg.smartdrugsearch.ActorBaseSpec
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.ActorBaseSpec
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
 
 class LinnaeusAnnotatorSpec extends ActorBaseSpec {
 

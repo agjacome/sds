@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.annotator
+package es.uvigo.ei.sing.sds.annotator
 
 import uk.ac.man.entitytagger.Mention
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity._
-import es.uvigo.esei.tfg.smartdrugsearch.service.LinnaeusService
+import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.service.LinnaeusService
 
 private[annotator] class LinnaeusAnnotator extends AnnotatorAdapter {
 

@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.entity
+package es.uvigo.ei.sing.sds.entity
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

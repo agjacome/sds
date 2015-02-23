@@ -1,4 +1,4 @@
-package es.uvigo.esei.tfg.smartdrugsearch.service
+package es.uvigo.ei.sing.sds.service
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -8,7 +8,7 @@ import play.api.Play.current
 
 import uk.ac.man.entitytagger.Mention
 
-import es.uvigo.esei.tfg.smartdrugsearch.entity.Sentence
+import es.uvigo.ei.sing.sds.entity.Sentence
 
 class LinnaeusService private {
 

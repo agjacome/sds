@@ -1,9 +1,9 @@
-package es.uvigo.esei.tfg.smartdrugsearch.entity
+package es.uvigo.ei.sing.sds.entity
 
 import play.api.libs.json._
 import org.scalacheck.Arbitrary.arbitrary
 
-import es.uvigo.esei.tfg.smartdrugsearch.BaseSpec
+import es.uvigo.ei.sing.sds.BaseSpec
 
 // first level because value classes cannot be members of another classes
 private case class TestId(value : Long) extends AnyVal with Identifier
