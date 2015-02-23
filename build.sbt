@@ -10,17 +10,16 @@ scalacOptions ++= Seq(
   "-language:existentials",
   "-language:higherKinds",
   "-language:implicitConversions",
+  "-language:postfixOps",
   "-unchecked",
-  // "-Xfatal-warnings",
   "-Xfuture",
   "-Xlint",
-  "-Yno-adapted-args",
-  // "-Yno-imports",
-  // "-Yno-predef",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Ywarn-unused-import"
+  // "-Yno-adapted-args", // not respected by scalaxb, so it cannot be used
+  // "-Xfatal-warnings",  // scalaxb generated code emits warnings
 )
 
 resolvers ++= Seq(
