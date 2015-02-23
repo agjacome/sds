@@ -15,3 +15,5 @@ src/main/resources/*
 !src/main/resources/abner.tar.lzma
 !src/main/resources/wsdl
 !src/main/resources/xsd
+
+.idea
