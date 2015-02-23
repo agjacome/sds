@@ -22,7 +22,7 @@ private[searcher] class SimpleSearcher extends SearcherAdapter {
   private[this] def searchInAnnotationTexts(searchPattern : String) =
     database withSession { implicit session =>
       (Annotations filter (_.text.asColumnOf[String] like searchPattern) flatMap {
-        a => Keywords filter (_.id is a.keywordId)
+        a => Keywords filter (_.id === a.keywordId)
       } groupBy identity map (_._1)).run
     }
 

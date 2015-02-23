@@ -30,22 +30,22 @@ private[annotator] trait AnnotatorBase extends Actor {
 
   protected final def isAnnotated(documentId  : DocumentId) =
     database withSession { implicit session =>
-      (Documents filter (_.id is documentId) map (_.annotated)).first
+      (Documents filter (_.id === documentId) map (_.annotated)).first
     }
 
   protected final def isBlocked(documentId : DocumentId) =
     database withSession { implicit session =>
-      (Documents filter (_.id is documentId) map (_.blocked)).first
+      (Documents filter (_.id === documentId) map (_.blocked)).first
     }
 
   protected def markAnnotated(documentId : DocumentId, annotated : Boolean) =
     database withSession { implicit session =>
-      Documents filter (_.id is documentId) map (_.annotated) update annotated
+      Documents filter (_.id === documentId) map (_.annotated) update annotated
     }
 
   protected def markBlocked(documentId : DocumentId, blocked : Boolean) =
     database withSession { implicit session =>
-      Documents filter (_.id is documentId) map (_.blocked) update blocked
+      Documents filter (_.id === documentId) map (_.blocked) update blocked
     }
 
   protected def deleteAnnotations(documentId : DocumentId) =
@@ -58,12 +58,12 @@ private[annotator] trait AnnotatorBase extends Actor {
 
   private[this] def decrementKeywordCounter(documentId : DocumentId)(implicit session : Session) =
     findDocumentKeywords(documentId) foreach {
-      case (id, (current, count)) => Keywords filter (_.id is id) map (_.occurrences) update (current - count)
+      case (id, (current, count)) => Keywords filter (_.id === id) map (_.occurrences) update (current - count)
     }
 
   private[this] def findDocumentKeywords(documentId : DocumentId)(implicit session : Session) =
-    (Annotations filter (_.documentId is documentId) flatMap {
-      a => Keywords filter (_.id is a.keywordId)
+    (Annotations filter (_.documentId === documentId) flatMap {
+      a => Keywords filter (_.id === a.keywordId)
     } groupBy identity map { case (k, ks) => (k.id, (k.occurrences, ks.length)) }).list
 
 }

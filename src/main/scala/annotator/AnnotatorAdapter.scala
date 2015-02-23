@@ -43,7 +43,7 @@ private[annotator] trait AnnotatorAdapter extends Actor {
 
   protected final def getOrStoreKeyword(normalized : Sentence, category : Category) =
     database withTransaction { implicit session =>
-      (Keywords filter (_.normalized is normalized) map (_.id)).firstOption getOrElse {
+      (Keywords filter (_.normalized === normalized) map (_.id)).firstOption getOrElse {
         val keyword = Keyword(None, normalized, category)
         Keywords += keyword
       }
@@ -51,7 +51,7 @@ private[annotator] trait AnnotatorAdapter extends Actor {
 
   protected def storeAnnotation(annotation : Annotation) =
     database withTransaction { implicit session =>
-      val counter = Keywords filter (_.id is annotation.keywordId) map (_.occurrences)
+      val counter = Keywords filter (_.id === annotation.keywordId) map (_.occurrences)
       counter update (counter.first + 1)
       Annotations += annotation
     }

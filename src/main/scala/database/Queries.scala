@@ -26,7 +26,7 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     }
 
     def update(account : Account)(implicit session : Session) : Unit = {
-      this filter (_.id is account.id) update account
+      this filter (_.id === account.id) update account
       ()
     }
 
@@ -51,7 +51,7 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     }
 
     def update(document : Document)(implicit session : Session) : Unit = {
-      this filter (_.id is document.id) update document
+      this filter (_.id === document.id) update document
       ()
     }
 
@@ -78,7 +78,7 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     }
 
     def update(keyword : Keyword)(implicit session : Session) : Unit = {
-      this filter (_.id is keyword.id) update keyword
+      this filter (_.id === keyword.id) update keyword
       ()
     }
 
@@ -105,7 +105,7 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     }
 
     def update(annotation : Annotation)(implicit session : Session) : Unit = {
-      this filter (_.id is annotation.id) update annotation
+      this filter (_.id === annotation.id) update annotation
       ()
     }
 

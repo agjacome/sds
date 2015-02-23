@@ -55,7 +55,7 @@ private[controller] trait AccountsController extends Controller with Authorizati
 
   private[this] def addResult(account : Account) =
     database withSession { implicit session =>
-      if ((Accounts filter (_.email is account.email)).exists.run)
+      if ((Accounts filter (_.email === account.email)).exists.run)
         BadRequest(Json obj ("err" -> "Email already exists in database"))
       else
         Created(Json obj ("id" -> (Accounts += account.hashPassword)))
@@ -64,7 +64,7 @@ private[controller] trait AccountsController extends Controller with Authorizati
   private[this] def editResult(id : AccountId, account : Account) =
     withAccount(id) { _ =>
       database withSession { implicit session =>
-        Accounts filter (_.id is id) map (_.password) update account.hashPassword.password
+        Accounts filter (_.id === id) map (_.password) update account.hashPassword.password
         NoContent
       }
     }

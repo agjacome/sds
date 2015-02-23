@@ -99,6 +99,8 @@ lazy val sds = (project in file(".")).enablePlugins(PlayScala, SbtWeb).settings(
   packageName      in (Compile, scalaxb) := "scalaxb.generated"                           ,
   wsdlSource       in (Compile, scalaxb) := (resourceDirectory in Compile).value / "wsdl" ,
   xsdSource        in (Compile, scalaxb) := (resourceDirectory in Compile).value / "xsd"  ,
+
+  async in (Compile, scalaxb) := false ,
   sourceGenerators in Compile <+= scalaxb in Compile ,
 
   shellPrompt := { state => name.value + " » " }

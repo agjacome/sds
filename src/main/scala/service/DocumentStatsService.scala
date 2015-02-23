@@ -71,7 +71,7 @@ private[service] class DocumentStatsServiceImpl extends DocumentStatsServiceBase
     }
 
   private[this] def groupedData(implicit session : Session) =
-    Annotations join Keywords on (_.keywordId is _.id) map {
+    Annotations join Keywords on (_.keywordId === _.id) map {
       case (a, k) => (a.documentId, a.keywordId, k.occurrences)
     } groupBy { case (documentId, keywordId, _) => (documentId, keywordId) }
 

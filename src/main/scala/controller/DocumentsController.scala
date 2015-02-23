@@ -69,8 +69,8 @@ private[controller] trait DocumentsController extends Controller with Authorizat
 
   private[this] def withAnnotatedDocument(id : DocumentId)(f : AnnotatedDocument => Result) =
     withDocument(id)(document => database withSession { implicit session =>
-      val as = Annotations filter (_.documentId is id)
-      val ks = as join Keywords on (_.keywordId is _.id) map (_._2) groupBy identity map (_._1)
+      val as = Annotations filter (_.documentId === id)
+      val ks = as join Keywords on (_.keywordId === _.id) map (_._2) groupBy identity map (_._1)
       f(AnnotatedDocument(document, as.list.toSet, ks.list.toSet))
     })
 

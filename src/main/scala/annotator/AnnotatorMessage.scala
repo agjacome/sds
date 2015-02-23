@@ -25,7 +25,7 @@ final case class Annotate (documentId : DocumentId) extends AnnotatorMessage {
     import database.profile.simple._
 
     database withSession { implicit session =>
-      (database.Documents filter (_.id is id)).exists.run
+      (database.Documents filter (_.id === id)).exists.run
     }
   }
 

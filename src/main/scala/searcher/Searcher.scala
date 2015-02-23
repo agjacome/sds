@@ -49,7 +49,7 @@ class Searcher {
   private[this] def getKeywordIdsOfDocument(document : Document, keywordIds : Set[KeywordId]) =
     database withSession { implicit session =>
       (Annotations filter {
-        a => (a.documentId is document.id) && (a.keywordId inSet keywordIds)
+        a => (a.documentId === document.id) && (a.keywordId inSet keywordIds)
       } map (_.keywordId)).list.toSet
     }
 
@@ -62,7 +62,7 @@ class Searcher {
     }
 
   private[this] def joinDocumentsWithStats(keywordIds : Set[KeywordId])(implicit session : Session) =
-    DocumentStats filter (_.keywordId inSet keywordIds) join Documents on (_.documentId is _.id)
+    DocumentStats filter (_.keywordId inSet keywordIds) join Documents on (_.documentId === _.id)
 
   private[this] def createSearchers(searchers : Option[java.util.List[String]]) =
     (searchers map (_.asScala) getOrElse List.empty).foldLeft(Set.empty[SearcherAdapter]) {

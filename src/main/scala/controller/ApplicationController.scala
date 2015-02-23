@@ -61,7 +61,7 @@ private[controller] trait ApplicationController extends Controller with Authoriz
 
   private[this] def doesAccountExist(id : AccountId) =
     database withSession { implicit session =>
-      (Accounts filter (_.id is id)).exists.run
+      (Accounts filter (_.id === id)).exists.run
     }
 
   private[this] def findByEmailAndPassword(email : String, password : String) =
