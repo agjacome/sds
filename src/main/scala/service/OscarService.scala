@@ -16,7 +16,7 @@ class OscarService private {
     Future(oscar findResolvableEntities text) map { _.toSet }
 
   def normalize(entity : ResolvedNamedEntity) : Sentence =
-    (entity getFirstChemicalStructure FormatType.INCHI).getValue
+    entity.getFirstChemicalStructure(FormatType.STD_INCHI).getValue
 
 }
 

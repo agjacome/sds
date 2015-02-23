@@ -18,7 +18,7 @@ private[controller] trait KeywordsController extends Controller {
       withKeyword(id) { keyword => Ok(Json toJson keyword) }
     }
 
-  private[this] def withKeyword(id : KeywordId)(f : Keyword => SimpleResult) =
+  private[this] def withKeyword(id : KeywordId)(f : Keyword => Result) =
     database withSession { implicit session =>
       (Keywords findById id).firstOption map f getOrElse NotFound(Json obj ("err" -> "Keyword not found"))
     }

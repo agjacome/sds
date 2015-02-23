@@ -40,7 +40,7 @@ object Account extends ((Option[AccountId], String, String) => Account) {
     apply(None, email, password)
 
   private def formUnapply(account : Account) : Option[(String, String)] =
-    Some(account.email, account.password)
+    Some((account.email, account.password))
 
 }
 

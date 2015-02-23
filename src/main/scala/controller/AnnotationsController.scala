@@ -18,7 +18,7 @@ private[controller] trait AnnotationsController extends Controller {
       withAnnotation(id) { annotation => Ok(Json toJson annotation) }
     }
 
-  private[this] def withAnnotation(id : AnnotationId)(f : Annotation => SimpleResult) =
+  private[this] def withAnnotation(id : AnnotationId)(f : Annotation => Result) =
     database withSession { implicit session =>
       (Annotations findById id).firstOption map f getOrElse NotFound(Json obj ("err" -> "Annotation not found"))
     }

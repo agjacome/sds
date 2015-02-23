@@ -20,11 +20,15 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     def -=(account : Account)(implicit session : Session) : Unit =
       account.id foreach { id => this -= id }
 
-    def -=(id : AccountId)(implicit session : Session) : Unit =
+    def -=(id : AccountId)(implicit session : Session) : Unit = {
       (this findById id).delete
+      ()
+    }
 
-    def update(account : Account)(implicit session : Session) : Unit =
+    def update(account : Account)(implicit session : Session) : Unit = {
       this filter (_.id is account.id) update account
+      ()
+    }
 
     def count(implicit session : Session) : Int =
       this.length.run
@@ -41,11 +45,15 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     def -=(document : Document)(implicit session : Session) : Unit =
       document.id foreach { id => this -= id }
 
-    def -=(documentId : DocumentId)(implicit session : Session) : Unit =
+    def -=(documentId : DocumentId)(implicit session : Session) : Unit = {
       (this findById documentId).delete
+      ()
+    }
 
-    def update(document : Document)(implicit session : Session) : Unit =
+    def update(document : Document)(implicit session : Session) : Unit = {
       this filter (_.id is document.id) update document
+      ()
+    }
 
     def count(implicit session : Session) : Int =
       this.length.run
@@ -64,11 +72,15 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     def -=(keyword : Keyword)(implicit session : Session) : Unit =
       keyword.id foreach { id => this -= id }
 
-    def -=(keywordId : KeywordId)(implicit session : Session) : Unit =
+    def -=(keywordId : KeywordId)(implicit session : Session) : Unit = {
       (this findById keywordId).delete
+      ()
+    }
 
-    def update(keyword : Keyword)(implicit session : Session) : Unit =
+    def update(keyword : Keyword)(implicit session : Session) : Unit = {
       this filter (_.id is keyword.id) update keyword
+      ()
+    }
 
     def count(implicit session : Session) : Int =
       this.length.run
@@ -87,11 +99,15 @@ private[database] trait Queries { this : Profile with Tables with Mappers =>
     def -=(annotation : Annotation)(implicit session : Session) : Unit =
       annotation.id foreach { id => this -= id }
 
-    def -=(annotationId : AnnotationId)(implicit session : Session) : Unit =
+    def -=(annotationId : AnnotationId)(implicit session : Session) : Unit = {
       (this findById annotationId).delete
+      ()
+    }
 
-    def update(annotation : Annotation)(implicit session : Session) : Unit =
+    def update(annotation : Annotation)(implicit session : Session) : Unit = {
       this filter (_.id is annotation.id) update annotation
+      ()
+    }
 
     def count(implicit session : Session) : Int =
       this.length.run

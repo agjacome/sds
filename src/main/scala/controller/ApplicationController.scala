@@ -3,6 +3,7 @@ package es.uvigo.esei.tfg.smartdrugsearch.controller
 import play.api.Play.current
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
+import play.twirl.api.Content
 
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity._

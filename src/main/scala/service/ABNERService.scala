@@ -42,7 +42,7 @@ class ABNERService private {
 
   private[this] def getStartAndEnd(str : String, txt : String, from : Position = 0) = {
     val start = txt.indexOf(str, from.toInt)
-    if (start < 0) None else Some(start, start + str.length)
+    if (start < 0) None else Some((start, start + str.length))
   }
 
 }

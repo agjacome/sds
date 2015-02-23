@@ -1,7 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.entity
 
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 sealed trait EntityList[A] {
   val totalCount : Size

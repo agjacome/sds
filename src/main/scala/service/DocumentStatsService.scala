@@ -18,7 +18,7 @@ private[service] trait DocumentStatsServiceBase extends Actor {
 
   protected def getData : List[(DocumentId, KeywordId, Int, Size)]
 
-  protected def replaceDocumentStats(data : List[(DocumentId, KeywordId, Int, Size)])
+  protected def replaceDocumentStats(data : List[(DocumentId, KeywordId, Int, Size)]) : Unit
 
 }
 
@@ -56,17 +56,18 @@ private[service] class DocumentStatsServiceImpl extends DocumentStatsServiceBase
 
   override protected def getData =
     database withTransaction { implicit session =>
-      (groupedData map { case ((documentId, keywordId), tuples) => 
+      (groupedData map { case ((documentId, keywordId), tuples) =>
         (documentId, keywordId, tuples.length, tuples.map(_._3).max.get)
       }).list
     }
 
-  override protected def replaceDocumentStats(data : List[(DocumentId, KeywordId, Int, Size)]) =
+  override protected def replaceDocumentStats(data : List[(DocumentId, KeywordId, Int, Size)]) : Unit =
     database withTransaction { implicit session =>
       DocumentStats.delete
       DocumentStats ++= data map { case (docId, keyId, docCounter, keyCounter) =>
-        (docId, keyId, Size(docCounter), docCounter.toDouble / keyCounter)
+        (docId, keyId, Size(docCounter.toLong), docCounter.toDouble / keyCounter)
       }
+      ()
     }
 
   private[this] def groupedData(implicit session : Session) =
@@ -77,4 +78,3 @@ private[service] class DocumentStatsServiceImpl extends DocumentStatsServiceBase
 }
 
 class DocumentStatsService extends DocumentStatsServiceImpl with DocumentStatsServiceLogging
-

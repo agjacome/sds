@@ -1,22 +1,20 @@
 package es.uvigo.esei.tfg.smartdrugsearch
 
-import scala.concurrent.duration._
-import scala.concurrent.Future
-
 import akka.actor._
-
-import play.api.Play.current
-import play.api.{ Application, GlobalSettings }
-import play.api.mvc._
-import play.api.mvc.Results._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.concurrent.Akka.system
-import play.api.libs.json.{ Json, JsValue }
-
 import es.uvigo.esei.tfg.smartdrugsearch.annotator.Annotator
 import es.uvigo.esei.tfg.smartdrugsearch.database.DatabaseProfile
 import es.uvigo.esei.tfg.smartdrugsearch.entity.Account
-import es.uvigo.esei.tfg.smartdrugsearch.service.{ ComputeStats, DocumentStatsService }
+import es.uvigo.esei.tfg.smartdrugsearch.service.{ComputeStats, DocumentStatsService}
+import play.api.Play.current
+import play.api.libs.concurrent.Akka.system
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
+import play.api.mvc.Results._
+import play.api.mvc._
+import play.api.{Application, GlobalSettings}
+
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 trait Global extends GlobalSettings {
 
@@ -24,7 +22,7 @@ trait Global extends GlobalSettings {
   lazy val annotator     = system.actorOf(Props[Annotator], "Annotator")
   lazy val documentStats = system.actorOf(Props[DocumentStatsService], "DocumentStatsComputer")
 
-  override def onStart(app : Application) = {
+  override def onStart(app : Application) : Unit = {
     createTables(app, DatabaseProfile())
     scheduleStatsService(app)
   }
@@ -34,8 +32,8 @@ trait Global extends GlobalSettings {
 
   override def onHandlerNotFound(request : RequestHeader) =
     Future {
-      if (request.path == s"${appRoot}/")
-        MovedPermanently(s"${appRoot}")
+      if (request.path == s"$appRoot/")
+        MovedPermanently(s"$appRoot")
       else
         NotFound(Json obj ("err" -> s"Path not found: ${request.path}"))
     }
@@ -45,15 +43,15 @@ trait Global extends GlobalSettings {
 
   private def createTables(app : Application, database : DatabaseProfile) =
     database withSession { implicit session =>
-      import database.profile.simple._
       if (database.isDatabaseEmpty)    database.createTables()
       if (database.Accounts.count < 1) database.Accounts += getDefaultAdmin(app)
     }
 
-  private def scheduleStatsService(app : Application) = {
+  private def scheduleStatsService(app : Application) : Unit = {
     val delay    = app.configuration getMilliseconds "documentStats.initialDelay" map (_.milliseconds)
     val interval = app.configuration getMilliseconds "documentStats.interval"     map (_.milliseconds)
     system.scheduler.schedule(delay getOrElse 10.seconds, interval getOrElse 6.hours, documentStats, ComputeStats)
+    ()
   }
 
   private def getDefaultAdmin(app : Application) = {

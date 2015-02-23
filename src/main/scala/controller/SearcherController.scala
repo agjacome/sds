@@ -20,12 +20,10 @@ private[controller] trait SearcherController extends Controller {
     _.milliseconds.toSeconds.toInt
   ) getOrElse 1800
 
-  def search(searchTerms : Sentence, pageNumber : Position, pageSize : Size) : Cached =
-    Cached(_ => s"search($searchTerms, $pageNumber, $pageSize)", cacheTime) {
-      Action.async(searcher search (searchTerms, pageNumber, pageSize) map {
-        result => Ok(Json toJson result)
-      })
-    }
+  def search(searchTerms : Sentence, pageNumber : Position, pageSize : Size) =
+    Action.async(searcher search (searchTerms, pageNumber, pageSize) map {
+      result => Ok(Json toJson result)
+    })
 
 }
 

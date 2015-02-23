@@ -2,7 +2,6 @@ package es.uvigo.esei.tfg.smartdrugsearch.controller
 
 import scala.concurrent.duration._
 
-import play.api.cache.Cached
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
@@ -23,10 +22,8 @@ private[controller] trait DocumentsController extends Controller with Authorizat
   def list(pageNumber : Option[Position], pageSize : Option[Size]) : Action[AnyContent] =
     Action(listResult(pageNumber getOrElse 1, pageSize getOrElse 50))
 
-  def get(id : DocumentId) : Cached =
-    Cached(_ => s"documentGet($id)", cacheTime) {
-      Action(withAnnotatedDocument(id) { document => Ok(Json toJson document) })
-    }
+  def get(id : DocumentId) =
+    Action(withAnnotatedDocument(id) { document => Ok(Json toJson document) })
 
   def add : Action[JsValue] =
     AuthorizedAction(parse.json) { _ => request =>
@@ -43,7 +40,7 @@ private[controller] trait DocumentsController extends Controller with Authorizat
 
   private[this] def listResult(pageNumber : Position, pageSize : Size) =
     database withSession { implicit session =>
-      val total  = Size(Documents.count)
+      val total  = Size(Documents.count.toLong)
       val toTake = pageSize.toInt
       val toDrop = (pageNumber.toInt - 1) * toTake
       val list   = (Documents sortBy(_.id) drop toDrop take toTake).list
@@ -65,12 +62,12 @@ private[controller] trait DocumentsController extends Controller with Authorizat
       }
     }
 
-  private[this] def withDocument(id : DocumentId)(f : Document => SimpleResult) =
+  private[this] def withDocument(id : DocumentId)(f : Document => Result) =
     database withSession { implicit session =>
       (Documents findById id).firstOption map f getOrElse NotFound(Json obj ("err" -> "Document not found"))
     }
 
-  private[this] def withAnnotatedDocument(id : DocumentId)(f : AnnotatedDocument => SimpleResult) =
+  private[this] def withAnnotatedDocument(id : DocumentId)(f : AnnotatedDocument => Result) =
     withDocument(id)(document => database withSession { implicit session =>
       val as = Annotations filter (_.documentId is id)
       val ks = as join Keywords on (_.keywordId is _.id) map (_._2) groupBy identity map (_._1)

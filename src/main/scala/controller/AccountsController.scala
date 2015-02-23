@@ -40,13 +40,13 @@ private[controller] trait AccountsController extends Controller with Authorizati
     }
 
   def delete(id : AccountId) : Action[AnyContent] =
-    AuthorizedAction() { _ => _ => 
+    AuthorizedAction() { _ => _ =>
       withAccount(id)(deleteResult)
     }
 
   private[this] def listResult(pageNumber : Position, pageSize : Size) =
     database withSession { implicit session =>
-      val total  = Size(Accounts.count)
+      val total  = Size(Accounts.count.toLong)
       val toTake = pageSize.toInt
       val toDrop = (pageNumber.toInt - 1) * toTake
       val list   = (Accounts drop toDrop take toTake).list
@@ -77,7 +77,7 @@ private[controller] trait AccountsController extends Controller with Authorizati
       } else BadRequest(Json obj ("err" -> "Cannot delete all accounts"))
     }
 
-  private[this] def withAccount(id : AccountId)(f : Account => SimpleResult) =
+  private[this] def withAccount(id : AccountId)(f : Account => Result) =
     database withSession { implicit session =>
      (Accounts findById id).firstOption map f getOrElse NotFound(Json obj ("err" -> "Account not found"))
     }

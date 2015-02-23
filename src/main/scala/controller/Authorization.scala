@@ -12,14 +12,14 @@ import es.uvigo.esei.tfg.smartdrugsearch.entity._
 
 private[controller] trait Authorization { this : Controller =>
 
-  implicit final class ResultWithToken (result : SimpleResult) {
+  implicit final class ResultWithToken (result : Result) {
 
-    def addingToken(token : (String, AccountId)) : SimpleResult = {
+    def addingToken(token : (String, AccountId)) : Result = {
       Cache set (token._1, token._2, sessionTimeout)
       result withCookies Cookie(authTokenCookieKey, token._1, None, httpOnly = false)
     }
 
-    def discardingToken(token : String) : SimpleResult = {
+    def discardingToken(token : String) : Result = {
       Cache remove token
       result discardingCookies DiscardingCookie(name = authTokenCookieKey)
     }
@@ -38,25 +38,25 @@ private[controller] trait Authorization { this : Controller =>
     _.milliseconds.toSeconds.toInt
   } getOrElse 120
 
-  def TokenizedAction[A](p : BodyParser[A] = parse.anyContent)(f : Token => AccountId => Request[A] => SimpleResult) =
+  def TokenizedAction[A](p : BodyParser[A] = parse.anyContent)(f : Token => AccountId => Request[A] => Result) =
     Action(p) {
       request => withToken(request)(f)
     }
 
-  def AuthorizedAction[A](p : BodyParser[A] = parse.anyContent)(f : AccountId => Request[A] => SimpleResult) =
+  def AuthorizedAction[A](p : BodyParser[A] = parse.anyContent)(f : AccountId => Request[A] => Result) =
     Action(p) {
       request => withToken(request)(_ => f)
     }
 
-  def AuthorizedAsyncAction[A](p : BodyParser[A] = parse.anyContent)(f : AccountId => Request[A] => Future[SimpleResult]) =
+  def AuthorizedAsyncAction[A](p : BodyParser[A] = parse.anyContent)(f : AccountId => Request[A] => Future[Result]) =
     Action.async(p) {
       request => withAsyncToken(request)(_ => f)
     }
 
-  private[this] def withToken[A](request : Request[A])(f : Token => AccountId => Request[A] => SimpleResult) =
+  private[this] def withToken[A](request : Request[A])(f : Token => AccountId => Request[A] => Result) =
     tokenized(request)(f)(Unauthorized(Json obj ("err" -> "No authorization token")))
 
-  private[this] def withAsyncToken[A](request : Request[A])(f : Token => AccountId => Request[A] => Future[SimpleResult]) =
+  private[this] def withAsyncToken[A](request : Request[A])(f : Token => AccountId => Request[A] => Future[Result]) =
     tokenized(request)(f)(Future { Unauthorized(Json obj ("err" -> "No authorization token")) })
 
   private[this] def tokenized[A, B](request : Request[A])(map : Token => AccountId => Request[A] => B)(orElse : B) =

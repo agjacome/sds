@@ -1,7 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.annotator
 
 import scala.collection.concurrent.TrieMap
-import scala.concurrent.duration._
 import akka.actor._
 
 import play.api.{ Configuration, Logger }
@@ -65,7 +64,7 @@ private[annotator] trait AnnotatorBase extends Actor {
   private[this] def findDocumentKeywords(documentId : DocumentId)(implicit session : Session) =
     (Annotations filter (_.documentId is documentId) flatMap {
       a => Keywords filter (_.id is a.keywordId)
-    } groupBy identity map { case (k, ks) => k.id -> (k.occurrences, ks.length) }).list
+    } groupBy identity map { case (k, ks) => (k.id, (k.occurrences, ks.length)) }).list
 
 }
 
@@ -109,14 +108,16 @@ private[annotator] class AnnotatorImpl extends AnnotatorBase {
 
   override protected def annotate(sender : ActorRef, documentId : DocumentId) = {
     markBlocked(documentId, true)
-    completed += (documentId -> (0, false))
+    completed += ((documentId, (0, false)))
     annotators foreach (_ ! Annotate(documentId))
   }
 
-  override protected def finished(sender : ActorRef, documentId : DocumentId) =
-    if (hasCompleted(documentId)) wrapUp(documentId) else {
+  override protected def finished(sender : ActorRef, documentId : DocumentId) : Unit =
+    if (hasCompleted(documentId))
+      wrapUp(documentId)
+    else {
       val (counter, failed) = completed(documentId)
-      completed update (documentId, (counter + 1, failed))
+      completed update(documentId, (counter + 1, failed))
     }
 
   override protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) =
@@ -125,12 +126,13 @@ private[annotator] class AnnotatorImpl extends AnnotatorBase {
       completed update (documentId, (counter + 1, true))
     }
 
-  private[this] def wrapUp(documentId : DocumentId) = {
+  private[this] def wrapUp(documentId : DocumentId) : Unit = {
     if (hasFailed(documentId)) deleteAnnotations(documentId) else {
       markAnnotated(documentId, true)
       markBlocked(documentId, false)
     }
     completed -= documentId
+    ()
   }
 
   private[this] def hasCompleted(documentId : DocumentId) =

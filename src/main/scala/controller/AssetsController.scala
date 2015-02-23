@@ -1,5 +1,6 @@
 package es.uvigo.esei.tfg.smartdrugsearch.controller
 
+import play.api.http.LazyHttpErrorHandler
 import controllers._
 
 // These objects exist for the sole purpose of redefining the Assets and
@@ -9,6 +10,6 @@ import controllers._
 // "es.uvigo.esei.tfg.smartdrugsearch.controller" in both the routes
 // configuration file and in the views a removed.
 
-object AssetsController       extends AssetsBuilder
+object AssetsController       extends AssetsBuilder(LazyHttpErrorHandler)
 object WebJarAssetsController extends WebJarAssets(Assets)
 
