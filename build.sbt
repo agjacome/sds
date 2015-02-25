@@ -37,16 +37,16 @@ libraryDependencies ++= Seq(
   // NER Tools
   "abner"                     % "abner"      % "1.5" ,
   "hu.u_szeged.rgai.bio.uima" % "linnaeus"   % "2.0" ,
-  "uk.ac.cam.ch.wwmm.oscar"   % "oscar4-api" % "4.2.2" exclude("org.slf4j", "slf4j-simple") exclude("com.google.guava", "guava") ,
-  "pt.ua.tm"                  % "gimli"      % "1.0.2" exclude("opennlp", "tools") ,
+  "uk.ac.cam.ch.wwmm.oscar"   % "oscar4-api" % "4.2.2" exclude("org.slf4j", "slf4j-simple")  exclude("com.google.guava", "guava") ,
+  "pt.ua.tm"                  % "gimli"      % "1.0.2" exclude("org.slf4j", "slf4j-log4j12") exclude("opennlp", "tools") ,
 
   // core java/scala
   "com.typesafe.akka"       %% "akka-actor"      % "2.3.9"    ,
-  "com.typesafe.slick"      %% "slick"           % "2.1.0"    ,
   "org.webjars"             %% "webjars-play"    % "2.4.0-M2" ,
-  "com.typesafe.play"       %% "play-slick"      % "0.9.0-M3" ,
   "com.typesafe.play"       %% "play-jdbc"       % "2.4.0-M2" ,
   "com.typesafe.play"       %% "play-cache"      % "2.4.0-M2" ,
+  "com.typesafe.slick"      %% "slick"           % "2.1.0"    ,
+  "com.typesafe.play"       %% "play-slick"      % "0.9.0-M3" ,
   "com.github.t3hnar"       %% "scala-bcrypt"    % "2.4"      ,
   "org.jsoup"               %  "jsoup"           % "1.8.1"    ,
   "net.databinder.dispatch" %% "dispatch-core"   % "0.11.2"   ,
@@ -76,6 +76,7 @@ import TwirlKeys._
 
 lazy val sds = (project in file(".")).enablePlugins(PlayScala, SbtWeb).settings(scalaxbSettings : _*).settings(
 
+
   sourceDirectory in Compile := baseDirectory.value / "src/main" ,
   sourceDirectory in Test    := baseDirectory.value / "src/test" ,
 
@@ -88,7 +89,7 @@ lazy val sds = (project in file(".")).enablePlugins(PlayScala, SbtWeb).settings(
   resourceDirectory in Compile := (sourceDirectory in Compile).value / "resources" ,
   resourceDirectory in Test    := (sourceDirectory in    Test).value / "resources" ,
 
-  confDirectory := (resourceDirectory in Compile).value / "conf" ,
+  confDirectory := (resourceDirectory in Compile).value ,
 
   sourceDirectory in (Compile, compileTemplates) := (sourceDirectory in Compile).value / "twirl" ,
 

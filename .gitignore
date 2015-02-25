@@ -10,7 +10,7 @@ project/*
 !project/plugins.sbt
 
 src/main/resources/*
-!src/main/resources/conf
+!src/main/resources/*conf
 !src/main/resources/linnaeus.tar.lzma
 !src/main/resources/abner.tar.lzma
 !src/main/resources/wsdl
