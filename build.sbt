@@ -12,14 +12,16 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-language:postfixOps",
   "-unchecked",
+  // "-Xfatal-warnings",
   "-Xfuture",
   "-Xlint",
+  // "-Yno-adapted-args",
+  // "-Yno-imports",
+  // "-Yno-predef",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard"
-  // "-Ywarn-unused-import" // play's auto-imports on twirl and routes
-  // "-Yno-adapted-args",   // not respected by scalaxb
-  // "-Xfatal-warnings",    // scalaxb generated code emits warnings
+  // "-Ywarn-unused-import"
 )
 
 resolvers ++= Seq(
@@ -75,7 +77,6 @@ import ScalaxbKeys._
 import TwirlKeys._
 
 lazy val sds = (project in file(".")).enablePlugins(PlayScala, SbtWeb).settings(scalaxbSettings : _*).settings(
-
 
   sourceDirectory in Compile := baseDirectory.value / "src/main" ,
   sourceDirectory in Test    := baseDirectory.value / "src/test" ,
