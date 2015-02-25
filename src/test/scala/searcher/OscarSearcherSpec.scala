@@ -20,8 +20,8 @@ class OscarSearcherSpec extends BaseSpec {
     (
       Document(Some(1), "test document", "Then we mix benzene with napthyridine and toluene"),
       Set(
-        Keyword(Some(1), "InChI=1/C6H6/c1-2-4-6-5-3-1/h1-6H",       Compound, 1),
-        Keyword(Some(2), "InChI=1/C7H8/c1-7-5-3-2-4-6-7/h2-6H,1H3", Compound, 1)
+        Keyword(Some(1), "InChI=1S/C6H6/c1-2-4-6-5-3-1/h1-6H",       Compound, 1),
+        Keyword(Some(2), "InChI=1S/C7H8/c1-7-5-3-2-4-6-7/h2-6H,1H3", Compound, 1)
       ),
       Set(
         Annotation(Some(1), 1, 1, "benzene", 12, 19),

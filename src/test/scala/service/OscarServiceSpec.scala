@@ -39,8 +39,8 @@ class OscarServiceSpec extends BaseSpec {
 
     "should be able to normalize a NamedEntity into its INCHI representation" in new WithApplication {
       forAll(entityNormalized) { (entity : ResolvedNamedEntity, normalized : Sentence) =>
-        when(entity getFirstChemicalStructure FormatType.INCHI) thenReturn new ChemicalStructure(
-          normalized.toString, FormatType.INCHI, null
+        when(entity getFirstChemicalStructure FormatType.STD_INCHI) thenReturn new ChemicalStructure(
+          normalized.toString, FormatType.STD_INCHI, null
         )
         oscar normalize entity should equal (normalized)
       }

@@ -31,13 +31,13 @@ class AnnotatorSpec extends ActorBaseSpec {
         )
       ),
       Set(
-        (Sentence("orexin B"),                                       Protein,  Size(1)),
-        (Sentence("LL-37"),                                          Protein,  Size(2)),
-        (Sentence("ORXB or VIPalone"),                               DNA,      Size(1)),
-        (Sentence("ORXB"),                                           Protein,  Size(2)),
-        (Sentence("Pseudomonas aeruginosa"),                         Species,  Size(1)),
-        (Sentence("Staphylococcus aureus"),                          Species,  Size(1)),
-        (Sentence("InChI=1/ClH.Na/h1H;/q;+1/p-1/fCl.Na/h1h;/q-1;m"), Compound, Size(2))
+        (Sentence("orexin B"),                      Protein,  Size(1)),
+        (Sentence("LL-37"),                         Protein,  Size(2)),
+        (Sentence("ORXB or VIPalone"),              DNA,      Size(1)),
+        (Sentence("ORXB"),                          Protein,  Size(2)),
+        (Sentence("Pseudomonas aeruginosa"),        Species,  Size(1)),
+        (Sentence("Staphylococcus aureus"),         Species,  Size(1)),
+        (Sentence("InChI=1S/ClH.Na/h1H;/q;+1/p-1"), Compound, Size(2))
       ),
       Set(
         (Sentence("orexin B"),               Position( 55), Position( 63)),

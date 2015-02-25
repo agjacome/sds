@@ -3,8 +3,6 @@ package es.uvigo.ei.sing.sds.entity
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 
-import es.uvigo.ei.sing.sds.macros.SealedValues
-
 object Generators {
 
   lazy val nonEmptyStringGenerator = Gen.alphaStr suchThat {
@@ -27,7 +25,7 @@ object Generators {
   lazy val keywordTupleGenerator = for {
     id          <- arbitrary[Option[Long]] map (_ map KeywordId)
     normalized  <- nonEmptyStringGenerator map Sentence
-    category    <- Gen.oneOf(SealedValues.from[Category].toSeq)
+    category    <- Gen.oneOf(Seq(Compound, Drug, Gene, Protein, Species, DNA, RNA, CellLine, CellType))
     occurrences <- Gen.choose(0, Long.MaxValue) map Size
   } yield (id, normalized, category, occurrences)
 
