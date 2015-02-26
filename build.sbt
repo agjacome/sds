@@ -1,6 +1,6 @@
 name         := "sds"
 organization := "es.uvigo.ei.sing"
-version      := "1.0"
+version      := "1.0.1"
 
 scalaVersion  := "2.11.5"
 scalacOptions ++= Seq(
