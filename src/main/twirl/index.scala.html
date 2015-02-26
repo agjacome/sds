@@ -1,21 +1,22 @@
 @()<!doctype html>
 <html lang="en">
 <head>
-    @import play.api.Play.{ current => app }
-    @import org.webjars.RequireJS
+    @import play.api.Play.current
     @import es.uvigo.ei.sing.sds.controller._
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <base href="@app.configuration.getString("application.context").getOrElse("")/" >
+    <base href="@current.configuration.getString("application.context").getOrElse("")/" >
 
     <title data-ng-bind="pageTitle"></title>
 
-    <link rel="shortcut icon" type="image/png" href="@routes.AssetsController.at("image/favicon.png")">
+    <link rel="shortcut icon" type="image/png" href="@routes.AssetsController.versioned("image/favicon.png")">
 
-    <link rel="stylesheet" media="all" href="@routes.WebJarAssetsController.at(WebJarAssetsController.locate("bootstrap.min.css"))" />
-    <link rel="stylesheet" media="all" href="@routes.WebJarAssetsController.at(WebJarAssetsController.locate("font-awesome.min.css"))" />
-    <link rel="stylesheet" media="all" href="@routes.AssetsController.at("style/main.css")">
+    <link rel="stylesheet" media="all" href="@routes.AssetsController.versioned("lib/bootstrap/css/bootstrap.css")" />
+    <link rel="stylesheet" media="all" href="@routes.AssetsController.versioned("lib/font-awesome/css/font-awesome.css")" />
+    <link rel="stylesheet" media="all" href="@routes.AssetsController.versioned("style/main.css")">
+
+    <script data-main="@routes.AssetsController.versioned("script/main.js")" type="text/javascript" src="@routes.AssetsController.versioned("lib/requirejs/require.js")"></script>
 
     @Html("""
     <!-- http://trentwalton.com/2013/01/16/windows-phone-8-viewport-fix/ -->
@@ -37,10 +38,7 @@
         <div data-ng-view></div>
     </div>
     <div class="footer">
-        <div data-ng-include='"@routes.AssetsController.at("template/footer.html")"'></div>
+        <div data-ng-include='"@routes.AssetsController.versioned("template/footer.html")"'></div>
     </div>
-
-    <script>@Html(RequireJS.getSetupJavaScript(routes.WebJarAssetsController.at("").url, null))</script>
-    <script data-main="@routes.AssetsController.at("script/main")" src="@routes.WebJarAssetsController.at(WebJarAssetsController.locate("require.min.js"))"></script>
 </body>
 </html>
