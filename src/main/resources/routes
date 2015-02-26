@@ -28,7 +28,6 @@ POST    /api/annotator/annotate         es.uvigo.ei.sing.sds.controller.Annotato
 GET     /api/provider/pubmed/search     es.uvigo.ei.sing.sds.controller.PubMedProviderController.search(query : es.uvigo.ei.sing.sds.entity.Sentence, limit : Option[es.uvigo.ei.sing.sds.entity.Size], page : es.uvigo.ei.sing.sds.entity.Position, count : es.uvigo.ei.sing.sds.entity.Size)
 POST    /api/provider/pubmed/download   es.uvigo.ei.sing.sds.controller.PubMedProviderController.download
 
-GET     /assets/*file                   es.uvigo.ei.sing.sds.controller.AssetsController.at(path = "/src/main/assets", file)
-GET     /webjars/*file                  es.uvigo.ei.sing.sds.controller.WebJarAssetsController.at(file)
+GET     /assets/*file                   es.uvigo.ei.sing.sds.controller.AssetsController.versioned(path = "/public", file: Asset)
 
 GET     /*any                           es.uvigo.ei.sing.sds.controller.ApplicationController.index(any)
