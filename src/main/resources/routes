@@ -1,0 +1,34 @@
+# Routes configuration file
+
+GET     /                               es.uvigo.ei.sing.sds.controller.ApplicationController.index(any : String = "none")
+GET     /*path/                         es.uvigo.ei.sing.sds.controller.ApplicationController.untrail(path)
+
+POST    /api/login                      es.uvigo.ei.sing.sds.controller.ApplicationController.login
+POST    /api/logout                     es.uvigo.ei.sing.sds.controller.ApplicationController.logout
+GET     /api/auth_ping                  es.uvigo.ei.sing.sds.controller.ApplicationController.authPing
+
+GET     /api/account                    es.uvigo.ei.sing.sds.controller.AccountsController.list(page : Option[es.uvigo.ei.sing.sds.entity.Position], count : Option[es.uvigo.ei.sing.sds.entity.Size])
+GET     /api/account/:id                es.uvigo.ei.sing.sds.controller.AccountsController.get(id : es.uvigo.ei.sing.sds.entity.AccountId)
+POST    /api/account                    es.uvigo.ei.sing.sds.controller.AccountsController.add
+PUT     /api/account/:id                es.uvigo.ei.sing.sds.controller.AccountsController.edit(id : es.uvigo.ei.sing.sds.entity.AccountId)
+DELETE  /api/account/:id                es.uvigo.ei.sing.sds.controller.AccountsController.delete(id : es.uvigo.ei.sing.sds.entity.AccountId)
+
+GET     /api/document                   es.uvigo.ei.sing.sds.controller.DocumentsController.list(page : Option[es.uvigo.ei.sing.sds.entity.Position], count : Option[es.uvigo.ei.sing.sds.entity.Size])
+GET     /api/document/:id               es.uvigo.ei.sing.sds.controller.DocumentsController.get(id : es.uvigo.ei.sing.sds.entity.DocumentId)
+POST    /api/document                   es.uvigo.ei.sing.sds.controller.DocumentsController.add
+DELETE  /api/document/:id               es.uvigo.ei.sing.sds.controller.DocumentsController.delete(id : es.uvigo.ei.sing.sds.entity.DocumentId)
+
+GET     /api/keyword/:id                es.uvigo.ei.sing.sds.controller.KeywordsController.get(id : es.uvigo.ei.sing.sds.entity.KeywordId)
+GET     /api/annotation/:id             es.uvigo.ei.sing.sds.controller.AnnotationsController.get(id : es.uvigo.ei.sing.sds.entity.AnnotationId)
+
+GET     /api/search                     es.uvigo.ei.sing.sds.controller.SearcherController.search(query : es.uvigo.ei.sing.sds.entity.Sentence, page : es.uvigo.ei.sing.sds.entity.Position, count : es.uvigo.ei.sing.sds.entity.Size)
+
+POST    /api/annotator/annotate         es.uvigo.ei.sing.sds.controller.AnnotatorController.annotate
+
+GET     /api/provider/pubmed/search     es.uvigo.ei.sing.sds.controller.PubMedProviderController.search(query : es.uvigo.ei.sing.sds.entity.Sentence, limit : Option[es.uvigo.ei.sing.sds.entity.Size], page : es.uvigo.ei.sing.sds.entity.Position, count : es.uvigo.ei.sing.sds.entity.Size)
+POST    /api/provider/pubmed/download   es.uvigo.ei.sing.sds.controller.PubMedProviderController.download
+
+GET     /assets/*file                   es.uvigo.ei.sing.sds.controller.AssetsController.at(path = "/src/main/assets", file)
+GET     /webjars/*file                  es.uvigo.ei.sing.sds.controller.WebJarAssetsController.at(file)
+
+GET     /*any                           es.uvigo.ei.sing.sds.controller.ApplicationController.index(any)

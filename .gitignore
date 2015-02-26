@@ -1,23 +1,20 @@
-dev_run.sh
-prod_run.sh
-
-.cache
-.classpath
-.idea
-.project
-.target
-.settings
+*.sh
+*.class
+*.cache
 
 logs
+target
 project/*
 !project/build.properties
 !project/Build.scala
 !project/plugins.sbt
-target
 
 src/main/resources/*
-!src/main/resources/.gitkeep
+!src/main/resources/routes
+!src/main/resources/*conf
 !src/main/resources/linnaeus.tar.lzma
 !src/main/resources/abner.tar.lzma
 !src/main/resources/wsdl
 !src/main/resources/xsd
+
+.idea
