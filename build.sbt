@@ -94,7 +94,7 @@ lazy val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbS
 
   sourceDirectory in (Compile, compileTemplates) := (sourceDirectory in Compile).value / "twirl" ,
 
-  unmanagedResourceDirectories in Assets := Seq((sourceDirectory in Compile).value / "assets") ,
+  sourceDirectory in Assets := (sourceDirectory in Compile).value / "assets" ,
   pipelineStages := Seq(rjs, digest, gzip) ,
 
   dispatchVersion  in (Compile, scalaxb) := "0.11.2" ,

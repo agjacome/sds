@@ -8,7 +8,7 @@
         height          : 57px;
         max-width       : 407px;
         margin          : 0 auto;
-        background      : url("../image/logo-small.png") no-repeat center bottom;
+        background      : url("../img/logo-small.png") no-repeat center bottom;
         background-size : contain;
     }
 }
