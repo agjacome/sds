@@ -44,7 +44,6 @@ libraryDependencies ++= Seq(
 
   // core java/scala
   "com.typesafe.akka"       %% "akka-actor"      % "2.3.9"    ,
-  "org.webjars"             %% "webjars-play"    % "2.4.0-M2" ,
   "com.typesafe.play"       %% "play-jdbc"       % "2.4.0-M2" ,
   "com.typesafe.play"       %% "play-cache"      % "2.4.0-M2" ,
   "com.typesafe.slick"      %% "slick"           % "2.1.0"    ,
@@ -58,11 +57,12 @@ libraryDependencies ++= Seq(
   "org.mariadb.jdbc" %  "mariadb-java-client"  % "1.1.7"  ,
 
   // css/javascript
-  "org.webjars" % "angularjs"            % "1.2.16-2" exclude("org.webjars", "jquery") ,
-  "org.webjars" % "bootstrap"            % "3.1.1-1"  exclude("org.webjars", "jquery") ,
-  "org.webjars" % "jquery"               % "1.9.1"   ,
-  "org.webjars" % "underscorejs"         % "1.7.0"   ,
-  "org.webjars" % "angular-ui-bootstrap" % "0.12.0"  ,
+  "org.webjars" % "angularjs"            % "1.3.13"  exclude("org.webjars", "jquery") ,
+  "org.webjars" % "bootstrap"            % "3.1.1-2" exclude("org.webjars", "jquery") ,
+  "org.webjars" % "jquery"               % "1.11.2"  ,
+  "org.webjars" % "underscorejs"         % "1.7.0-1" ,
+  "org.webjars" % "requirejs"            % "2.1.16"  ,
+  "org.webjars" % "angular-ui-bootstrap" % "0.12.1"  ,
   "org.webjars" % "font-awesome"         % "4.3.0-1" ,
 
   // testing
@@ -76,7 +76,7 @@ import PlayKeys._
 import ScalaxbKeys._
 import TwirlKeys._
 
-lazy val sds = (project in file(".")).enablePlugins(PlayScala, SbtWeb).settings(scalaxbSettings : _*).settings(
+lazy val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbSettings : _*).settings(
 
   sourceDirectory in Compile := baseDirectory.value / "src/main" ,
   sourceDirectory in Test    := baseDirectory.value / "src/test" ,
