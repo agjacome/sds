@@ -93,6 +93,7 @@ lazy val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbS
   confDirectory := (resourceDirectory in Compile).value ,
 
   sourceDirectory in (Compile, compileTemplates) := (sourceDirectory in Compile).value / "twirl" ,
+  templateImports += "es.uvigo.ei.sing.sds.controller._" ,
 
   sourceDirectory in Assets := (sourceDirectory in Compile).value / "assets" ,
   pipelineStages := Seq(rjs, digest, gzip) ,

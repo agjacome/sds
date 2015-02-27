@@ -1,16 +1,15 @@
-@()<!doctype html>
+@(baseRef: String)
+<!doctype html>
 <html lang="en">
 <head>
-    @import play.api.Play.current
-    @import es.uvigo.ei.sing.sds.controller._
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <base href="@current.configuration.getString("application.context").getOrElse("")/" >
+    <base href="@baseRef">
 
     <title data-ng-bind="pageTitle"></title>
 
-    <link rel="shortcut icon" type="image/png" href="@routes.AssetsController.versioned("image/favicon.png")">
+    <link rel="shortcut icon" type="image/png" href="@routes.AssetsController.versioned("img/favicon.png")">
 
     <link rel="stylesheet" media="screen" href="@routes.AssetsController.versioned("lib/bootstrap/css/bootstrap.min.css")" />
     <link rel="stylesheet" media="screen" href="@routes.AssetsController.versioned("lib/font-awesome/css/font-awesome.min.css")" />

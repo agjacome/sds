@@ -1,32 +1,30 @@
 package es.uvigo.ei.sing.sds.controller
 
-import play.api.Play.current
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
+import play.api.Play.current
 import play.twirl.api.Content
 
 import es.uvigo.ei.sing.sds.database.DatabaseProfile
 import es.uvigo.ei.sing.sds.entity._
+import es.uvigo.ei.sing.sds.Global
 
 private[controller] trait ApplicationController extends Controller with Authorization {
 
-  lazy val appRoot   = current.configuration.getString("application.context").getOrElse("")
   lazy val database  = DatabaseProfile()
 
   import database._
   import database.profile.simple._
 
-  def index(any : String) : Action[AnyContent] =
-    Action {
-      Ok(twirl.html.index())
-    }
+  def index(path: String): Action[AnyContent] = Action {
+    Ok(twirl.html.index(Global.context))
+  }
 
-  def untrail(path : String) : Action[AnyContent] =
-    Action {
-      MovedPermanently(s"${appRoot}/${path}")
-    }
+  def untrail(path: String): Action[AnyContent] = Action {
+    MovedPermanently(s"${Global.context}$path")
+  }
 
-  def login : Action[JsValue] =
+  def login: Action[JsValue] =
     Action(parse.json) { request =>
       Account.form bind request.body fold (
         errors  => BadRequest(Json obj ("err" -> errors.errorsAsJson)),
@@ -72,4 +70,3 @@ private[controller] trait ApplicationController extends Controller with Authoriz
 }
 
 object ApplicationController extends ApplicationController
-

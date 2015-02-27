@@ -1,66 +1,73 @@
 package es.uvigo.ei.sing.sds
 
+import scala.concurrent.duration._
+import scala.concurrent.Future
+
 import akka.actor._
-import es.uvigo.ei.sing.sds.annotator.Annotator
-import es.uvigo.ei.sing.sds.database.DatabaseProfile
-import es.uvigo.ei.sing.sds.entity.Account
-import es.uvigo.ei.sing.sds.service.{ComputeStats, DocumentStatsService}
-import play.api.Play.current
-import play.api.libs.concurrent.Akka.system
+
+import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.mvc.Results._
-import play.api.mvc._
-import play.api.{Application, GlobalSettings}
+import play.api.mvc.{ RequestHeader, Result }
+import play.api.Play.{ current => app }
+import play.api.{ Application, GlobalSettings, Logger, Play }
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
+import es.uvigo.ei.sing.sds.annotator.Annotator
+import es.uvigo.ei.sing.sds.database.DatabaseProfile
+import es.uvigo.ei.sing.sds.entity.Account
+import es.uvigo.ei.sing.sds.service.{ DocumentStatsService, ComputeStats }
 
-trait Global extends GlobalSettings {
 
-  lazy val appRoot       = current.configuration.getString("application.context").getOrElse("")
-  lazy val annotator     = system.actorOf(Props[Annotator], "Annotator")
-  lazy val documentStats = system.actorOf(Props[DocumentStatsService], "DocumentStatsComputer")
+object Global extends GlobalSettings {
 
-  override def onStart(app : Application) : Unit = {
-    createTables(app, DatabaseProfile())
-    scheduleStatsService(app)
+  lazy val annotator: ActorRef =
+    Akka.system.actorOf(Props[Annotator], "annotator")
+
+  lazy val statsService: ActorRef =
+    Akka.system.actorOf(Props[DocumentStatsService], "stats_service")
+
+  lazy val statsSchedule: Cancellable = {
+    val delay    = app.configuration.getMilliseconds("stats.initialDelay").get.milliseconds
+    val interval = app.configuration.getMilliseconds("stats.interval"    ).get.milliseconds
+    Akka.system.scheduler.schedule(delay, interval, statsService, ComputeStats)
   }
 
-  override def onError(request : RequestHeader, error : Throwable) =
-    Future { InternalServerError(Json obj ("err" -> s"Server Error: ${error.getMessage}")) }
+  def context: String = {
+    val path = app.configuration.getString("play.http.context").get
+    if (path endsWith "/") path else path + "/"
+  }
 
-  override def onHandlerNotFound(request : RequestHeader) =
-    Future {
-      if (request.path == s"$appRoot/")
-        MovedPermanently(s"$appRoot")
-      else
-        NotFound(Json obj ("err" -> s"Path not found: ${request.path}"))
-    }
+  def defaultAdmin: Account = {
+    val mail = app.configuration.getString("application.admin.email").get
+    val pass = app.configuration.getString("application.admin.pass" ).get
+    Account(None, mail, pass)
+  }
 
-  override def onBadRequest(request : RequestHeader, error : String) =
-    Future { BadRequest(Json obj ("err" -> s"Bad Request: $error")) }
-
-  private def createTables(app : Application, database : DatabaseProfile) =
+  def createDatabase(database: DatabaseProfile): Unit =
     database withSession { implicit session =>
-      if (database.isDatabaseEmpty)    database.createTables()
-      if (database.Accounts.count < 1) database.Accounts += getDefaultAdmin(app)
+      if (database.isDatabaseEmpty) {
+        database.createTables()
+        database.Accounts += defaultAdmin
+        Logger.info(s"Created database tables and admin account ${defaultAdmin.email}")
+      }
     }
 
-  private def scheduleStatsService(app : Application) : Unit = {
-    val delay    = app.configuration getMilliseconds "documentStats.initialDelay" map (_.milliseconds)
-    val interval = app.configuration getMilliseconds "documentStats.interval"     map (_.milliseconds)
-    system.scheduler.schedule(delay getOrElse 10.seconds, interval getOrElse 6.hours, documentStats, ComputeStats)
-    ()
+  override def onStart(app: Application): Unit = createDatabase(DatabaseProfile())
+
+  override def onError(request: RequestHeader, err: Throwable): Future[Result] = Future {
+    InternalServerError(Json obj ("err" -> s"Server Error: ${err.getMessage}"))
   }
 
-  private def getDefaultAdmin(app : Application) = {
-    val email = app.configuration getString "application.admin.email" getOrElse "admin@smartdrugsearch"
-    val passw = app.configuration getString "application.admin.pass"  getOrElse "$2a$10$1nvpfxRdbsmmEms4O/YN9u.Evxm1eihFhB9bLm4Mzy71kbvkjgNpO"
-    Account(None, email, passw)
+  override def onHandlerNotFound(request: RequestHeader): Future[Result] = Future {
+    if (request.path == context)
+      MovedPermanently(request.path dropRight 1)
+    else
+      NotFound(Json obj ("err" -> s"Path not found: ${request.path}"))
+  }
+
+  override def onBadRequest(request : RequestHeader, error : String): Future[Result] = Future {
+    BadRequest(Json obj ("err" -> s"Bad Request: $error"))
   }
 
 }
-
-object Global extends Global
-
