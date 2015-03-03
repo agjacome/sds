@@ -26,9 +26,9 @@ class SimpleSearcher extends SearcherAdapter {
   private[this] def searchInAnnotationTexts(searchPattern: String): Seq[Keyword] =
     database withSession { implicit session =>
       sql"""
-        SELECT DISTINCT keyword_id, normalized_text, category, counter
-        FROM annotations NATURAL JOIN keywords
-        WHERE original_text LIKE $searchPattern
+        SELECT DISTINCT k.keyword_id, k.normalized_text, k.category, k.counter
+        FROM annotations a, keywords k
+        WHERE original_text LIKE $searchPattern AND a.keyword_id = k.keyword_id
       """.as[Keyword].list
     }
 
