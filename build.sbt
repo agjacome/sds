@@ -51,10 +51,9 @@ libraryDependencies ++= Seq(
   "com.github.t3hnar"       %% "scala-bcrypt"    % "2.4"      ,
   "org.jsoup"               %  "jsoup"           % "1.8.1"    ,
   "net.databinder.dispatch" %% "dispatch-core"   % "0.11.2"   ,
-
+  //
   // database connectors
-  "mysql"            %  "mysql-connector-java" % "5.1.34" ,
-  "org.mariadb.jdbc" %  "mariadb-java-client"  % "1.1.7"  ,
+  "mysql" % "mysql-connector-java" % "5.1.34" ,
 
   // css/javascript
   "org.webjars" % "angularjs"            % "1.3.13"  exclude("org.webjars", "jquery") ,
