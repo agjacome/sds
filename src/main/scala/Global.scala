@@ -21,17 +21,11 @@ import es.uvigo.ei.sing.sds.service.{ DocumentStatsService, ComputeStats }
 
 object Global extends GlobalSettings {
 
-  lazy val annotator: ActorRef =
-    Akka.system.actorOf(Props[Annotator], "annotator")
+  val annotator    = Akka.system.actorOf(Props[Annotator], "annotator")
+  val statsService = Akka.system.actorOf(Props[DocumentStatsService], "stats_service")
 
-  lazy val statsService: ActorRef =
-    Akka.system.actorOf(Props[DocumentStatsService], "stats_service")
-
-  lazy val statsSchedule: Cancellable = {
-    val delay    = app.configuration.getMilliseconds("stats.initialDelay").get.milliseconds
-    val interval = app.configuration.getMilliseconds("stats.interval"    ).get.milliseconds
-    Akka.system.scheduler.schedule(delay, interval, statsService, ComputeStats)
-  }
+  // TODO: replace mutable var with immutable counterpart
+  var statsSchedule: Cancellable = _
 
   def context: String = {
     val path = app.configuration.getString("play.http.context").get
@@ -53,7 +47,16 @@ object Global extends GlobalSettings {
       }
     }
 
-  override def onStart(app: Application): Unit = createDatabase(DatabaseProfile())
+  def scheduleStats(): Cancellable = {
+    val delay    = app.configuration.getMilliseconds("stats.initialDelay").get.milliseconds
+    val interval = app.configuration.getMilliseconds("stats.interval"    ).get.milliseconds
+    Akka.system.scheduler.schedule(delay, interval, statsService, ComputeStats)
+  }
+
+  override def onStart(app: Application): Unit = {
+    createDatabase(DatabaseProfile())
+    this.statsSchedule = scheduleStats()
+  }
 
   override def onError(request: RequestHeader, err: Throwable): Future[Result] = Future {
     InternalServerError(Json obj ("err" -> s"Server Error: ${err.getMessage}"))
