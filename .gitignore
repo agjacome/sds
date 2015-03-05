@@ -2,6 +2,8 @@
 *.class
 *.cache
 
+doc
+
 logs
 target
 project/*
