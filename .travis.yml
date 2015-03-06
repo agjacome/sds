@@ -1,13 +1,12 @@
 language: scala
 scala:
-  - 2.11.4
-  - 2.11.5
+  - 2.11.6
 jdk:
   - oraclejdk7
-  - openjdk7
 before_script:
   - tar -C src/main/resources --lzma -xvf src/main/resources/linnaeus.tar.lzma
   - tar -C src/main/resources --lzma -xvf src/main/resources/abner.tar.lzma
+  - rm -vf src/main/resources/*lzma
 notifications:
   email:
     recipients:
