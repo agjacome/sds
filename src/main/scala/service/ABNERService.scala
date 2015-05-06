@@ -13,8 +13,13 @@ class ABNERService private {
 
   import ABNERService.abner
 
+  // TODO: currently ignoring ABNER errors, lots of NullPointerException and
+  // ArrayIndexOutOfBounds that are internal to the tool, and cannot be fixed in
+  // here. Try to think of some cleaner way of handling this.
   def getEntities(text : String)(implicit ec : ExecutionContext) : Future[Set[ABNEREntity]] =
-    Future(abner getEntities text) map {
+    Future {
+      try (abner.getEntities(text)) catch { case _: Throwable => Array.empty }
+    } map {
       case Array(entities, categories) => createEntities(entities zip (categories map toCategory), text)
     }
 
