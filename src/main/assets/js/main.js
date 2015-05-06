@@ -16,7 +16,9 @@
             'bootstrap'         : ['../lib/bootstrap/js/bootstrap'],
             'underscore'        : ['../lib/underscorejs/underscore'],
             'ui-bootstrap'      : ['../lib/angular-ui-bootstrap/ui-bootstrap'],
-            'ui-bootstrap-tpls' : ['../lib/angular-ui-bootstrap/ui-bootstrap-tpls']
+            'ui-bootstrap-tpls' : ['../lib/angular-ui-bootstrap/ui-bootstrap-tpls'],
+            'sigma'             : ['../lib/sigma.js/sigma.min'],
+            'sigma-json'        : ['../lib/sigma.js/plugins/sigma.parsers.json.min']
         },
         shim: {
             'angular'           : { deps: ['jquery'], exports: 'angular' },
@@ -26,6 +28,7 @@
             'bootstrap'         : ['jquery'],
             'ui-bootstrap'      : ['bootstrap', 'angular'],
             'ui-bootstrap-tpls' : ['bootstrap', 'angular'],
+            'sigma-json'        : ['sigma'],
         }
     });
 
@@ -34,6 +37,8 @@
         'jquery',
         'underscore',
         'bootstrap',
+        'sigma',
+        'sigma-json',
         './app',
         './routes',
         './util'

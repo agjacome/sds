@@ -51,7 +51,7 @@ libraryDependencies ++= Seq(
   "com.github.t3hnar"       %% "scala-bcrypt"    % "2.4"      ,
   "org.jsoup"               %  "jsoup"           % "1.8.1"    ,
   "net.databinder.dispatch" %% "dispatch-core"   % "0.11.2"   ,
-  //
+
   // database connectors
   "mysql" % "mysql-connector-java" % "5.1.34" ,
 
@@ -63,6 +63,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "requirejs"            % "2.1.16"  ,
   "org.webjars" % "angular-ui-bootstrap" % "0.12.1"  ,
   "org.webjars" % "font-awesome"         % "4.3.0-1" ,
+  "org.webjars" % "sigma.js"             % "1.0.3"   ,
 
   // testing
   "org.scalatest"     %% "scalatest"    % "2.2.4"   % "test" ,
