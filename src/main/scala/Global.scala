@@ -21,8 +21,8 @@ import es.uvigo.ei.sing.sds.service.{ DocumentStatsService, ComputeStats }
 
 object Global extends GlobalSettings {
 
-  val annotator    = Akka.system.actorOf(Props[Annotator], "annotator")
-  val statsService = Akka.system.actorOf(Props[DocumentStatsService], "stats_service")
+  lazy val annotator    = Akka.system.actorOf(Props[Annotator], "annotator")
+  lazy val statsService = Akka.system.actorOf(Props[DocumentStatsService], "stats_service")
 
   // TODO: replace mutable var with immutable counterpart
   var statsSchedule: Cancellable = _
@@ -32,30 +32,31 @@ object Global extends GlobalSettings {
     if (path endsWith "/") path else path + "/"
   }
 
-  def defaultAdmin: Account = {
+  def defaultAdmin(app: Application): Account = {
     val mail = app.configuration.getString("application.admin.email").get
     val pass = app.configuration.getString("application.admin.pass" ).get
     Account(None, mail, pass)
   }
 
-  def createDatabase(database: DatabaseProfile): Unit =
+  def createDatabase(app: Application, database: DatabaseProfile): Unit =
     database withSession { implicit session =>
       if (database.isDatabaseEmpty) {
+        val admin = defaultAdmin(app)
         database.createTables()
-        database.Accounts += defaultAdmin
-        Logger.info(s"Created database tables and admin account ${defaultAdmin.email}")
+        database.Accounts += admin
+        Logger.info(s"Created database tables and admin account ${admin.email}")
       }
     }
 
-  def scheduleStats(): Cancellable = {
+  def scheduleStats(app: Application): Cancellable = {
     val delay    = app.configuration.getMilliseconds("stats.initialDelay").get.milliseconds
     val interval = app.configuration.getMilliseconds("stats.interval"    ).get.milliseconds
-    Akka.system.scheduler.schedule(delay, interval, statsService, ComputeStats)
+    Akka.system(app).scheduler.schedule(delay, interval, statsService, ComputeStats)
   }
 
   override def onStart(app: Application): Unit = {
-    createDatabase(DatabaseProfile())
-    this.statsSchedule = scheduleStats()
+    createDatabase(app, DatabaseProfile())
+    this.statsSchedule = scheduleStats(app)
   }
 
   override def onError(request: RequestHeader, err: Throwable): Future[Result] = Future {
