@@ -3,7 +3,7 @@
 
     <!--    version="2.0" -->
 
-    <!-- http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_140101.dtd -->
+    <!-- http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_150101.dtd -->
 
     <xs:complexType name="AbstractType">
         <xs:sequence>
@@ -19,7 +19,6 @@
                 <xs:attribute name="NlmCategory">
                     <xs:simpleType>
                         <xs:restriction base="xs:NMTOKEN">
-                            <xs:enumeration value="UNLABELLED"/>
                             <xs:enumeration value="BACKGROUND"/>
                             <xs:enumeration value="OBJECTIVE"/>
                             <xs:enumeration value="METHODS"/>
@@ -65,18 +64,16 @@
         </xs:sequence>
     </xs:complexType>
     <xs:element name="Acronym" type="xs:string"/>
+  
+   	<xs:element name="AffiliationInfo">
+ 		<xs:complexType>
+ 			<xs:sequence>
+ 				<xs:element name="Affiliation" type="xs:string" />
+ 				<xs:element name="Identifier" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
+ 			</xs:sequence>
+ 		</xs:complexType>
+ 	</xs:element>
 
-<!--    
-    <xs:complexType name="AffiliationType" mixed="true">
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="b" type="tns:bType"/>
-            <xs:element name="i" type="tns:iType"/>
-            <xs:element name="sup" type="tns:supType"/>
-            <xs:element name="sub" type="tns:subType"/>
-            <xs:element name="u" type="tns:uType"/>
-        </xs:choice>
-    </xs:complexType>
--->    
     <xs:element name="Agency" type="xs:string"/>
     <xs:complexType name="ArticleType">
         <xs:sequence>
@@ -90,8 +87,6 @@
                 <xs:element name="ELocationID" type="tns:ELocationIDType" maxOccurs="unbounded"/>
             </xs:choice>
             <xs:element name="Abstract" type="tns:AbstractType" minOccurs="0"/>
-            <!-- xs:element name="Affiliation" type="tns:AffiliationType" minOccurs="0"/ -->
-            <xs:element name="AffiliationInfo" type="xs:string" minOccurs="0"/>
             <xs:element name="AuthorList" type="tns:AuthorListType" minOccurs="0"/>
             <xs:element ref="tns:Language" maxOccurs="unbounded"/>
             <xs:element name="DataBankList" type="tns:DataBankListType" minOccurs="0"/>
@@ -193,7 +188,9 @@
             -->
             <xs:element name="NameID" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Identifier" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="AffiliationInfo" type="xs:string" minOccurs="0"/>
+            <xs:element ref="tns:AffiliationInfo" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Affiliation" type="xs:string" minOccurs="0"/> <!-- backward compatible; for transitional period -->
+            
         </xs:sequence>
         <xs:attribute name="ValidYN" default="Y">
             <xs:simpleType>
@@ -382,6 +379,8 @@
         <xs:attribute name="RefType" use="required">
             <xs:simpleType>
                 <xs:restriction base="xs:NMTOKEN">
+				    <xs:enumeration value="AssociatedDataset"/>
+					<xs:enumeration value="AssociatedPublication"/>
                     <xs:enumeration value="CommentOn"/>
                     <xs:enumeration value="CommentIn"/>
                     <xs:enumeration value="ErratumIn"/>
@@ -493,6 +492,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="UI" type="xs:string" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -617,8 +617,10 @@
             -->
             <xs:element name="NameID" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Identifier" type="tns:IdentifierType" minOccurs="0" maxOccurs="unbounded"/>
-            <!-- xs:element name="Affiliation" type="tns:AffiliationType" minOccurs="0"/ -->
-            <xs:element name="AffiliationInfo" type="xs:string" minOccurs="0"/>
+ 
+            <xs:element ref="tns:AffiliationInfo" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Affiliation" type="xs:string" minOccurs="0"/> <!-- backward compatible; for transitional period -->
+            
         </xs:sequence>
         <xs:attribute name="ValidYN" default="Y">
             <xs:simpleType>
@@ -819,6 +821,16 @@
     </xs:complexType>
     <xs:element name="Minute" type="xs:string"/>
     <xs:element name="Month" type="xs:string"/>
+    <xs:element name="NameOfSubstance">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<!-- xs:attribute name="UI" type="xs:string" use="required"/ --> 
+					<xs:attribute name="UI" type="xs:string" />  <!-- backward compatibility -->
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
     <xs:complexType name="IdentifierType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
@@ -826,7 +838,6 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    <xs:element name="NameOfSubstance" type="xs:string"/>
     <xs:element name="NlmUniqueID" type="xs:string"/>
     <xs:element name="Note" type="xs:string"/>
     <xs:element name="NumberOfReferences" type="xs:string"/>
@@ -976,7 +987,17 @@
         </xs:attribute>
     </xs:complexType>
     <xs:element name="PublicationStatus" type="xs:string"/>
-    <xs:element name="PublicationType" type="xs:string"/>
+    <xs:element name="PublicationType">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<!-- xs:attribute name="UI" type="xs:string" use="required"/ -->
+					<xs:attribute name="UI" type="xs:string" /> <!-- backward compatibility -->
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
     <xs:complexType name="PublicationTypeListType">
         <xs:sequence>
             <xs:element ref="tns:PublicationType" maxOccurs="unbounded"/>
@@ -1057,6 +1078,8 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <!-- xs:attribute name="UI" type="xs:string" use="required"/ -->
+                <xs:attribute name="UI" type="xs:string" /> <!-- backward compatibility -->
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -1133,6 +1156,8 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <!-- xs:attribute name="UI" type="xs:string" use="required"/ -->
+                <xs:attribute name="UI" type="xs:string" /> <!-- backward compatibility -->
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
