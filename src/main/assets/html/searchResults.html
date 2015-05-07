@@ -27,20 +27,35 @@
     </div>
     <div data-ng-hide="loading" class="row result-list">
         <div class="col-xs-12">
-            <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.list">
-                <a href='' data-ng-click="goToDocument(r.document)" class="title">
-                    <div class="panel-body">{{ r.document.title }}</div>
-                </a>
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-6 col-md-3" data-ng-repeat="k in r.keywords | orderBy: 'occurrences'">
-                            <span data-ng-class="['keyword', k.category.toLowerCase()]" data-tooltip="{{ k.category }}">
-                                {{ k.normalized }}
-                            </span>
+            <tabset>
+                <tab heading="List view">
+                    <div id="list-mode">
+                        <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.list">
+                            <a href='' data-ng-click="goToDocument(r.document)" class="title">
+                                <div class="panel-body">{{ r.document.title }}</div>
+                            </a>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6 col-md-3" data-ng-repeat="k in r.keywords | orderBy: 'occurrences'">
+                                        <span data-ng-class="['keyword', k.category.toLowerCase()]" data-tooltip="{{ k.category }}">
+                                            {{ k.normalized }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </tab>
+                <tab select="refreshGraph()" heading="Graph view">
+                    <div id="graph-mode">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div id="graph-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+            </tabset>
         </div>
     </div>
     <div class="row pagination-row text-center">

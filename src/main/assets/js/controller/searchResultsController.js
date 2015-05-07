@@ -1,6 +1,17 @@
 define(['./main'], function(controller) {
     'use strict';
 
+    var COLORS = {
+        'Compound' : '#59ABE3',
+        'Gene'     : '#BF55EC',
+        'Protein'  : '#F39C12',
+        'Species'  : '#2ECC71',
+        'DNA'      : '#E74C3C',
+        'RNA'      : '#95A5A6',
+        'CellLine' : '#96281B',
+        'CellType' : '#34495E',
+    };
+
     var COUNT_PER_PAGE       = 10;
     var MAX_PAGINATION_LINKS =  5;
 
@@ -13,14 +24,72 @@ define(['./main'], function(controller) {
         });
     };
 
+    var getGraph = function(results) {
+        var graph = { nodes: [ ], edges: [ ] };
+
+        var keywords = _.flatten(_.map(results, function(result) {
+            return result.keywords;
+        }));
+
+        var nodeIds = [ ];
+        _.each(keywords, function(keyword) {
+            var node = {
+                id    : '' + keyword.id,
+                x     : Math.random(),
+                y     : Math.random(),
+                size  : 10,
+                label : keyword.normalized,
+                color : COLORS[keyword.category]
+            };
+
+            if (!_.contains(nodeIds, node.id)) {
+                graph.nodes.push(node)
+                nodeIds.push(node.id);
+            }
+        });
+
+        var edgeIds = [ ];
+        _.each(results, function(doc) {
+            _.each(doc.keywords, function(k1) {
+                _.each(doc.keywords, function(k2) {
+                    var edge = {
+                        id     : '' + k1.id + '-' + k2.id,
+                        source : '' + k1.id,
+                        target : '' + k2.id,
+                        size   : 1,
+                        color  : '#444444',
+                    };
+
+                    if (!_.contains(edgeIds, edge.id)) {
+                        graph.edges.push(edge);
+                        edgeIds.push(edge.id);
+                        edgeIds.push('' + k2.id + '-' + k1.id);
+                    }
+                });
+            });
+        });
+
+        return graph;
+    };
+
     var search = function(service, scope, rootScope) {
         scope.loading = true;
+        scope.sigmaGraph.kill();
+
         service.search(scope.terms, scope.pageNumber, COUNT_PER_PAGE).then(
             function(response) {
                 scope.loading   = false;
                 rootScope.error = false;
-                scope.results   = response.data;
+
+                scope.results = response.data;
                 minimizeCompounds(response.data.list);
+
+                scope.sigmaGraph = new sigma({
+                    graph: getGraph(response.data.list),
+                    container: 'graph-container',
+                });
+
+                scope.refreshGraph();
             },
             function(error) {
                 scope.loading          = false;
@@ -37,9 +106,10 @@ define(['./main'], function(controller) {
             $scope.terms = $routeParams.terms || '';
             if (!$scope.terms.trim()) $location.path('/').search('terms', null)
 
-            $scope.countPerPage  = COUNT_PER_PAGE;
-            $scope.maxSize       = MAX_PAGINATION_LINKS;
-            $scope.pageNumber    = 1;
+            $scope.countPerPage = COUNT_PER_PAGE;
+            $scope.maxSize      = MAX_PAGINATION_LINKS;
+            $scope.pageNumber   = 1;
+            $scope.sigmaGraph   = new sigma();
 
             $rootScope.pageTitle = $scope.terms + $rootScope.pageTitle;
 
@@ -53,8 +123,18 @@ define(['./main'], function(controller) {
                 $location.path('/document/' + d.id).search('terms', null);
             };
 
-            search(SearchService, $scope, $rootScope);
+            $scope.refreshGraph = function() {
+                // nasty hack, sleep for 500ms before refreshing, needed
+                // because the graph is inside a bootstrap tab, and does not
+                // have proper sizes (required by sigma) until it is fully
+                // rendered
+                window.setTimeout(function() {
+                    $scope.sigmaGraph.refresh();
+                    window.dispatchEvent(new Event('resize'));
+                }, 500);
+            };
 
+            search(SearchService, $scope, $rootScope);
         }
     ];
 
