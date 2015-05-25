@@ -4,9 +4,9 @@ scala:
 jdk:
   - oraclejdk7
 before_script:
-  - tar -C src/main/resources --lzma -xvf src/main/resources/linnaeus.tar.lzma
-  - tar -C src/main/resources --lzma -xvf src/main/resources/abner.tar.lzma
-  - rm -vf src/main/resources/*lzma
+  - tar -C src/main/resources --lzma -xvf linnaeus.tar.lzma
+  - tar -C src/main/resources --lzma -xvf abner.tar.lzma
+  - rm -vf *lzma
 notifications:
   email:
     recipients:
