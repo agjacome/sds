@@ -19,4 +19,5 @@ src/main/resources/*
 !src/main/resources/wsdl
 !src/main/resources/xsd
 
+.flagged
 .idea
