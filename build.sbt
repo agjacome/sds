@@ -43,14 +43,14 @@ libraryDependencies ++= Seq(
   "pt.ua.tm"                  % "gimli"      % "1.0.2" exclude("org.slf4j", "slf4j-log4j12") exclude("opennlp", "tools") ,
 
   // core java/scala
-  "com.typesafe.akka"       %% "akka-actor"      % "2.3.11"    ,
-  "com.typesafe.play"       %% "play-jdbc"       % "2.4.0-RC5" ,
-  "com.typesafe.play"       %% "play-cache"      % "2.4.0-RC5" ,
-  "com.typesafe.slick"      %% "slick"           % "3.0.0"     ,
-  "com.typesafe.play"       %% "play-slick"      % "1.0.0-RC3" ,
-  "com.github.t3hnar"       %% "scala-bcrypt"    % "2.4"       ,
-  "org.jsoup"               %  "jsoup"           % "1.8.2"     ,
-  "net.databinder.dispatch" %% "dispatch-core"   % "0.11.2"    ,
+  "com.typesafe.akka"       %% "akka-actor"    % "2.3.11"    ,
+  "com.typesafe.play"       %% "play-jdbc"     % "2.4.0-RC5" ,
+  "com.typesafe.play"       %% "play-cache"    % "2.4.0-RC5" ,
+  "com.typesafe.slick"      %% "slick"         % "3.0.0"     ,
+  "com.typesafe.play"       %% "play-slick"    % "1.0.0-RC3" ,
+  "com.github.t3hnar"       %% "scala-bcrypt"  % "2.4"       ,
+  "org.jsoup"               %  "jsoup"         % "1.8.2"     ,
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.2"    ,
 
   // database connectors
   "mysql"            % "mysql-connector-java" % "5.1.35" ,
@@ -96,9 +96,9 @@ val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbSettin
   TwirlKeys.templateImports += "es.uvigo.ei.sing.sds.controller._" ,
 
   ScalaxbKeys.dispatchVersion  in (Compile, ScalaxbKeys.scalaxb) := "0.11.2" ,
-  ScalaxbKeys.packageName      in (Compile, ScalaxbKeys.scalaxb) := "scalaxb.generated"                           ,
-  ScalaxbKeys.wsdlSource       in (Compile, ScalaxbKeys.scalaxb) := (resourceDirectory in Compile).value / "wsdl" ,
-  ScalaxbKeys.xsdSource        in (Compile, ScalaxbKeys.scalaxb) := (resourceDirectory in Compile).value / "xsd"  ,
+  ScalaxbKeys.packageName      in (Compile, ScalaxbKeys.scalaxb) := "es.uvigo.ei.sing.sds.generated"       ,
+  ScalaxbKeys.wsdlSource       in (Compile, ScalaxbKeys.scalaxb) := baseDirectory.value / "share" / "wsdl" ,
+  ScalaxbKeys.xsdSource        in (Compile, ScalaxbKeys.scalaxb) := baseDirectory.value / "share" / "xsd"  ,
 
   ScalaxbKeys.async in (Compile, ScalaxbKeys.scalaxb) := false ,
   sourceGenerators in Compile <+= ScalaxbKeys.scalaxb in Compile ,
