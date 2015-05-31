@@ -11,13 +11,8 @@ project/*
 !project/Build.scala
 !project/plugins.sbt
 
-src/main/resources/*
-!src/main/resources/routes
-!src/main/resources/*conf
-!src/main/resources/linnaeus.tar.lzma
-!src/main/resources/abner.tar.lzma
-!src/main/resources/wsdl
-!src/main/resources/xsd
+src/main/resources/linnaeus/*
+src/main/resources/abner/*
 
 .flagged
 .idea

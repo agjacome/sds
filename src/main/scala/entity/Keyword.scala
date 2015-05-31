@@ -1,20 +1,18 @@
-package es.uvigo.ei.sing.sds.entity
+package es.uvigo.ei.sing.sds
+package entity
 
 import play.api.libs.json._
 
-final case class KeywordId (value : Long) extends AnyVal with Identifier
-object KeywordId extends IdentifierCompanion[KeywordId]
-
 final case class Keyword (
-  id          : Option[KeywordId] = None,
-  normalized  : Sentence,
-  category    : Category,
-  occurrences : Size = 0
+  id:         Option[Keyword.ID],
+  normalized: String,
+  category:   Category
 )
 
-object Keyword extends ((Option[KeywordId], Sentence, Category, Size) => Keyword) {
+object Keyword extends ((Option[Long], String, Category) => Keyword) {
 
-  implicit val keywordWrites = Json.writes[Keyword]
+  type ID = Long
+
+  implicit val KeywordWrites: Writes[Keyword] = Json.writes[Keyword]
 
 }
-

@@ -1,26 +1,33 @@
-package es.uvigo.ei.sing.sds.entity
+package es.uvigo.ei.sing.sds
+package entity
 
 import play.api.libs.json._
 
-final case class AnnotationId (value : Long) extends AnyVal with Identifier
-object AnnotationId extends IdentifierCompanion[AnnotationId]
-
 final case class Annotation (
-  id            : Option[AnnotationId] = None,
-  documentId    : DocumentId,
-  keywordId     : KeywordId,
-  text          : Sentence,
-  startPosition : Position,
-  endPosition   : Position
-) {
+  id:        Option[Annotation.ID],
+  articleId: Article.ID,
+  keyword:   Keyword.ID,
+  text:      String,
+  start:     Long,
+  end:       Long
+)
 
-  require(startPosition < endPosition, "Start Position must be inferior than End Position")
+object Annotation extends ((Option[Long], Article.ID, Keyword.ID, String, Long, Long) => Annotation) {
 
-}
+  type ID = Long
 
-object Annotation extends ((Option[AnnotationId], DocumentId, KeywordId, Sentence, Position, Position) => Annotation) {
-
-  implicit val annotationWrites = Json.writes[Annotation]
+  implicit val AnnotationWrites: Writes[Annotation] = Json.writes[Annotation]
 
 }
 
+final case class AnnotatedArticle (
+  article:     Article,
+  annotations: Set[Annotation],
+  keywords:    Set[Keyword]
+)
+
+object AnnotatedArticle extends ((Article, Set[Annotation], Set[Keyword]) => AnnotatedArticle) {
+
+  implicit val AnnotatedArticleWrites: Writes[AnnotatedArticle] = Json.writes[AnnotatedArticle]
+
+}
