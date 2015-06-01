@@ -1,31 +1,28 @@
-package es.uvigo.ei.sing.sds.service
+package es.uvigo.ei.sing.sds
+package service
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
+
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import uk.ac.cam.ch.wwmm.oscar.Oscar
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.{ FormatType, ResolvedNamedEntity }
 
-import es.uvigo.ei.sing.sds.entity.Sentence
+final class OscarService {
 
-class OscarService private {
+  import OscarService._
 
-  import OscarService.oscar
+  def getNamedEntities(text: String): Future[Set[ResolvedNamedEntity]] =
+    Future { oscar.findResolvableEntities(text).toSet }
 
-  def getNamedEntities(text : String)(implicit ec : ExecutionContext) : Future[Set[ResolvedNamedEntity]] =
-    Future(oscar findResolvableEntities text) map { _.toSet }
-
-  def normalize(entity : ResolvedNamedEntity) : Sentence =
-    entity.getFirstChemicalStructure(FormatType.STD_INCHI).getValue
+  def normalize(entity: ResolvedNamedEntity): Future[String] =
+    Future { entity.getFirstChemicalStructure(FormatType.STD_INCHI).getValue }
 
 }
 
-object OscarService extends (() => OscarService) {
+object OscarService {
 
   lazy val oscar = new Oscar()
 
-  def apply( ) : OscarService =
-    new OscarService
-
 }
-

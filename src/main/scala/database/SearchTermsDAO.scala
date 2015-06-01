@@ -13,7 +13,7 @@ import entity._
 import util.Page
 
 trait SearchTermsComponent {
-  self: AnnotationsComponent with ArticlesComponent with KeywordsComponent with HasDatabaseConfig[JdbcProfile] =>
+  self: ArticlesComponent with KeywordsComponent with HasDatabaseConfig[JdbcProfile] =>
 
   import driver.api._
 
@@ -24,28 +24,29 @@ trait SearchTermsComponent {
     def tfidf        = column[Double]("search_index_tf_idf")
     def articleId    = column[Article.ID]("article_id")
     def keywordId    = column[Keyword.ID]("keyword_id")
-    def annotationId = column[Annotation.ID]("annotation_id")
 
-    def pk = primaryKey("search_index_pk", (term, annotationId, keywordId, articleId))
+    def pk = primaryKey("search_index_pk", (term, keywordId, articleId))
 
-    def annotation = foreignKey("search_index_annotation_fk", annotationId, annotations)(_.id, onUpdate = ForeignKeyAction.Cascade, onDelete = ForeignKeyAction.Cascade)
     def keyword    = foreignKey("search_index_keyword_fk", keywordId, keywords)(_.id, onUpdate = ForeignKeyAction.Cascade, onDelete = ForeignKeyAction.Cascade)
     def article    = foreignKey("search_index_article_fk", articleId, articles)(_.id, onUpdate = ForeignKeyAction.Cascade, onDelete = ForeignKeyAction.Cascade)
 
-    def * = (term, tf, idf, tfidf, articleId, keywordId, annotationId) <> (SearchTerm.tupled, SearchTerm.unapply)
+    def * = (term, tf, idf, tfidf, articleId, keywordId) <> (SearchTerm.tupled, SearchTerm.unapply)
   }
 
   val terms = TableQuery[SearchTerms]
 
 }
 
-final class SearchTermsDAO extends SearchTermsComponent with AnnotationsComponent with ArticlesComponent with KeywordsComponent with HasDatabaseConfig[JdbcProfile] {
+final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent with KeywordsComponent with HasDatabaseConfig[JdbcProfile] {
 
   import driver.api._
 
   protected val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def count(termFilter: String = "%"): Future[Int] =
+  def count: Future[Int] =
+    db.run(terms.length.result)
+
+  def count(termFilter: String): Future[Int] =
     db.run {
       terms.filter(_.term.toLowerCase like termFilter.toLowerCase).length.result
     }
@@ -53,7 +54,6 @@ final class SearchTermsDAO extends SearchTermsComponent with AnnotationsComponen
   def get(id: SearchTerm.ID): Future[Option[SearchTerm]] =
     db.run {
       terms.filter(term =>
-        (term.annotationId     === id._4) &&
         (term.articleId        === id._2) &&
         (term.keywordId        === id._3) &&
         (term.term.toLowerCase === id._1.toLowerCase)

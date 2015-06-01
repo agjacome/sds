@@ -40,6 +40,9 @@ final class ArticlesDAO extends ArticlesComponent with HasDatabaseConfig[JdbcPro
 
   protected val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def count: Future[Int] =
+    db.run(articles.length.result)
+
   def count(filter: Filter): Future[Int] =
     db.run {
       val f1 = articles.filter(_.title.toLowerCase like filter.title.toLowerCase)

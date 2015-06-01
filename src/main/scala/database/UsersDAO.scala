@@ -39,7 +39,10 @@ final class UsersDAO extends UsersComponent with HasDatabaseConfig[JdbcProfile] 
 
   protected val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def count(emailFilter: String = "%"): Future[Int] =
+  def count: Future[Int] =
+    db.run(users.length.result)
+
+  def count(emailFilter: String): Future[Int] =
     db.run(users.filter(_.email.toLowerCase like emailFilter.toLowerCase).length.result)
 
   def get(id: User.ID): Future[Option[User]] =

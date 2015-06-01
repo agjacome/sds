@@ -39,6 +39,9 @@ final class AuthorsDAO extends AuthorsComponent with HasDatabaseConfig[JdbcProfi
 
   protected val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def count: Future[Int] =
+    db.run(authors.length.result)
+
   def count(filter: Filter): Future[Int] =
     db.run {
       authors.filter(author =>

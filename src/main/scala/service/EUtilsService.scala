@@ -1,115 +1,113 @@
-package es.uvigo.ei.sing.sds.service
+package es.uvigo.ei.sing.sds
+package service
 
-import play.api.Logger
+import scala.concurrent.Future
 
-import scalaxb._
-import scalaxb.generated._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import org.jsoup.Jsoup
-import com.google.common.annotations.VisibleForTesting
 
-import es.uvigo.ei.sing.sds.entity._
+import scalaxb._
 
-class EUtilsService private {
+import entity._
+import generated._
+import util.Page
 
-  // All methods present here are blocking, and should be wrapped inside a
-  // Future whenever being reactive is a requirement, as they perform
-  // long-running operations (SOAP calls). Example usage:
-  //
-  //   val eUtils = EUtilsService()
-  //   Future(eUtils taxonomyScientificName 9606) map {
-  //     scientificName => doSomething(scientificName)
-  //   }
-  //
-  // That way, the method call will be non-blocking, and the "doSomething..."
-  // operation will be done once the web service call completes.
+// TODO: parse List[Author] for each Article
 
-  import EUtilsService.service
+final class EUtilsService extends EUtilsServiceSoapBindings with Soap11Clients with DispatchHttpClients {
 
-  def findPubMedIds(
-    terms : Sentence, days : Option[Size], start : Position, count : Size
-  ) : (Size, Set[PubMedId]) = {
-    val res = searchInPubMed(terms, days map (_.toInt), start.toInt, count.toInt)
-    (getCountFromResult(res), getIdListFromResult(res))
-  }
-
-  def fetchPubMedArticles(ids : Set[PubMedId]) : Set[Document] =
-    service.run_eFetch(Some(ids mkString ","), None, None, None, None, None, None, Some("abstract")) match {
-      case Right(result) => parsePubMedResult(result)
-      case Left(fault)   => Logger.error(fault.toString); Set.empty
+  def searchArticlePMID(query: String, days: Option[Int] = None, page: Int = 0, pageSize: Int = 30): Future[Page[Article.PMID]] =
+    Future {
+      val offset = page * pageSize
+      val result = searchPubMed(query, days, offset, pageSize)
+      Page(extractResultPMIDs(result).toSeq, page, offset, countResults(result))
     }
 
-  def taxonomyScientificName(id : Long) : Option[Sentence] =
-    service.run_eSummary(Some("taxonomy"), Some(id.toString), None, None, None, None, None, None) match {
-      case Right(summary) => parseScientificName(summary)
-      case Left(fault)    => Logger.error(fault.toString); None
+  def fetchPubMedArticles(pmids: Set[Article.PMID]): Future[Seq[Article]] =
+    Future {
+      service.run_eFetch(
+        id        = Some(pmids mkString ","),
+        webEnv    = None,
+        query_key = None,
+        tool      = None,
+        email     = None,
+        retstart  = None,
+        retmax    = None,
+        rettype   = Some("abstract")
+      ).right.toOption.fold(Set.empty[Article])(parseResultArticles).toSeq
     }
 
-  @VisibleForTesting
-  private[service] def searchInPubMed(terms : String, relDate : Option[Int], retStart : Int, retMax : Int) : Option[ESearchResult] =
+  def fetchTaxonomyScientificName(taxonomyId: Long): Future[Option[String]] =
+    Future {
+      service.run_eSummary(
+        db        = Some("taxonomy"),
+        id        = Some(taxonomyId.toString),
+        webEnv    = None,
+        query_key = None,
+        retstart  = None,
+        retmax    = None,
+        tool      = None,
+        email     = None
+      ).right.toOption.flatMap(parseScientificName)
+    }
+
+  private def searchPubMed(query: String, reldate: Option[Int], retstart: Int, retmax: Int): Option[ESearchResult] =
     service.run_eSearch(
-      db       = Some("pubmed"),
-      term     = Some(terms),
-      datetype = Some("edat"),
-      reldate  = relDate map (_.toString),
-      retStart = Some(retStart.toString),
-      retMax   = Some(retMax.toString),
-      webEnv  = None, queryKey = None, usehistory = None, tool = None, email = None, field = None, mindate = None,
-      maxdate = None, rettype  = None, sort       = None
-    ) match {
-      case Right(result) => Some(result)
-      case Left(fault)   => Logger.error(fault.toString); None
-    }
+      db         = Some("pubmed"),
+      term       = Some(query),
+      datetype   = Some("edat"),
+      reldate    = reldate.map(_.toString),
+      retStart   = Some(retstart.toString),
+      retMax     = Some(retmax.toString),
+      webEnv     = None,
+      queryKey   = None,
+      usehistory = None,
+      tool       = None,
+      email      = None,
+      field      = None,
+      mindate    = None,
+      maxdate    = None,
+      rettype    = None,
+      sort       = None
+    ).right.toOption
 
-  private[this] def getCountFromResult(result : Option[ESearchResult]) =
-    result.fold(Size(0)) { _.Count.fold(Size(0))(_.toLong) }
+  private def countResults(result: Option[ESearchResult]): Int =
+    result.flatMap(_.Count).fold(0)(_.toInt)
 
-  private[this] def getIdListFromResult(result : Option[ESearchResult]) =
-    result.fold(Set.empty[PubMedId])(_.IdList match {
-      case Some(ids) => (ids.Id map { id => PubMedId(id.toLong) }).toSet
-      case None      => Set.empty[PubMedId]
-    })
+  private def extractResultPMIDs(result: Option[ESearchResult]): Set[Article.PMID] =
+    result.flatMap(_.IdList).fold(Set.empty[Article.PMID])(_.Id.map(_.toLong).toSet)
 
-  private[this] def parsePubMedResult(result : EFetchResult) =
-    result.PubmedArticleSet.fold(Set.empty[Document])(parsePubMedArticleSet)
+  private def parseResultArticles(result: EFetchResult): Set[Article] =
+    result.PubmedArticleSet.fold(Set.empty[Article])(parseArticleSet)
 
-  private[this] def parsePubMedArticleSet(articles : PubmedArticleSet) =
-    (articles.pubmedarticlesetoption flatMap {
-      case DataRecord(_, _, PubmedArticleType(medline,  _)) => parseArticleType(medline)
-      case DataRecord(_, _, PubmedBookArticleType(book, _)) => parseBookArticleType(book)
-    }).toSet
+  private def parseArticleSet(articles: PubmedArticleSet): Set[Article] =
+    articles.pubmedarticlesetoption flatMap {
+      case DataRecord(_, _, PubmedArticleType(medline, _))  => parseArticleType(medline)
+      case DataRecord(_, _, PubmedBookArticleType(book, _)) => parseBookType(book)
+    } toSet
 
-  private[this] def parseArticleType(medline : MedlineCitationType) =
-    medline.Article.Abstract map {
-      abstrakt => Document(
-        title    = (Jsoup parse medline.Article.ArticleTitle.value).text,
-        text     = (Jsoup parse abstrakt.AbstractText.head.value).text,
-        pubmedId = Some(medline.PMID.value.toLong)
+  private def parseArticleType(medline: MedlineCitationType): Option[Article] =
+    medline.Article.Abstract map { 
+      txt => Article(
+        Some(medline.PMID.value.toLong),
+        Jsoup.parse(medline.Article.ArticleTitle.value).text,
+        Jsoup.parse(txt.AbstractText.head.value).text
       )
     }
 
-  private[this] def parseBookArticleType(book : BookDocumentType) =
-    (book.ArticleTitle, book.Abstract) match {
-      case (Some(title), Some(abstrakt)) => Some(Document(
-        title    = title.value,
-        text     = abstrakt.AbstractText.head.value,
-        pubmedId = Some(book.PMID.value.toLong)
-      ))
-      case _ => None
+  private def parseBookType(book: BookDocumentType): Option[Article] =
+    book.ArticleTitle.flatMap(title => book.Abstract.map(txt => (title, txt))) map {
+      case (title, txt) => Article(
+        Some(book.PMID.value.toLong),
+        title.value,
+        txt.AbstractText.head.value
+      )
     }
 
-  private[this] def parseScientificName(summary : ESummaryResult) =
-    (summary.DocSum flatMap (_.Item) filter (_.Name == "ScientificName")).headOption flatMap {
-      item => item.ItemContent map Sentence
-    }
-
-}
-
-object EUtilsService extends (() => EUtilsService) {
-
-  lazy val service = new EUtilsServiceSoapBindings with Soap11Clients with DispatchHttpClients { }.service
-
-  def apply( ) : EUtilsService =
-    new EUtilsService
+  private def parseScientificName(summary: ESummaryResult): Option[String] = {
+    val items = summary.DocSum.flatMap(_.Item).filter(_.Name == "ScientificName")
+    items.headOption.flatMap(_.ItemContent)
+  }
 
 }

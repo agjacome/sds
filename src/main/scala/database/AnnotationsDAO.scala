@@ -42,6 +42,9 @@ final class AnnotationsDAO extends AnnotationsComponent with ArticlesComponent w
 
   protected val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def count: Future[Int] =
+    db.run(annotations.length.result)
+
   def count(filter: Filter): Future[Int] =
     db.run {
       val f1 = annotations.filter(_.text.toLowerCase like filter.text.toLowerCase)
@@ -54,6 +57,21 @@ final class AnnotationsDAO extends AnnotationsComponent with ArticlesComponent w
   def get(id: Annotation.ID): Future[Option[Annotation]] =
     db.run(annotations.filter(_.id === id).result.headOption)
 
+  def countByKeyword: Future[Map[Keyword.ID, Int]] =
+    db.run(annotations.groupBy(_.keywordId) map {
+      case (kid, as) => (kid -> as.length)
+    } result).map(_.toMap)
+
+  def countByArticle: Future[Map[Article.ID, Int]] =
+    db.run(annotations.groupBy(_.articleId) map {
+      case (aid, as) => (aid -> as.length)
+    } result).map(_.toMap)
+
+  def countByArticleAndKeyword: Future[Map[(Article.ID, Keyword.ID), Int]] =
+    db.run(annotations.groupBy(a => (a.articleId, a.keywordId)) map {
+      case ((aid, kid), as) => ((aid, kid) -> as.length)
+    } result).map(_.toMap)
+
   def list(page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderByID, filter: Filter = Filter()): Future[Page[Annotation]] = {
     val offset = pageSize * page
 
@@ -61,7 +79,7 @@ final class AnnotationsDAO extends AnnotationsComponent with ArticlesComponent w
       val f1 = annotations.filter(_.text.toLowerCase like filter.text.toLowerCase)
       val f2 = filter.articleId.fold(f1)(id => f1.filter(_.articleId === id))
       val f3 = filter.keywordId.fold(f2)(id => f2.filter(_.keywordId === id))
-       
+
       f3.sortBy(orderBy.order).drop(offset).take(pageSize)
     }
 

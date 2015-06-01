@@ -1,0 +1,110 @@
+package es.uvigo.ei.sing.sds
+package service
+
+import scala.concurrent.Future
+import scala.util.{ Try, Success, Failure }
+
+import play.api.{ Logger, Play }
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import akka.actor._
+
+import entity._
+import database._
+
+sealed trait IndexerMessage
+case object ClearIndex    extends IndexerMessage
+case object PopulateIndex extends IndexerMessage
+case object UpdateIndex   extends IndexerMessage
+
+final class IndexerService extends Actor {
+
+  lazy val indexDAO       = new SearchTermsDAO
+  lazy val articlesDAO    = new ArticlesDAO
+  lazy val keywordsDAO    = new KeywordsDAO
+  lazy val annotationsDAO = new AnnotationsDAO
+
+  override val receive: Receive = {
+    case ClearIndex    => clearIndex()
+    case PopulateIndex => populateIndex()
+    case UpdateIndex   => updateIndex()
+  }
+
+  def clearIndex(): Unit = {
+    Logger.info("Clearing search index")
+    indexDAO.clear onComplete {
+      case Success(_) => Logger.info("Finished clearing search index")
+      case Failure(e) => Logger.error("Error clearing search index", e); sys.exit(1)
+    }
+  }
+
+  def populateIndex(): Unit = {
+    Logger.info("Populating search index")
+    insertSearchTerms() onComplete {
+      case Success(ts) => Logger.info(s"Finished populating search index with ${ts.size} entries")
+      case Failure(e)  => Logger.error("Error populating search index", e); sys.exit(1)
+    }
+  }
+
+  def updateIndex(): Unit = {
+    clearIndex()
+    populateIndex()
+  }
+
+  private def insertSearchTerms(): Future[Seq[SearchTerm]] =
+    searchTerms flatMap {
+      terms => indexDAO.insert(terms: _*)
+    }
+
+  private def searchTerms: Future[Seq[SearchTerm]] =
+    frequencies flatMap {
+      f => Future.sequence(f.toSeq map {
+        case ((aid, kid), (tf, idf, tfidf)) =>
+          // FIXME: unsafe get
+          val term = keywordsDAO.get(kid).map(_.get.normalized)
+          term.map(t => SearchTerm(t, tf, idf, tfidf, aid, kid))
+      })
+    }
+
+  private def frequencies: Future[Map[(Article.ID, Keyword.ID), (Double, Double, Double)]] =
+    for {
+      n   <- articlesDAO.count
+      tfs <- annotationsDAO.countByArticleAndKeyword
+    } yield computeTFIDF(n, tfs)
+
+  private def computeTFIDF(count: Int, freqs: Map[(Article.ID, Keyword.ID), Int]): Map[(Article.ID, Keyword.ID), (Double, Double, Double)] =
+    freqs.toSeq map { case ((aid, kid), tf) =>
+      val idf   = Math.log(freqs.count(kv => kv._1._2 == kid).toDouble)
+      val tfidf = tf * idf
+      ((aid, kid), (tf.toDouble, idf, tfidf))
+    } toMap
+
+}
+
+  // override protected def computeStats( ) =
+    // replaceDocumentStats(getData)
+
+  // override protected def getData =
+    // database withTransaction { implicit session =>
+      // (groupedData map { case ((documentId, keywordId), tuples) =>
+        // (documentId, keywordId, tuples.length, tuples.map(_._3).max.get)
+      // }).list
+    // }
+
+  // override protected def replaceDocumentStats(data : List[(DocumentId, KeywordId, Int, Size)]) : Unit =
+    // database withTransaction { implicit session =>
+      // DocumentStats.delete
+      // DocumentStats ++= data map { case (docId, keyId, docCounter, keyCounter) =>
+        // (docId, keyId, Size(docCounter.toLong), docCounter.toDouble / keyCounter)
+      // }
+      // ()
+    // }
+
+  // private[this] def groupedData(implicit session : Session) =
+    // Annotations join Keywords on (_.keywordId === _.id) map {
+      // case (a, k) => (a.documentId, a.keywordId, k.occurrences)
+    // } groupBy { case (documentId, keywordId, _) => (documentId, keywordId) }
+
+// }
+
+// class DocumentStatsService extends DocumentStatsServiceImpl with DocumentStatsServiceLogging

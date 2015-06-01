@@ -39,7 +39,10 @@ final class KeywordsDAO extends KeywordsComponent with HasDatabaseConfig[JdbcPro
 
   protected val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def count(normalizedFilter: String = "%"): Future[Int] =
+  def count: Future[Int] =
+    db.run(keywords.length.result)
+
+  def count(normalizedFilter: String): Future[Int] =
     db.run(keywords.filter(_.normalized.toLowerCase like normalizedFilter.toLowerCase).length.result)
 
   def get(id: Keyword.ID): Future[Option[Keyword]] =

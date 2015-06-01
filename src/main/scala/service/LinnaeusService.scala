@@ -1,47 +1,50 @@
-package es.uvigo.ei.sing.sds.service
+package es.uvigo.ei.sing.sds
+package service
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
+
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import play.api.cache.Cache
 import play.api.Play.current
 
 import uk.ac.man.entitytagger.Mention
 
-import es.uvigo.ei.sing.sds.entity.Sentence
+final class LinnaeusService {
 
-class LinnaeusService private {
+  import LinnaeusService._
 
-  import LinnaeusService.linnaeus
+  lazy val eUtils = new EUtilsService
 
-  lazy val eUtils = EUtilsService()
+  def getMentions(text: String): Future[Set[Mention]] =
+    Future { linnaeus.`match`(text).toSet }
 
-  def obtainMentions(text : String)(implicit ec : ExecutionContext) : Future[Seq[Mention]] =
-    Future { linnaeus `match` text }
+  def normalize(mention: Mention): Future[String] = {
+    val id = mention.getMostProbableID.split(":").last.toLong
+    scientificNameOf(id).map(_.getOrElse(s"NCBI Taxonomy ID: $id"))
+  }
 
-  def normalize(mention : Mention) : Sentence =
-    getScientificName((mention.getMostProbableID split ":").last.toLong)
-
-  private[this] def getScientificName(ncbiId : Long) =
-    Cache.getAs[String](s"TaxonomyId($ncbiId)") getOrElse {
-      val name = (eUtils taxonomyScientificName ncbiId).fold(s"NCBI Taxonomy ID: $ncbiId")(Sentence(_))
-      Cache.set(s"TaxonomyId($ncbiId)", name)
+  private def scientificNameOf(taxonomyId: Long): Future[Option[String]] =
+    Cache.getAs[String](s"taxonomy-id($taxonomyId)").fold({
+      val name = eUtils.fetchTaxonomyScientificName(taxonomyId)
+      name.foreach(n => Cache.set(s"taxonomy-id($taxonomyId)", n))
       name
-    }
+    })(name => Future.successful(Some(name)))
 
 }
 
-object LinnaeusService extends (() => LinnaeusService) {
+object LinnaeusService {
 
   import uk.ac.man.entitytagger.matching.{ Matcher, Postprocessor }
   import uk.ac.man.entitytagger.matching.matchers.{ MatchPostProcessor, VariantDictionaryMatcher }
 
-  private lazy val dictionary  = getClass.getResourceAsStream("/linnaeus/dict-species.tsv")
-  private lazy val frequencies = getClass.getResourceAsStream("/linnaeus/freq-species.tsv")
-  private lazy val stopList    = getClass.getResourceAsStream("/linnaeus/stoplist.tsv")
-  private lazy val synonyms    = getClass.getResourceAsStream("/linnaeus/synonyms.tsv")
+  lazy val dictionary  = Thread.currentThread.getContextClassLoader.getResourceAsStream("/linnaeus/dict-species.tsv")
+  lazy val frequencies = Thread.currentThread.getContextClassLoader.getResourceAsStream("/linnaeus/freq-species.tsv")
+  lazy val stopList    = Thread.currentThread.getContextClassLoader.getResourceAsStream("/linnaeus/stoplist.tsv")
+  lazy val synonyms    = Thread.currentThread.getContextClassLoader.getResourceAsStream("/linnaeus/synonyms.tsv")
 
-  lazy val linnaeus : Matcher = new MatchPostProcessor(
+  lazy val linnaeus: Matcher = new MatchPostProcessor(
     VariantDictionaryMatcher.load(dictionary, true),
     Matcher.Disambiguation.ON_WHOLE,
     true,
@@ -49,8 +52,4 @@ object LinnaeusService extends (() => LinnaeusService) {
     new Postprocessor(Array(stopList), Array(synonyms), Array(frequencies), null, null)
   )
 
-  def apply( ) : LinnaeusService =
-    new LinnaeusService
-
 }
-
