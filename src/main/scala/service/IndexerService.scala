@@ -80,31 +80,3 @@ final class IndexerService extends Actor {
     } toMap
 
 }
-
-  // override protected def computeStats( ) =
-    // replaceDocumentStats(getData)
-
-  // override protected def getData =
-    // database withTransaction { implicit session =>
-      // (groupedData map { case ((documentId, keywordId), tuples) =>
-        // (documentId, keywordId, tuples.length, tuples.map(_._3).max.get)
-      // }).list
-    // }
-
-  // override protected def replaceDocumentStats(data : List[(DocumentId, KeywordId, Int, Size)]) : Unit =
-    // database withTransaction { implicit session =>
-      // DocumentStats.delete
-      // DocumentStats ++= data map { case (docId, keyId, docCounter, keyCounter) =>
-        // (docId, keyId, Size(docCounter.toLong), docCounter.toDouble / keyCounter)
-      // }
-      // ()
-    // }
-
-  // private[this] def groupedData(implicit session : Session) =
-    // Annotations join Keywords on (_.keywordId === _.id) map {
-      // case (a, k) => (a.documentId, a.keywordId, k.occurrences)
-    // } groupBy { case (documentId, keywordId, _) => (documentId, keywordId) }
-
-// }
-
-// class DocumentStatsService extends DocumentStatsServiceImpl with DocumentStatsServiceLogging

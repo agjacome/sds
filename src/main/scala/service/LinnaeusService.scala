@@ -52,4 +52,10 @@ object LinnaeusService {
     new Postprocessor(Array(stopList), Array(synonyms), Array(frequencies), null, null)
   )
 
+  implicit class MentionOps(mention: Mention) {
+    import entity._
+    def toAnnotation(articleId: Article.ID, keywordId: Keyword.ID): Annotation =
+      Annotation(None, articleId, keywordId, mention.getText, mention.getStart.toLong, mention.getEnd.toLong)
+  }
+
 }

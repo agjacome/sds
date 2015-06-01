@@ -17,7 +17,12 @@ final case class ABNEREntity (
   cat:   Category,
   start: Int,
   end:   Int
-)
+) {
+
+  def toAnnotation(articleId: Article.ID, keywordId: Keyword.ID): Annotation =
+    Annotation(None, articleId, keywordId, txt, start.toLong, end.toLong)
+
+}
 
 final class ABNERService {
 

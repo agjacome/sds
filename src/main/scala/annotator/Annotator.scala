@@ -1,154 +1,109 @@
-package es.uvigo.ei.sing.sds.annotator
+package es.uvigo.ei.sing.sds
+package annotator
 
 import scala.collection.concurrent.TrieMap
+import scala.concurrent.Future
+import scala.util.{ Try, Success, Failure }
+
+import play.api.{ Configuration, Logger, Play }
+
 import akka.actor._
 
-import play.api.{ Configuration, Logger }
-import play.api.Play.{ current => app }
+import entity._
+import database._
 
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.database.DatabaseProfile
+sealed trait AnnotatorMessage { def articleId: Article.ID }
+final case class Annotate (articleId: Article.ID) extends AnnotatorMessage
+final case class Finished (articleId: Article.ID) extends AnnotatorMessage
+final case class Failed   (articleId: Article.ID, cause: Throwable) extends AnnotatorMessage
 
-private[annotator] trait AnnotatorBase extends Actor {
+final class Annotator extends Actor {
 
-  lazy val database = DatabaseProfile()
+  import context._
 
-  import database._
-  import database.profile.simple._
+  lazy val articlesDAO    = new ArticlesDAO
+  lazy val keywordsDAO    = new KeywordsDAO
+  lazy val annotationsDAO = new AnnotationsDAO
 
-  override final def receive : Receive = {
-    case msg : Annotate => annotate(sender, msg.documentId)
-    case msg : Finished => finished(sender, msg.documentId)
-    case msg : Failed   => failed(sender, msg.documentId, msg.cause)
+  private lazy val annotators = createAnnotators(Play.current.configuration.getConfig("annotator"))
+  private lazy val completed  = TrieMap.empty[Article.ID, (Int, Boolean)]
+
+  override def receive: Receive = {
+    case Annotate(id)    => annotate(id, sender.path.name)
+    case Finished(id)    => finished(id, sender.path.name)
+    case Failed(id, err) => failed(id, err, sender.path.name)
   }
 
-  protected def annotate(sender : ActorRef, documentId : DocumentId) : Unit
-
-  protected def finished(sender : ActorRef, documentId : DocumentId) : Unit
-
-  protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) : Unit
-
-  protected final def isAnnotated(documentId  : DocumentId) =
-    database withSession { implicit session =>
-      (Documents filter (_.id === documentId) map (_.annotated)).first
+  def annotate(id: Article.ID, senderName: String): Unit = {
+    Logger.info(s"[$senderName] Annotating article $id")
+    articlesDAO.get(id) onComplete {
+      case Success(article) => checkAndAnnotate(article, id, senderName)
+      case Failure(error)   => failed(id, error, senderName)
     }
-
-  protected final def isBlocked(documentId : DocumentId) =
-    database withSession { implicit session =>
-      (Documents filter (_.id === documentId) map (_.blocked)).first
-    }
-
-  protected def markAnnotated(documentId : DocumentId, annotated : Boolean) =
-    database withSession { implicit session =>
-      Documents filter (_.id === documentId) map (_.annotated) update annotated
-    }
-
-  protected def markBlocked(documentId : DocumentId, blocked : Boolean) =
-    database withSession { implicit session =>
-      Documents filter (_.id === documentId) map (_.blocked) update blocked
-    }
-
-  protected def deleteAnnotations(documentId : DocumentId) =
-    database withTransaction { implicit session =>
-      decrementKeywordCounter(documentId)
-      (Annotations findByDocumentId documentId).delete
-      markAnnotated(documentId, false)
-      markBlocked(documentId, false)
-    }
-
-  private[this] def decrementKeywordCounter(documentId : DocumentId)(implicit session : Session) =
-    findDocumentKeywords(documentId) foreach {
-      case (id, (current, count)) => Keywords filter (_.id === id) map (_.occurrences) update (current - count)
-    }
-
-  private[this] def findDocumentKeywords(documentId : DocumentId)(implicit session : Session) =
-    (Annotations filter (_.documentId === documentId) flatMap {
-      a => Keywords filter (_.id === a.keywordId)
-    } groupBy identity map { case (k, ks) => (k.id, (k.occurrences, ks.length)) }).list
-
-}
-
-private[annotator] trait AnnotatorLogging extends AnnotatorBase {
-
-  abstract override protected def annotate(sender : ActorRef, documentId : DocumentId) =
-    if (isAnnotated(documentId))
-      Logger.warn(s"[${self.path.name}] Ignorning already annotated ${documentId}")
-    else if (isBlocked(documentId))
-      Logger.warn(s"[${self.path.name}] Ignornig blocked (currently annotating) ${documentId}")
-    else super.annotate(sender, documentId);
-
-  abstract override protected def finished(sender : ActorRef, documentId : DocumentId) = {
-    Logger.info(s"[${sender.path.name}] Finished for ${documentId}")
-    super.finished(sender, documentId)
   }
 
-  abstract override protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) = {
-    Logger.error(s"[${sender.path.name}] Failed for ${documentId}\n${cause}")
-    super.failed(sender, documentId, cause)
+  def finished(id: Article.ID, senderName: String): Unit = {
+    Logger.info(s"[$senderName] Finished annotating article $id")
+    updateCompleted(id, false)
+    if (allAnnotatorsCompleted(id)) wrapUp(id)
   }
 
-  abstract override protected def deleteAnnotations(documentId : DocumentId) = {
-    Logger.error(s"[${self.path.name}] Some annotator failed, restoring DB for $documentId")
-    super.deleteAnnotations(documentId)
+  def failed(id: Article.ID, cause: Throwable, senderName: String): Unit = {
+    Logger.error(s"[$senderName] Failed annotation of article $id", cause)
+    updateCompleted(id, true)
+    if (allAnnotatorsCompleted(id)) wrapUp(id)
   }
 
-  abstract override protected def markAnnotated(documentId : DocumentId, annotated : Boolean) = {
-    if (annotated) Logger.info(s"[${self.path.name}] All annotators finished for $documentId")
-    super.markAnnotated(documentId, annotated)
-  }
-
-}
-
-private[annotator] class AnnotatorImpl extends AnnotatorBase {
-
-  // map of (DocumentId -> (CompletedAnnotatorsCounter, HasAnyAnnotatorFailed?))
-  private[this] lazy val completed = TrieMap[DocumentId, (Size, Boolean)]()
-
-  private[this] lazy val annotators = createAnnotators(app.configuration getConfig "annotator")
-
-  override protected def annotate(sender : ActorRef, documentId : DocumentId) = {
-    markBlocked(documentId, true)
-    completed += ((documentId, (0, false)))
-    annotators foreach (_ ! Annotate(documentId))
-  }
-
-  override protected def finished(sender : ActorRef, documentId : DocumentId) : Unit =
-    if (hasCompleted(documentId))
-      wrapUp(documentId)
-    else {
-      val (counter, failed) = completed(documentId)
-      completed update(documentId, (counter + 1, failed))
+  private def checkAndAnnotate(maybeArticle: Option[Article], id: Article.ID, senderName: String): Unit =
+    maybeArticle.fold(Logger.error(s"[$senderName] Cannot find article $id")) {
+      case Article(_, _, _, _, true, _) => Logger.warn(s"[$senderName] Ignoring already annotated article $id")
+      case Article(_, _, _, _, _, true) => Logger.warn(s"[$senderName] Ignoring already processing article $id")
+      case article                      => annotateArticle(article, senderName)
     }
 
-  override protected def failed(sender : ActorRef, documentId : DocumentId, cause : Throwable) =
-    if (hasCompleted(documentId)) wrapUp(documentId) else {
-      val (counter, _) = completed(documentId)
-      completed update (documentId, (counter + 1, true))
+  // FIXME: unsafe gets
+  private def annotateArticle(article: Article, senderName: String): Unit =
+    articlesDAO.update(article, false, true) onComplete {
+      case Failure(err) => Logger.error(s"[$senderName] Cannot update article ${article.id.get} status")
+      case Success(_)   => {
+        completed.put(article.id.get, (0, false))
+        annotators foreach (_ ! Annotate(article.id.get))
+      }
     }
 
-  private[this] def wrapUp(documentId : DocumentId) : Unit = {
-    if (hasFailed(documentId)) deleteAnnotations(documentId) else {
-      markAnnotated(documentId, true)
-      markBlocked(documentId, false)
+  // FIXME: unsafe get
+  private def wrapUp(id: Article.ID): Unit = {
+    val future = {
+      if (anyAnnotatorFailed(id))
+        annotationsDAO.deleteAnnotationsOf(id)
+      else
+        articlesDAO.get(id) flatMap { a => articlesDAO.update(a.get, true, false) }
     }
-    completed -= documentId
-    ()
+
+    completed.remove(id)
+
+    future onComplete {
+      case Success(_) => Logger.info(s"Completed annotation of article $id")
+      case Failure(e) => Logger.error(s"Could not complete annotation of article $id", e)
+    }
   }
 
-  private[this] def hasCompleted(documentId : DocumentId) =
-    completed(documentId)._1.value == annotators.size - 1
+  private def allAnnotatorsCompleted(id: Article.ID): Boolean =
+    completed(id)._1 == annotators.size
 
-  private[this] def hasFailed(documentId : DocumentId) =
-    completed(documentId)._2
+  private def anyAnnotatorFailed(id: Article.ID): Boolean =
+    completed(id)._2
 
-  private[this] def createAnnotators(subConfig : Option[Configuration]) =
-    subConfig.fold(Set.empty[ActorRef]) {
+  private def updateCompleted(id: Article.ID, hasFailed: Boolean = false): Unit = {
+    val (counter, failed) = completed(id)
+    completed.update(id, (counter + 1, failed || hasFailed))
+  }
+
+  private def createAnnotators(annotatorsConfig: Option[Configuration]): Set[ActorRef] =
+    annotatorsConfig.fold(Set.empty[ActorRef]) {
       config => config.keys map {
-        key => context actorOf (Props(Class forName (config getString key).get), key)
+        key => context.actorOf(Props(Class.forName(config.getString(key).get)), key)
       }
     }
 
 }
-
-class Annotator extends AnnotatorImpl with AnnotatorLogging
-

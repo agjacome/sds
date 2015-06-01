@@ -117,6 +117,9 @@ final class AnnotationsDAO extends AnnotationsComponent with ArticlesComponent w
       new IllegalArgumentException("It is impossible to delete an annotation with empty ID")
     })(delete)
 
+  def deleteAnnotationsOf(id: Article.ID): Future[Unit] =
+    db.run(annotations.filter(_.articleId === id).delete).map(_ => ())
+
 }
 
 object AnnotationsDAO {

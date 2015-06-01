@@ -25,4 +25,10 @@ object OscarService {
 
   lazy val oscar = new Oscar()
 
+  implicit class NamedEntityOps(rne: ResolvedNamedEntity) {
+    import entity._
+    def toAnnotation(articleId: Article.ID, keywordId: Keyword.ID): Annotation =
+      Annotation(None, articleId, keywordId, rne.getSurface, rne.getStart.toLong, rne.getEnd.toLong)
+  }
+
 }

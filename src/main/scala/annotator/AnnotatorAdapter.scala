@@ -1,60 +1,49 @@
-package es.uvigo.ei.sing.sds.annotator
+package es.uvigo.ei.sing.sds
+package annotator
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
-import scala.language.postfixOps
-import scala.util.{ Failure, Success }
+import scala.util.{ Try, Success, Failure }
 
-import akka.actor.{ Actor, ActorRef }
+import akka.actor._
 import akka.pattern.pipe
 
 import play.api.cache.Cache
-import play.api.Play.current
+import play.api.Play
 
-import es.uvigo.ei.sing.sds.database.DatabaseProfile
-import es.uvigo.ei.sing.sds.entity._
+import entity._
+import database._
 
-private[annotator] trait AnnotatorAdapter extends Actor {
-
-  lazy val database = DatabaseProfile()
+trait AnnotatorAdapter extends Actor {
 
   import context._
-  import database._
-  import database.profile.simple._
 
-  override final def receive : Receive = {
-    case Annotate(documentId) => respondToSender(documentId, sender)
+  lazy val articlesDAO    = new ArticlesDAO
+  lazy val keywordsDAO    = new KeywordsDAO
+  lazy val annotationsDAO = new AnnotationsDAO
+
+  override def receive: Receive = {
+    case Annotate(id) => respondToSender(id, sender)
   }
 
-  protected def annotate(document : Document) : Future[Unit]
+  def annotate(article: Article): Future[Unit]
 
-  private[this] final def respondToSender(documentId : DocumentId, sender : ActorRef) =
-    (getDocument _ andThen annotate)(documentId) onComplete {
-      case Success(_)     => sender ! Finished(documentId)
-      case Failure(cause) => sender ! Failed(documentId, cause)
+  private def respondToSender(id: Article.ID, sender: ActorRef): Unit =
+    getArticle(id).map(annotate) onComplete {
+      case Success(_)   => sender ! Finished(id)
+      case Failure(err) => sender ! Failed(id, err)
     }
 
-  private[this] def getDocument(id : DocumentId) =
-    Cache.getAs[Document](s"Annotator(${id.toString})") getOrElse {
-      val document = database withSession { implicit session => (Documents findById id).first }
-      Cache set (s"Annotator(${id.toString})", document, 15 seconds)
-      document
-    }
+  private def getArticle(id: Article.ID): Future[Article] =
+    articlesDAO.get(id).flatMap(_.fold(Future.failed[Article] {
+      new IllegalArgumentException(s"Cannot find article with id $id")
+    })(Future.successful))
 
-  protected final def getOrStoreKeyword(normalized : Sentence, category : Category) =
-    database withTransaction { implicit session =>
-      (Keywords filter (_.normalized === normalized) map (_.id)).firstOption getOrElse {
-        val keyword = Keyword(None, normalized, category)
-        Keywords += keyword
-      }
-    }
-
-  protected def storeAnnotation(annotation : Annotation) =
-    database withTransaction { implicit session =>
-      val counter = Keywords filter (_.id === annotation.keywordId) map (_.occurrences)
-      counter update (counter.first + 1)
-      Annotations += annotation
+  protected final def getOrStoreKeyword(normalized: String, category: Category): Future[Keyword] =
+    keywordsDAO.getByNormalized(normalized) map {
+      _.filter(_.category == category)
+    } flatMap {
+      _.fold(keywordsDAO.insert(Keyword(None, normalized, category)))(Future.successful)
     }
 
 }
-

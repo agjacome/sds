@@ -1,27 +1,31 @@
-package es.uvigo.ei.sing.sds.annotator
+package es.uvigo.ei.sing.sds
+package annotator
+
+import scala.concurrent.Future
 
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.ResolvedNamedEntity
 
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.service.OscarService
+import entity._
+import service.OscarService
+import service.OscarService.NamedEntityOps
 
-private[annotator] class OscarAnnotator extends AnnotatorAdapter {
+final class OscarAnnotator extends AnnotatorAdapter {
 
   import context._
 
-  lazy val oscar = OscarService()
+  lazy val oscar = new OscarService
 
-  override protected def annotate(document : Document) =
-    oscar getNamedEntities document.text map {
-      entities => entities foreach (saveEntity(_, document.id.get))
-    }
+  override def annotate(article: Article): Future[Unit] =
+    oscar.getNamedEntities(article.content).flatMap(es => saveEntities(es, article.id.get)).map(_ => ())
 
-  private[this] def saveEntity(entity : ResolvedNamedEntity, documentId : DocumentId) = {
-    val normalized = oscar normalize entity
-    val keywordId  = getOrStoreKeyword(normalized, Compound)
-    val annotation = Annotation(None, documentId, keywordId, entity.getSurface, entity.getStart, entity.getEnd)
-    storeAnnotation(annotation)
-  }
+  private def saveEntities(entities: Set[ResolvedNamedEntity], articleId: Article.ID): Future[Set[(Keyword, Annotation)]] =
+    Future.sequence { entities.map(e => saveEntity(e, articleId)) }
+
+  private def saveEntity(entity: ResolvedNamedEntity, articleId: Article.ID): Future[(Keyword, Annotation)] =
+    for {
+      normalized <- oscar.normalize(entity)
+      keyword    <- getOrStoreKeyword(normalized, Compound)
+      annotation <- annotationsDAO.insert(entity.toAnnotation(articleId, keyword.id.get))
+    } yield (keyword, annotation)
 
 }
-

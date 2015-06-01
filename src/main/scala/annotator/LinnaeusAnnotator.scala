@@ -1,27 +1,31 @@
-package es.uvigo.ei.sing.sds.annotator
+package es.uvigo.ei.sing.sds
+package annotator
+
+import scala.concurrent.Future
 
 import uk.ac.man.entitytagger.Mention
 
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.service.LinnaeusService
+import entity._
+import service.LinnaeusService
+import service.LinnaeusService.MentionOps
 
-private[annotator] class LinnaeusAnnotator extends AnnotatorAdapter {
+final class LinnaeusAnnotator extends AnnotatorAdapter {
 
   import context._
 
-  lazy val linnaeus = LinnaeusService()
+  lazy val linnaeus = new LinnaeusService
 
-  override protected def annotate(document : Document) =
-    linnaeus obtainMentions document.text map {
-      mentions => mentions foreach (saveMention(_, document.id.get))
-    }
+  override def annotate(article: Article): Future[Unit] =
+    linnaeus.getMentions(article.content).flatMap(ms => saveMentions(ms, article.id.get)).map(_ => ())
 
-  private[this] def saveMention(mention : Mention, documentId : DocumentId) = {
-    val normalized = linnaeus normalize mention
-    val keywordId  = getOrStoreKeyword(normalized, Species)
-    val annotation = Annotation(None, documentId, keywordId, mention.getText, mention.getStart, mention.getEnd)
-    storeAnnotation(annotation)
-  }
+  private def saveMentions(mentions: Set[Mention], articleId: Article.ID): Future[Set[(Keyword, Annotation)]] =
+    Future.sequence { mentions.map(m => saveMention(m, articleId)) }
+
+  private def saveMention(mention: Mention, articleId: Article.ID): Future[(Keyword, Annotation)] =
+    for {
+      normalized <- linnaeus.normalize(mention)
+      keyword    <- getOrStoreKeyword(normalized, Species)
+      annotation <- annotationsDAO.insert(mention.toAnnotation(articleId, keyword.id.get))
+    } yield (keyword, annotation)
 
 }
-
