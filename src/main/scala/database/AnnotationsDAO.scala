@@ -57,6 +57,25 @@ final class AnnotationsDAO extends AnnotationsComponent with ArticlesComponent w
   def get(id: Annotation.ID): Future[Option[Annotation]] =
     db.run(annotations.filter(_.id === id).result.headOption)
 
+  def getAnnotatedArticle(id: Article.ID): Future[Option[AnnotatedArticle]] = {
+    val joined = for {
+      annotation <- annotations
+      keyword    <- keywords if annotation.keywordId === keyword.id
+      article    <- articles if annotation.articleId === article.id
+      if article.id === id
+    } yield (article, keyword, annotation)
+
+    val query = joined.sortBy(_._1.id)
+
+    db.run(query.result) map { tuples =>
+      val keywords    = tuples.map(_._2).toSet
+      val annotations = tuples.map(_._3).toSet
+      val article     = tuples.headOption.map(_._1)
+
+      article.map(a => AnnotatedArticle(a, annotations, keywords))
+    }
+  }
+
   def countByKeyword: Future[Map[Keyword.ID, Int]] =
     db.run(annotations.groupBy(_.keywordId) map {
       case (kid, as) => (kid -> as.length)

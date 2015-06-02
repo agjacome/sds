@@ -1,72 +1,67 @@
-package es.uvigo.ei.sing.sds.controller
+package es.uvigo.ei.sing.sds
+package controller
 
+import scala.concurrent.Future
+
+import play.api.Play
+import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
-import play.api.Play.current
 import play.twirl.api.Content
 
-import es.uvigo.ei.sing.sds.database.DatabaseProfile
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.Global
+import entity._
+import database._
 
-private[controller] trait ApplicationController extends Controller with Authorization {
+object ApplicationController extends Controller with Authorization {
 
-  lazy val database  = DatabaseProfile()
+  import Play.current
+  import User.UserForm
 
-  import database._
-  import database.profile.simple._
+  lazy val usersDAO = new UsersDAO
 
-  def index(path: String): Action[AnyContent] = Action {
-    Ok(twirl.html.index(Global.context))
-  }
+  def index(path: String): Action[AnyContent] =
+    Action { Ok(twirl.html.index(httpContext)) }
 
-  def untrail(path: String): Action[AnyContent] = Action {
-    MovedPermanently(s"${Global.context}$path")
-  }
+  def untrail(path: String): Action[AnyContent] =
+    Action { MovedPermanently(s"$httpContext$path") }
 
   def login: Action[JsValue] =
-    Action(parse.json) { request =>
-      Account.form bind request.body fold (
-        errors  => BadRequest(Json obj ("err" -> errors.errorsAsJson)),
-        account => createLoginResponse(account.email, account.password)
+    Action.async(parse.json) {
+      request => UserForm.bind(request.body).fold(
+        errors => Future.successful(BadRequest(Json.obj("err" -> errors.errorsAsJson))),
+        user   => createLoginResponse(user.email, user.pass)
       )
     }
 
-  def authPing : Action[AnyContent] =
-    TokenizedAction() { token => currentId => request =>
-      if (doesAccountExist(currentId))
-        Ok(Json obj ("accountId" -> currentId)) addingToken (token -> currentId)
-      else NotFound(Json obj ("err" -> "Account not found"))
+  def logout: Action[AnyContent] =
+    Action {
+      _.headers.get(authTokenHeader).map(
+        token => Ok.discardingToken(token)
+      ).getOrElse(BadRequest(Json.obj("err" -> "No token is set")))
     }
 
-  def logout : Action[AnyContent] =
-    Action(_.headers get authTokenHeader map { token =>
-        Ok discardingToken token
-    } getOrElse BadRequest(Json obj ("err" -> "No token is set")))
+  def authPing: Action[AnyContent] =
+    AsyncTokenizedAction(parse.anyContent) { token => id => request =>
+      usersDAO.get(id) map {
+        case Some(_) => Ok(Json.obj("userId" -> id)).addingToken(token -> id)
+        case None    => NotFound(Json.obj("err" -> "User not found"))
+      }
+    }
 
-  private[this] def createLoginResponse(email : String, password : String) =
-    findByEmailAndPassword(email, password) map setToken getOrElse NotFound(
-      Json obj ("err" -> "Account not found or password invalid.")
-    )
+  private def createLoginResponse(email: String, pass: String): Future[Result] =
+    usersDAO.getByEmailAndPass(email, pass) map {
+      user => user.map(setToken).getOrElse(NotFound(
+        Json.obj("err" -> "Invalid login parameters")
+      ))
+    }
 
-  private[this] def setToken(account : Account) = {
+  private def setToken(user: User): Result = {
     val token = java.util.UUID.randomUUID.toString
-    Ok(Json obj (
+    Ok(Json.obj(
       "authToken" -> token,
-      "accountId" -> account.id.get
-    )) addingToken (token -> account.id.get)
+      "userId"    -> user.id.get
+    )).addingToken(token -> user.id.get)
   }
 
-  private[this] def doesAccountExist(id : AccountId) =
-    database withSession { implicit session =>
-      (Accounts filter (_.id === id)).exists.run
-    }
-
-  private[this] def findByEmailAndPassword(email : String, password : String) =
-    database withSession { implicit session =>
-      (Accounts findByEmail email).firstOption
-    } filter (_.checkPassword(password))
-
 }
-
-object ApplicationController extends ApplicationController

@@ -1,29 +1,20 @@
-package es.uvigo.ei.sing.sds.controller
+package es.uvigo.ei.sing.sds
+package controller
 
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.Json
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 
-import es.uvigo.ei.sing.sds.database.DatabaseProfile
-import es.uvigo.ei.sing.sds.entity._
+import entity._
+import database._
 
-private[controller] trait KeywordsController extends Controller {
+object KeywordsController extends Controller {
 
-  lazy val database = DatabaseProfile()
+  lazy val keywordsDAO = new KeywordsDAO
 
-  import database._
-  import database.profile.simple._
-
-  def get(id : KeywordId) : Action[AnyContent] =
-    Action {
-      withKeyword(id) { keyword => Ok(Json toJson keyword) }
-    }
-
-  private[this] def withKeyword(id : KeywordId)(f : Keyword => Result) =
-    database withSession { implicit session =>
-      (Keywords findById id).firstOption map f getOrElse NotFound(Json obj ("err" -> "Keyword not found"))
-    }
+  def get(id: Keyword.ID): Action[AnyContent] =
+    Action.async(keywordsDAO.get(id) map {
+      _.map(k => Ok(Json.toJson(k))).getOrElse(NotFound(Json.obj("err" -> "Keyword not found")))
+    })
 
 }
-
-object KeywordsController extends KeywordsController
-

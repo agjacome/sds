@@ -41,18 +41,19 @@ libraryDependencies ++= Seq(
   "uk.ac.cam.ch.wwmm.oscar"   % "oscar4-api" % "4.2.2" exclude("org.slf4j", "slf4j-simple")  exclude("com.google.guava", "guava") ,
 
   // core java/scala
-  "com.typesafe.akka"       %% "akka-actor"    % "2.3.11" ,
-  "com.typesafe.play"       %% "play-jdbc"     % "2.4.0"  ,
-  "com.typesafe.play"       %% "play-cache"    % "2.4.0"  ,
-  "com.typesafe.slick"      %% "slick"         % "3.0.0"  ,
-  "com.typesafe.play"       %% "play-slick"    % "1.0.0"  ,
-  "com.github.t3hnar"       %% "scala-bcrypt"  % "2.4"    ,
-  "org.jsoup"               %  "jsoup"         % "1.8.2"  ,
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.3" ,
+  "com.typesafe.slick"      %% "slick"                 % "3.0.0"  ,
+  "com.typesafe.akka"       %% "akka-actor"            % "2.3.11" ,
+  "com.typesafe.play"       %% "play-cache"            % "2.4.0"  ,
+  "com.typesafe.play"       %% "play-slick"            % "1.0.0"  ,
+  "com.typesafe.play"       %% "play-slick-evolutions" % "1.0.0"  ,
+  "com.github.t3hnar"       %% "scala-bcrypt"          % "2.4"    ,
+  "net.databinder.dispatch" %% "dispatch-core"         % "0.11.3" ,
+  "org.jsoup"               %  "jsoup"                 % "1.8.2"  ,
 
   // database connectors
-  "mysql"            % "mysql-connector-java" % "5.1.35" ,
-  "org.mariadb.jdbc" % "mariadb-java-client"  % "1.1.8"  ,
+  "mysql"            % "mysql-connector-java" % "5.1.35"  ,
+  "org.mariadb.jdbc" % "mariadb-java-client"  % "1.1.8"   ,
+  "com.h2database"   % "h2"                   % "1.4.187" ,
 
   // css/javascript
   "org.webjars" % "angularjs"            % "1.3.15"  exclude("org.webjars", "jquery") ,

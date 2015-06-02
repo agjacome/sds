@@ -23,8 +23,6 @@ trait KeywordsComponent { self: HasDatabaseConfig[JdbcProfile] =>
     def normalized  = column[String]("keyword_normalized")
     def category    = column[Category]("keyword_category")
 
-    def unique_normalized = index("idx_keyword_unique_normalized", normalized, unique = true)
-
     def * = (id.?, normalized, category) <> (Keyword.tupled, Keyword.unapply)
   }
 

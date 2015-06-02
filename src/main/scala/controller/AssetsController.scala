@@ -1,4 +1,6 @@
-package es.uvigo.ei.sing.sds.controller
+package es.uvigo.ei.sing.sds
+package controller
 
-object AssetsController extends controllers.AssetsBuilder(play.api.http.LazyHttpErrorHandler)
+import play.api.http.LazyHttpErrorHandler
 
+object AssetsController extends controllers.AssetsBuilder(LazyHttpErrorHandler)

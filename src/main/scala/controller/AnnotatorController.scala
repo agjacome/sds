@@ -1,37 +1,33 @@
-package es.uvigo.ei.sing.sds.controller
+package es.uvigo.ei.sing.sds
+package controller
 
 import scala.concurrent.Future
-import scala.util.Try
 
-import play.api.mvc._
+import play.api.Play
+import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.mvc._
 
-import es.uvigo.ei.sing.sds.annotator.Annotate
-import es.uvigo.ei.sing.sds.entity.DocumentId
-import es.uvigo.ei.sing.sds.Global.annotator
+import entity._
+import annotator._
 
-private[controller] trait AnnotatorController extends Controller with Authorization {
+object AnnotatorController extends Controller with Authorization {
 
-  import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  lazy val annotator = SDSSettings.annotator
 
-  def annotate( ) : Action[JsValue] =
+  def annotateOne(id: Article.ID): Action[AnyContent] =
+    AuthorizedAction(parse.anyContent) { _ => _ =>
+      annotator ! Annotate(id)
+      Accepted
+    }
+
+  def annotate: Action[JsValue] =
     AuthorizedAction(parse.json) { _ => request =>
-      (request.body \ "ids").validate[Set[DocumentId]] fold (
-        errors => BadRequest(Json obj ("err" -> errors.toString)),
-        annotateIds
+      (request.body \ "ids").validate[Set[Article.ID]].fold(
+        errors => BadRequest(Json.obj("err" -> errors.mkString("\n"))),
+        ids    => { ids.foreach(id => annotator ! Annotate(id)); Accepted }
       )
     }
 
-  private[this] def annotateIds(ids : Set[DocumentId]) =
-    (annotateResult _) tupled (ids map { id => Try(Annotate(id)) } partition (_.isSuccess))
-
-  private[this] def annotateResult(successful : Set[Try[Annotate]], failed : Set[Try[Annotate]]) =
-    if (failed.isEmpty) {
-      Future(successful foreach { t => annotator ! t.get })
-      Accepted
-    } else NotFound(Json obj ("err" -> "Document not found"))
-
 }
-
-object AnnotatorController extends AnnotatorController
-

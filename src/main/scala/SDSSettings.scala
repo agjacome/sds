@@ -31,13 +31,14 @@ object SDSSettings extends GlobalSettings {
     Akka.system.scheduler.schedule(delay, interval, indexer, UpdateIndex)
   }
 
-  override def onStart(app: Application): Unit =
-    createDatabase(app) flatMap { created =>
-      if (created) (new UsersDAO).insert(defaultAdmin(app)).map(_ => ()) else Future.successful(())
-    } onComplete {
-      case Success(_)   => annotator; indexer; indexerSchedule; () // Force evaluation of lazys
-      case Failure(err) => Logger.error("Error while creating database", err); sys.exit(1)
-    }
+  // Force evaluation of lazys, cannot be created as "vals" because they need a
+  // running Play application (Play.current) and that will only be available
+  // when this onStart method is called, but not before.
+  override def onStart(app: Application): Unit = {
+    annotator
+    indexer
+    ()
+  }
 
   override def onError(request: RequestHeader, err: Throwable): Future[Result] = 
     Future.successful {
