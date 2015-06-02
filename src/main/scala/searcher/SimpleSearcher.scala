@@ -1,40 +1,16 @@
-package es.uvigo.ei.sing.sds.searcher
+package es.uvigo.ei.sing.sds
+package searcher
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.slick.jdbc.GetResult
-import scala.slick.jdbc.StaticQuery.interpolation
+import scala.concurrent.Future
 
-import es.uvigo.ei.sing.sds.entity._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-class SimpleSearcher extends SearcherAdapter {
+import entity._
+import service.ABNERService
 
-  import database._
-  import database.profile.simple._
+final class SimpleSearcher extends SearcherAdapter {
 
-  implicit val getKeywordResult: GetResult[Keyword] = GetResult(res => Keyword(
-    Some(KeywordId(res.nextLong)), Sentence(res.nextString), Category(CategoryId(res.nextLong)), Size(res.nextLong)
-  ))
-
-  override def search(searchTerms: Sentence)(implicit ec: ExecutionContext): Future[Set[Keyword]] =
-    Future { searchByWords(searchTerms) }
-
-  private[this] def searchByWords(searchTerms: Sentence): Set[Keyword] =
-    searchTerms.words.foldLeft(Set.empty[Keyword]) {
-      case (set, word) => set ++ searchInAnnotationTexts(s"%$word%")
-    }
-
-  private[this] def searchInAnnotationTexts(searchPattern: String): Seq[Keyword] =
-    database withSession { implicit session =>
-      sql"""
-        SELECT DISTINCT k.keyword_id, k.normalized_text, k.category, k.counter
-        FROM annotations a, keywords k
-        WHERE original_text LIKE $searchPattern AND a.keyword_id = k.keyword_id
-      """.as[Keyword].list
-    }
+  override def search(query: String): Future[Set[Keyword.ID]] =
+    searchNormalized(query.toLowerCase.split("\\s+").toSet)
 
 }
-
-object SimpleSearcher {
-  def apply(): SimpleSearcher = new SimpleSearcher()
-}
-

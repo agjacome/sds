@@ -1,35 +1,22 @@
-package es.uvigo.ei.sing.sds.searcher
+package es.uvigo.ei.sing.sds
+package searcher
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.service.OscarService
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-private[searcher] class OscarSearcher extends SearcherAdapter {
+import entity._
+import service.OscarService
 
-  import database._
-  import database.profile.simple._
+final class OscarSearcher extends SearcherAdapter {
 
-  lazy val oscar = OscarService()
+  lazy val oscar = new OscarService
 
-  override def search(searchTerms : Sentence)(implicit ec : ExecutionContext) =
-    oscar getNamedEntities searchTerms map (_ map oscar.normalize) map {
-      normalizedTerms => searchNormalized(normalizedTerms.toSet)
-    }
-
-  private[this] def searchNormalized(normalizedTerms : Set[Sentence]) =
-    database withSession { implicit session =>
-      normalizedTerms flatMap {
-        normalized => (Keywords findByNormalized normalized).firstOption
-      }
-    }
+  override def search(query: String): Future[Set[Keyword.ID]] =
+    for {
+      entities   <- oscar.getNamedEntities(query)
+      normalized <- Future.sequence(entities.map(oscar.normalize))
+      keywordIds <- searchNormalized(normalized)
+    } yield keywordIds
 
 }
-
-private[searcher] object OscarSearcher extends (() => OscarSearcher) {
-
-  def apply( ) : OscarSearcher =
-    new OscarSearcher()
-
-}
-

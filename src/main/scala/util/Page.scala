@@ -15,7 +15,9 @@ object Page {
     (__ \ 'items).write[Seq[A]] and
     (__ \ 'page).write[Int] and
     (__ \ 'offset).write[Int] and
-    (__ \ 'total).write[Int]
-  )(unlift(Page.unapply[A]))
+    (__ \ 'total).write[Int] and
+    (__ \ 'prev).writeNullable[Int] and
+    (__ \ 'next).writeNullable[Int]
+  )(p => (p.items, p.page, p.offset, p.total, p.prev, p.next))
 
 }

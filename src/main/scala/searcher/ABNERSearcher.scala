@@ -1,35 +1,22 @@
-package es.uvigo.ei.sing.sds.searcher
+package es.uvigo.ei.sing.sds
+package searcher
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.service.ABNERService
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-private[searcher] class ABNERSearcher extends SearcherAdapter {
+import entity._
+import service.ABNERService
 
-  import database._
-  import database.profile.simple._
+final class ABNERSearcher extends SearcherAdapter {
 
-  lazy val abner = ABNERService()
+  lazy val abner = new ABNERService
 
-  override def search(searchTerms : Sentence)(implicit ec : ExecutionContext) =
-    abner getEntities searchTerms map (_ map abner.normalize) map {
-      normalizedTerms => searchNormalized(normalizedTerms.toSet)
-    }
-
-  private[this] def searchNormalized(normalizedTerms : Set[Sentence]) =
-    database withSession { implicit session =>
-      normalizedTerms flatMap {
-        normalized => (Keywords findByNormalized normalized).firstOption
-      }
-    }
+  override def search(query: String): Future[Set[Keyword.ID]] =
+    for {
+      entities   <- abner.getEntities(query)
+      normalized <- Future.sequence(entities.map(abner.normalize))
+      keywordIds <- searchNormalized(normalized)
+    } yield keywordIds
 
 }
-
-private[searcher] object ABNERSearcher extends (() => ABNERSearcher) {
-
-  def apply( ) : ABNERSearcher =
-    new ABNERSearcher()
-
-}
-

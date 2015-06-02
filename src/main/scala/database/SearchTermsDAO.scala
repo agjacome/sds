@@ -60,7 +60,12 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
       ).result.headOption
     }
 
-  def list(page: Int = 0, pageSize: Int = 10, termFilter: String = "%"): Future[Page[SearchTerm]] = {
+  def getKeywordIds(termFilter: String = "%"): Future[Set[Keyword.ID]] =
+    db.run(terms.filter(
+      _.term.toLowerCase like termFilter.toLowerCase
+    ).groupBy(_.keywordId).map(_._1).result).map(_.toSet)
+
+  def searchTerm(page: Int = 0, pageSize: Int = 10, termFilter: String = "%"): Future[Page[SearchTerm]] = {
     val offset = pageSize * page
 
     val query = terms.filter(
@@ -69,6 +74,30 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
 
     for {
       total  <- count(termFilter)
+      result <- db.run(query.result)
+    } yield Page(result, page, offset, total)
+  }
+
+  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID]): Future[Page[(Article, Keyword)]] = {
+    val offset = pageSize * page
+
+    val joined = for {
+      t <- terms
+      a <- articles if t.articleId === a.id
+      k <- keywords if t.keywordId === k.id
+      if t.keywordId inSet keywordIds
+    } yield (t, a, k)
+
+    val query = joined.sortBy(_._1.tfidf.desc).map(
+      tuple => (tuple._2, tuple._3)
+    ).drop(offset).take(pageSize)
+
+    val total = terms.filter(
+      _.keywordId inSet keywordIds
+    ).groupBy(_.articleId).map(_._1).length
+
+    for {
+      total  <- db.run(total.result)
       result <- db.run(query.result)
     } yield Page(result, page, offset, total)
   }
