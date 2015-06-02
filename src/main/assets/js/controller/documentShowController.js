@@ -9,7 +9,7 @@ define(['./main'], function(controller) {
         minimizeCompounds(scope.keywords);
         annotateDocumentText(scope.document, scope.keywords, scope.annotations);
 
-        scope.document.text = sce.trustAsHtml(scope.document.text);
+        scope.document.content = sce.trustAsHtml(scope.document.content);
     };
 
     var minimizeCompounds = function(keywords) {
@@ -22,23 +22,23 @@ define(['./main'], function(controller) {
     var annotateDocumentText = function(doc, keywords, annotations) {
         _.each(filterDuplicateStartPositions(annotations), function(annotation) {
             var keyword = findById(keywords, annotation.keywordId);
-            doc.text    = addAnnotation(doc.text, annotation, keyword);
+            doc.content = addAnnotation(doc.content, annotation, keyword);
         });
     };
 
     var filterDuplicateStartPositions = function(annotations) {
-        var cmp = function(x, y) { return y.startPosition - x.startPosition };
+        var cmp = function(x, y) { return y.start - x.start};
 
         var noDuplicated   = [ ];
         var startPositions = [ ];
 
         _.each(annotations.sort(cmp), function(annotation) {
             var isEmpty  = !_.size(startPositions);
-            var contains = _.indexOf(startPositions, annotation.startPosition) >= 0;
-            var overlaps = _.last(startPositions) < annotation.endPosition;
+            var contains = _.indexOf(startPositions, annotation.start) >= 0;
+            var overlaps = _.last(startPositions) < annotation.end;
 
             if (isEmpty || (!contains && !overlaps)) {
-                startPositions.push(annotation.startPosition);
+                startPositions.push(annotation.start);
                 noDuplicated.push(annotation);
             }
         });
@@ -54,8 +54,8 @@ define(['./main'], function(controller) {
             annotation.text + '</span>';
 
         return text.splice(
-            annotation.startPosition,
-            annotation.endPosition - annotation.startPosition,
+            annotation.start,
+            annotation.end- annotation.start,
             span
         );
     };

@@ -5,7 +5,7 @@
 <div data-ng-show="listing">
     <div class="row pagination-row text-center">
         <div class="col-xs-12">
-            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="listing.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
+            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="listing.total" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
         </div>
     </div>
     <div class="row account-list">
@@ -24,7 +24,7 @@
                             <span class="text-muted fa fa-spin fa-spinner fa-3x"></span>
                         </td>
                     </tr>
-                    <tr data-ng-hide="loading" data-ng-model="listing" data-ng-repeat="a in listing.list | orderBy : ordering">
+                    <tr data-ng-hide="loading" data-ng-model="listing" data-ng-repeat="a in listing.items | orderBy : ordering">
                         <td class="text-center">{{ a.id }}</td>
                         <td>{{ a.email }}</td>
                         <td class="button-cell text-center">
@@ -42,7 +42,7 @@
     </div>
     <div class="row pagination-row text-center">
         <div class="col-xs-12">
-            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="listing.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
+            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="listing.total;" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
         </div>
     </div>
 </div>

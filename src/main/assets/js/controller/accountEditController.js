@@ -5,9 +5,9 @@ define(['./main'], function(controller) {
         service.get({ id : id }).$promise.then(
             function(data) {
                 scope.account = {
-                    id       : data.id,
-                    email    : data.email,
-                    password : '',
+                    id    : data.id,
+                    email : data.email,
+                    pass  : '',
                 };
 
                 rootScope.error     = false;
@@ -47,9 +47,9 @@ define(['./main'], function(controller) {
             if (!(accountId)) $location.path('/');
 
             $scope.account = {
-                id       : accountId,
-                email    : '',
-                password : '',
+                id    : accountId,
+                email : '',
+                pass  : '',
             };
 
             $scope.editAccount = function( ) {

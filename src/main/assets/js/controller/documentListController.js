@@ -36,7 +36,7 @@ define(['./main'], function(controller) {
 
     var annotateDocument = function(service, document, scope, rootScope) {
         service.annotate({ ids : [document.id] }).then(
-            function(data) { document.blocked = true; },
+            function(data) { document.isProcessing = true; },
             function(error) {
                 rootScope.error        = true;
                 rootScope.errorMessage = error.data.err;

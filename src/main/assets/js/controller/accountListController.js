@@ -72,7 +72,7 @@ define(['./main'], function(controller) {
             };
 
             $scope.cannotDelete = function(account) {
-                return $scope.listing.totalCount === 1;
+                return $scope.listing.total === 1;
             };
 
             $scope.deleteAccount = function(account) {

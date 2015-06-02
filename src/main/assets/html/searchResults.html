@@ -11,13 +11,13 @@
     <div class="row text-center">
         <div class="col-xs-12">
             <div class="well well-sm">
-                Found a total of <strong>{{ results.totalCount }}</strong> results for "<span ng-bind="terms"></span>".
+                Found a total of <strong>{{ results.total }}</strong> results for "<span ng-bind="terms"></span>".
             </div>
         </div>
     </div>
     <div class="row pagination-row text-center">
         <div class="col-xs-12">
-            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
+            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.total" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
         </div>
     </div>
     <div data-ng-show="loading" class="row text-center">
@@ -30,13 +30,13 @@
             <tabset>
                 <tab heading="List view">
                     <div id="list-mode">
-                        <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.list">
-                            <a href='' data-ng-click="goToDocument(r.document)" class="title">
-                                <div class="panel-body">{{ r.document.title }}</div>
+                        <div class="panel panel-default" data-ng-model="results" data-ng-repeat="r in results.items">
+                            <a href='' data-ng-click="goToDocument(r.article)" class="title">
+                                <div class="panel-body">{{ r.article.title }}</div>
                             </a>
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="col-xs-12 col-sm-6 col-md-3" data-ng-repeat="k in r.keywords | orderBy: 'occurrences'">
+                                    <div class="col-xs-12 col-sm-6 col-md-3" data-ng-repeat="k in r.keywords"> 
                                         <span data-ng-class="['keyword', k.category.toLowerCase()]" data-tooltip="{{ k.category }}">
                                             {{ k.normalized }}
                                         </span>
@@ -60,7 +60,7 @@
     </div>
     <div class="row pagination-row text-center">
         <div class="col-xs-12">
-            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.totalCount" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
+            <div data-pagination data-ng-model="pageNumber" data-ng-change="pageChanged()" data-total-items="results.total" data-items-per-page="countPerPage" data-boundary-links="true" data-max-size="maxSize" class="pagination-sm"></div>
         </div>
     </div>
 </div>

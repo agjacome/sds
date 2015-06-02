@@ -21,7 +21,7 @@ define(['./main'], function(controller) {
 
             $scope.document = {
                 title    : '',
-                text     : '',
+                content  : '',
                 pubmedId : null
             };
 

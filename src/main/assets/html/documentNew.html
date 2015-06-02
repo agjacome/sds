@@ -19,8 +19,8 @@
                     <div class="form-group col-sm-12 col-md-3" data-ng-class="{ 'has-error' : documentForm.pubmedId.$invalid }">
                         <input type="number" data-min="1" name="pubmedId" placeholder="PubMed ID (Optional)" class="form-control" data-ng-model="document.pubmedId">
                     </div>
-                    <div class="form-group col-xs-12" data-ng-class="{ 'has-error' : document.text != '' && documentForm.text.$invalid }">
-                        <textarea name="text" class="form-control" rows="15" placeholder="Document text" data-ng-model="document.text" required></textarea>
+                    <div class="form-group col-xs-12" data-ng-class="{ 'has-error' : document.content != '' && documentForm.text.$invalid }">
+                        <textarea name="text" class="form-control" rows="15" placeholder="Article content" data-ng-model="document.content" required></textarea>
                     </div>
                 </div>
                 <div class="panel-footer text-center">

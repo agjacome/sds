@@ -4,7 +4,7 @@ define(['app'], function(app) {
     var checkAuthorization = [
         'AuthorizationService', function(AuthorizationService) {
             return AuthorizationService.ping().success(function(data) {
-                AuthorizationService.setAccountId(data.accountId);
+                AuthorizationService.setAccountId(data.userId);
                 return data;
             }).error(function(data) {
                 AuthorizationService.setAccountId(undefined);
@@ -31,41 +31,41 @@ define(['app'], function(app) {
                 $locationProvider.html5Mode(true);
 
             $routeProvider.when('/', {
-                pageTitle   : 'SmartDrugSearch',
+                pageTitle   : 'SDS',
                 templateUrl : 'assets/html/home.html',
                 controller  : 'HomeController',
             });
 
             $routeProvider.when('/about', {
-                pageTitle   : 'About :: SmartDrugSearch',
+                pageTitle   : 'About - SDS',
                 templateUrl : 'assets/html/about.html',
             });
 
             $routeProvider.when('/api', {
-                pageTitle   : 'API Documentation :: SmartDrugSearch',
+                pageTitle   : 'API Documentation - SDS',
                 templateUrl : 'assets/html/api.html',
             });
 
             $routeProvider.when('/help', {
-                pageTitle   : 'Help :: SmartDrugSearch',
+                pageTitle   : 'Help - SDS',
                 templateUrl : 'assets/html/help.html',
             });
 
             $routeProvider.when('/search', {
-                pageTitle   : ' :: SmartDrugSearch',
+                pageTitle   : ' - SDS',
                 templateUrl : 'assets/html/searchResults.html',
                 controller  : 'SearchResultsController',
             });
 
             $routeProvider.when('/document/:id', {
-                pageTitle      : ' :: Document :: SmartDrugSearch',
+                pageTitle      : ' - Document - SDS',
                 templateUrl    : 'assets/html/documentShow.html',
                 controller     : 'DocumentShowController',
                 reloadOnSearch : false,
             });
 
             $routeProvider.when('/login', {
-                pageTitle   : 'Sign In :: SmartDrugSearch',
+                pageTitle   : 'Sign In - SDS',
                 templateUrl : 'assets/html/login.html',
                 controller  : 'AuthorizationController',
             });
@@ -79,42 +79,42 @@ define(['app'], function(app) {
             });
 
             $routeProvider.when('/admin/documents', {
-                pageTitle   : 'Documents :: Admin Panel :: SmartDrugSearch',
+                pageTitle   : 'Documents - Admin Panel - SDS',
                 templateUrl : 'assets/html/documentList.html',
                 controller  : 'DocumentListController',
                 resolve     : { authorize : checkAuthorization },
             });
 
             $routeProvider.when('/admin/document/new', {
-                pageTitle   : 'New Document :: Admin Panel :: SmartDrugSearch',
+                pageTitle   : 'New Document - Admin Panel - SDS',
                 templateUrl : 'assets/html/documentNew.html',
                 controller  : 'DocumentNewController',
                 resolve     : { authorize : checkAuthorization },
             });
 
             $routeProvider.when('/admin/provider/pubmed', {
-                pageTitle   : 'PubMed Provider :: Admin Panel :: SmartDrugSearch',
+                pageTitle   : 'PubMed Provider - Admin Panel - SDS',
                 templateUrl : 'assets/html/pubmedProvider.html',
                 controller  : 'PubMedProviderController',
                 resolve     : { authorize : checkAuthorization },
             });
 
             $routeProvider.when('/admin/accounts', {
-                pageTitle   : 'Accounts :: Admin Panel :: SmartDrugSearch',
+                pageTitle   : 'Accounts - Admin Panel - SDS',
                 templateUrl : 'assets/html/accountList.html',
                 controller  : 'AccountListController',
                 resolve     : { authorize : checkAuthorization },
             });
 
             $routeProvider.when('/admin/account/new', {
-                pageTitle   : 'Create Account :: Admin Panel :: SmartDrugSearch',
+                pageTitle   : 'Create Account - Admin Panel - SDS',
                 templateUrl : 'assets/html/accountNew.html',
                 controller  : 'AccountNewController',
                 resolve     : { authorize : checkAuthorization },
             });
 
             $routeProvider.when('/admin/account/edit/:id', {
-                pageTitle   : ' :: Edit Account :: Admin Panel :: SmartDrugSearch',
+                pageTitle   : ' - Edit Account - Admin Panel - SDS',
                 templateUrl : 'assets/html/accountEdit.html',
                 controller  : 'AccountEditController',
                 resolve     : { authorize : checkAuthorization },

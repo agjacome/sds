@@ -6,10 +6,10 @@ define(['./main'], function(service) {
             search : function(terms, limit, page, count) {
                 return $http.get('api/provider/pubmed/search', {
                     params : {
-                        query : terms,
-                        limit : limit,
-                        page  : page,
-                        count : count,
+                        query: terms,
+                        limit: limit,
+                        page : page,
+                        count: count,
                     }
                 });
             },
