@@ -24,7 +24,7 @@ final class EUtilsService extends EUtilsServiceSoapBindings with Soap11Clients w
       Page(extractResultPMIDs(result).toSeq, page, offset, countResults(result))
     }
 
-  def fetchPubMedArticles(pmids: Set[Article.PMID]): Future[Seq[Article]] =
+  def fetchPubMedArticles(pmids: Set[Article.PMID]): Future[Set[Article]] =
     Future {
       service.run_eFetch(
         id        = Some(pmids mkString ","),
@@ -35,7 +35,7 @@ final class EUtilsService extends EUtilsServiceSoapBindings with Soap11Clients w
         retstart  = None,
         retmax    = None,
         rettype   = Some("abstract")
-      ).right.toOption.fold(Set.empty[Article])(parseResultArticles).toSeq
+      ).right.toOption.fold(Set.empty[Article])(parseResultArticles)
     }
 
   def fetchTaxonomyScientificName(taxonomyId: Long): Future[Option[String]] =

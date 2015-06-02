@@ -1,45 +1,26 @@
-package es.uvigo.ei.sing.sds.provider
+package es.uvigo.ei.sing.sds
+package provider
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
-import es.uvigo.ei.sing.sds.database.DatabaseProfile
-import es.uvigo.ei.sing.sds.entity._
-import es.uvigo.ei.sing.sds.service.EUtilsService
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-class PubMedProvider private {
+import entity._
+import database._
+import service.EUtilsService
+import util.Page
 
-  lazy val database = DatabaseProfile()
-  lazy val eUtils   = EUtilsService()
+final class PubMedProvider {
 
-  import database.Documents
-  import database.profile.simple._
+  lazy val eUtils      = new EUtilsService
+  lazy val articlesDAO = new ArticlesDAO
 
-  def search(terms : Sentence, limit : Option[Size], pageNumber : Position, pageSize : Size)(
-    implicit ec : ExecutionContext
-  ) : Future[PubMedIdList] =
-    Future(eUtils findPubMedIds (terms, limit, (pageNumber - 1) * pageSize, pageSize)) map {
-      case (total, ids) => PubMedIdList(total, pageNumber, pageSize, ids.toSeq)
-    }
+  def search(query: String, limit: Option[Int], page: Int, pageSize: Int): Future[Page[Article.PMID]] =
+    eUtils.searchArticlePMID(query, limit, page, pageSize)
 
-  def download(ids : Set[PubMedId])(implicit ec : ExecutionContext) : Future[Set[DocumentId]] =
-    Future { eUtils fetchPubMedArticles ids } map {
-      documents => (documents.par map saveDocument).seq
-    }
-
-  private[this] def saveDocument(document : Document) : DocumentId =
-    database withTransaction { implicit session =>
-      (Documents findByPubMedId document.pubmedId.get).firstOption match {
-        case Some(doc) => doc.id.get
-        case None      => Documents returning Documents.map(_.id) += document
-      }
-    }
+  def download(ids: Set[Article.PMID]): Future[Set[Article]] =
+    eUtils.fetchPubMedArticles(ids) flatMap {
+      articles => articlesDAO.insert(articles.toSeq: _*)
+    } map (_.toSet)
 
 }
-
-object PubMedProvider extends (() => PubMedProvider) {
-
-  def apply( ) : PubMedProvider =
-    new PubMedProvider
-
-}
-
