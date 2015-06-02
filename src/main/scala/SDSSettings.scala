@@ -2,7 +2,7 @@ package es.uvigo.ei.sing.sds
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
-import scala.util.{ Try, Success, Failure }
+import scala.util.{ Success, Failure }
 
 import akka.actor._
 
@@ -22,17 +22,20 @@ object SDSSettings extends GlobalSettings {
 
   import Play.current
 
-  lazy val annotator = Akka.system.actorOf(Props[Annotator], "annotator")
-  lazy val indexer   = Akka.system.actorOf(Props[IndexerService], "indexer")
+  lazy val annotator: ActorRef = Akka.system.actorOf(Props[Annotator], "annotator")
+  lazy val indexer:   ActorRef = Akka.system.actorOf(Props[IndexerService], "indexer")
 
-  // FIXME: delete mutable state
-  private var indexerSchedule: Cancellable = _
+  lazy val indexerSchedule: Cancellable = {
+    val delay    = current.configuration.getMilliseconds("indexer.initialDelay").getOrElse(500L).milliseconds
+    val interval = current.configuration.getMilliseconds("indexer.interval"    ).getOrElse(3600000L).milliseconds
+    Akka.system.scheduler.schedule(delay, interval, indexer, UpdateIndex)
+  }
 
   override def onStart(app: Application): Unit =
     createDatabase(app) flatMap { created =>
       if (created) (new UsersDAO).insert(defaultAdmin(app)).map(_ => ()) else Future.successful(())
     } onComplete {
-      case Success(_)   => indexerSchedule = scheduleIndexer(app)
+      case Success(_)   => annotator; indexer; indexerSchedule; () // Force evaluation of lazys
       case Failure(err) => Logger.error("Error while creating database", err); sys.exit(1)
     }
 
@@ -51,11 +54,5 @@ object SDSSettings extends GlobalSettings {
 
   override def onBadRequest(request : RequestHeader, error : String): Future[Result] =
     Future.successful(BadRequest(Json.obj("err" -> s"Bad Request: $error")))
-
-  private def scheduleIndexer(app: Application): Cancellable = {
-    val delay    = app.configuration.getMilliseconds("indexer.initialDelay").get.milliseconds
-    val interval = app.configuration.getMilliseconds("indexer.interval"    ).get.milliseconds
-    Akka.system(app).scheduler.schedule(delay, interval, indexer, UpdateIndex)
-  }
 
 }
