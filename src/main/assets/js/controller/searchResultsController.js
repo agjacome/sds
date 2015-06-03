@@ -15,6 +15,17 @@ define(['./main'], function(controller) {
     var COUNT_PER_PAGE       = 10;
     var MAX_PAGINATION_LINKS =  5;
 
+    sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+        var k,
+        neighbors = {},
+        index = this.allNeighborsIndex[nodeId] || {};
+
+        for (k in index)
+            neighbors[k] = this.nodesIndex[k];
+
+        return neighbors;
+    });
+
     var minimizeCompounds = function(results) {
         _.each(results, function(result) {
             _.each(result.keywords, function(keyword) {
@@ -34,12 +45,14 @@ define(['./main'], function(controller) {
         var nodeIds = [ ];
         _.each(keywords, function(keyword) {
             var node = {
-                id    : '' + keyword.id,
-                x     : Math.random(),
-                y     : Math.random(),
-                size  : 10,
-                label : keyword.normalized,
-                color : COLORS[keyword.category]
+                id            : '' + keyword.id,
+                x             : Math.random(),
+                y             : Math.random(),
+                size          : 10,
+                label         : keyword.normalized,
+                originalLabel : keyword.normalized,
+                color         : COLORS[keyword.category],
+                originalColor : COLORS[keyword.category]
             };
 
             if (!_.contains(nodeIds, node.id)) {
@@ -53,11 +66,12 @@ define(['./main'], function(controller) {
             _.each(doc.keywords, function(k1) {
                 _.each(doc.keywords, function(k2) {
                     var edge = {
-                        id     : '' + k1.id + '-' + k2.id,
-                        source : '' + k1.id,
-                        target : '' + k2.id,
-                        size   : 1,
-                        color  : '#444444',
+                        id            : '' + k1.id + '-' + k2.id,
+                        source        : '' + k1.id,
+                        target        : '' + k2.id,
+                        size          : 1,
+                        color         : '#444444',
+                        originalColor : '#444444',
                     };
 
                     if (!_.contains(edgeIds, edge.id)) {
@@ -69,7 +83,47 @@ define(['./main'], function(controller) {
             });
         });
 
+
         return graph;
+    };
+
+    var bindClickToSigma = function(s) {
+        s.bind('clickNode', function(e) {
+            var nodeId = e.data.node.id,
+            toKeep = s.graph.neighbors(nodeId);
+            toKeep[nodeId] = e.data.node;
+
+            s.graph.nodes().forEach(function(n) {
+                if (toKeep[n.id])
+                    n.color = n.originalColor;
+                else {
+                    n.color = '#ccc';
+                    n.label = '';
+                }
+            });
+
+            s.graph.edges().forEach(function(e) {
+                if (toKeep[e.source] && toKeep[e.target])
+                    e.color = e.originalColor;
+                else
+                    e.color = '#ccc';
+            });
+
+            s.refresh();
+        });
+
+        s.bind('clickStage', function(e) {
+            s.graph.nodes().forEach(function(n) {
+                n.color = n.originalColor;
+                n.label = n.originalLabel;
+            });
+
+            s.graph.edges().forEach(function(e) {
+                e.color = e.originalColor;
+            });
+
+            s.refresh();
+        });
     };
 
     var search = function(service, scope, rootScope) {
@@ -88,6 +142,8 @@ define(['./main'], function(controller) {
                     graph: getGraph(response.data.list),
                     container: 'graph-container',
                 });
+
+                bindClickToSigma(scope.sigmaGraph);
 
                 scope.refreshGraph();
             },
