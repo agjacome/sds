@@ -94,9 +94,10 @@ define(['./main'], function(controller) {
             toKeep[nodeId] = e.data.node;
 
             s.graph.nodes().forEach(function(n) {
-                if (toKeep[n.id])
+                if (toKeep[n.id]) {
                     n.color = n.originalColor;
-                else {
+                    n.label = n.originalLabel;
+                } else {
                     n.color = '#ccc';
                     n.label = '';
                 }
