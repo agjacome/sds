@@ -82,7 +82,7 @@ object KeywordsDAO {
 
   import slick.ast.Ordering
   import slick.ast.Ordering.{ Asc, NullsDefault }
-  import slick.lifted.{ ColumnOrdered, Query, Rep }
+  import slick.lifted.ColumnOrdered
 
   private type Keywords = KeywordsComponent#Keywords
 

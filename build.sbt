@@ -12,16 +12,14 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-language:postfixOps",
   "-unchecked",
-  // "-Xfatal-warnings",
+  "-Xfatal-warnings",
   "-Xfuture",
   "-Xlint",
-  // "-Yno-adapted-args",
-  // "-Yno-imports",
-  // "-Yno-predef",
+  "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard"
-  // "-Ywarn-unused-import"
+  // "-Ywarn-unused-import" // commented out because twirl and routes file
 )
 
 resolvers ++= Seq(

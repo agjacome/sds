@@ -1,7 +1,6 @@
 package es.uvigo.ei.sing.sds
 package annotator
 
-import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 

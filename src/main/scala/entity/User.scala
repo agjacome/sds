@@ -7,8 +7,6 @@ import play.api.libs.functional.syntax._
 import play.api.data.Form
 import play.api.data.Forms._
 
-import com.github.t3hnar.bcrypt._
-
 final case class User (
   id:    Option[User.ID],
   email: String,

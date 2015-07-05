@@ -13,8 +13,6 @@ import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 
-import entity._
-import database._
 import annotator._
 import service._
 

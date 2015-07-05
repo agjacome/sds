@@ -5,7 +5,6 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 import play.api.Play
-import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.{ Json, JsValue }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
