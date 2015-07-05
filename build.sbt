@@ -2,7 +2,7 @@ name         := "sds"
 organization := "es.uvigo.ei.sing"
 version      := "1.1.0"
 
-scalaVersion  := "2.11.6"
+scalaVersion := "2.11.7"
 scalacOptions ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8",
@@ -32,8 +32,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   // scala lang modules
-  "org.scala-lang.modules"  %% "scala-xml"                % "1.0.4" ,
-  "org.scala-lang.modules"  %% "scala-parser-combinators" % "1.0.4" ,
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.4" ,
 
   // NER Tools
   "abner"                     % "abner"      % "1.5" ,
@@ -43,7 +42,7 @@ libraryDependencies ++= Seq(
   // core java/scala
   "com.typesafe.slick"      %% "slick"                 % "3.0.0"  ,
   "com.typesafe.akka"       %% "akka-actor"            % "2.3.11" ,
-  "com.typesafe.play"       %% "play-cache"            % "2.4.0"  ,
+  "com.typesafe.play"       %% "play-cache"            % "2.4.2"  ,
   "com.typesafe.play"       %% "play-slick"            % "1.0.0"  ,
   "com.typesafe.play"       %% "play-slick-evolutions" % "1.0.0"  ,
   "com.github.t3hnar"       %% "scala-bcrypt"          % "2.4"    ,
@@ -51,7 +50,7 @@ libraryDependencies ++= Seq(
   "org.jsoup"               %  "jsoup"                 % "1.8.2"  ,
 
   // database connectors
-  "mysql"            % "mysql-connector-java" % "5.1.35"  ,
+  "mysql"            % "mysql-connector-java" % "5.1.36"  ,
   "org.mariadb.jdbc" % "mariadb-java-client"  % "1.1.8"   ,
   "com.h2database"   % "h2"                   % "1.4.187" ,
 
@@ -73,8 +72,9 @@ libraryDependencies ++= Seq(
 )
 
 import PlayKeys._
+import TwirlKeys.{ compileTemplates, templateImports }
 
-val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbSettings : _*).settings(
+val sds = (project in file(".")).enablePlugins(PlayScala).settings(
 
   sourceDirectory in Compile := baseDirectory.value / "src/main" ,
   sourceDirectory in Test    := baseDirectory.value / "src/test" ,
@@ -82,26 +82,15 @@ val sds = (project in file(".")).enablePlugins(PlayScala).settings(scalaxbSettin
   scalaSource in Compile := (sourceDirectory in Compile).value / "scala" ,
   scalaSource in Test    := (sourceDirectory in    Test).value / "scala" ,
 
-  javaSource in Compile := (sourceDirectory in Compile).value / "java" ,
-  javaSource in Test    := (sourceDirectory in    Test).value / "java" ,
-
   resourceDirectory in Compile := (sourceDirectory in Compile).value / "resources" ,
   resourceDirectory in Test    := (sourceDirectory in    Test).value / "resources" ,
 
   sourceDirectory in Assets := (sourceDirectory in Compile).value / "assets" ,
   pipelineStages := Seq(rjs, digest, gzip) ,
 
-  sourceDirectory in (Compile, TwirlKeys.compileTemplates) := (sourceDirectory in Compile).value / "twirl" ,
-  TwirlKeys.templateImports += "es.uvigo.ei.sing.sds.controller._" ,
+  sourceDirectory in (Compile, compileTemplates) := (sourceDirectory in Compile).value / "twirl" ,
+  templateImports += "es.uvigo.ei.sing.sds.controller._" ,
 
-  ScalaxbKeys.dispatchVersion  in (Compile, ScalaxbKeys.scalaxb) := "0.11.3" ,
-  ScalaxbKeys.packageName      in (Compile, ScalaxbKeys.scalaxb) := "es.uvigo.ei.sing.sds.generated"       ,
-  ScalaxbKeys.wsdlSource       in (Compile, ScalaxbKeys.scalaxb) := baseDirectory.value / "share" / "wsdl" ,
-  ScalaxbKeys.xsdSource        in (Compile, ScalaxbKeys.scalaxb) := baseDirectory.value / "share" / "xsd"  ,
-
-  ScalaxbKeys.async in (Compile, ScalaxbKeys.scalaxb) := false ,
-  sourceGenerators in Compile <+= ScalaxbKeys.scalaxb in Compile ,
-
-  shellPrompt := { state => name.value + " » " }
+  shellPrompt := { _ => name.value + " » " }
 
 )

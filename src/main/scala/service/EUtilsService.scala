@@ -2,112 +2,80 @@ package es.uvigo.ei.sing.sds
 package service
 
 import scala.concurrent.Future
+import scala.xml.{ Elem => XMLElement, Node => XMLNode }
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
+import dispatch.{ url, Http, Res }
+
 import org.jsoup.Jsoup
 
-import scalaxb._
-
 import entity._
-import generated._
 import util.Page
 
 // TODO: parse List[Author] for each Article
+final class EUtilsService {
 
-final class EUtilsService extends EUtilsServiceSoapBindings with Soap11Clients with DispatchHttpClients {
+  implicit val asXML: Res => XMLElement = dispatch.as.xml.Elem
 
-  def searchArticlePMID(query: String, days: Option[Int] = None, page: Int = 0, pageSize: Int = 30): Future[Page[Article.PMID]] =
-    Future {
-      val offset = page * pageSize
-      val result = searchPubMed(query, days, offset, pageSize)
-      Page(extractResultPMIDs(result).toSeq, page, offset, countResults(result))
+  def searchArticlePMID(query: String, days: Option[Int] = None, page: Int = 0, pageSize: Int = 30): Future[Page[Article.PMID]] = {
+    val offset = page * pageSize
+    search("pubmed", query, days, offset, pageSize) map {
+      result => Page(idList(result), page, offset, count(result))
     }
+  }
 
   def fetchPubMedArticles(pmids: Set[Article.PMID]): Future[Set[Article]] =
-    Future {
-      service.run_eFetch(
-        id        = Some(pmids mkString ","),
-        webEnv    = None,
-        query_key = None,
-        tool      = None,
-        email     = None,
-        retstart  = None,
-        retmax    = None,
-        rettype   = Some("abstract")
-      ).right.toOption.fold(Set.empty[Article])(parseResultArticles)
-    }
+    fetch("pubmed", pmids, "abstract").map(parseResultArticles).map(_.toSet)
 
   def fetchTaxonomyScientificName(taxonomyId: Long): Future[Option[String]] =
-    Future {
-      service.run_eSummary(
-        db        = Some("taxonomy"),
-        id        = Some(taxonomyId.toString),
-        webEnv    = None,
-        query_key = None,
-        retstart  = None,
-        retmax    = None,
-        tool      = None,
-        email     = None
-      ).right.toOption.flatMap(parseScientificName)
-    }
+    summary("taxonomy", taxonomyId).map(parseScientificName)
 
-  private def searchPubMed(query: String, reldate: Option[Int], retstart: Int, retmax: Int): Option[ESearchResult] =
-    service.run_eSearch(
-      db         = Some("pubmed"),
-      term       = Some(query),
-      datetype   = Some("edat"),
-      reldate    = reldate.map(_.toString),
-      retStart   = Some(retstart.toString),
-      retMax     = Some(retmax.toString),
-      webEnv     = None,
-      queryKey   = None,
-      usehistory = None,
-      tool       = None,
-      email      = None,
-      field      = None,
-      mindate    = None,
-      maxdate    = None,
-      rettype    = None,
-      sort       = None
-    ).right.toOption
+  def serviceURL(service: String): String =
+    s"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/$service.fcgi"
 
-  private def countResults(result: Option[ESearchResult]): Int =
-    result.flatMap(_.Count).fold(0)(_.toInt)
+  def search(db: String, query: String, reldate: Option[Int], retstart: Int, retmax: Int): Future[XMLElement] =
+    simpleHttpRequest(serviceURL("esearch"))(
+      "db"       -> db,
+      "term"     -> query,
+      "retstart" -> retstart.toString,
+      "retmax"   -> retmax.toString,
+      "datetype" -> "edat",
+      "reldate"  -> reldate.map(_.toString).getOrElse("")
+    )
 
-  private def extractResultPMIDs(result: Option[ESearchResult]): Set[Article.PMID] =
-    result.flatMap(_.IdList).fold(Set.empty[Article.PMID])(_.Id.map(_.toLong).toSet)
+  def fetch(db: String, ids: Set[Long], rettype: String): Future[XMLElement] =
+    simpleHttpRequest(serviceURL("efetch"))(
+      "db"      -> db,
+      "id"      -> ids.mkString(","),
+      "rettype" -> rettype
+    )
 
-  private def parseResultArticles(result: EFetchResult): Set[Article] =
-    result.PubmedArticleSet.fold(Set.empty[Article])(parseArticleSet)
+  def summary(db: String, id: Long): Future[XMLElement] =
+    simpleHttpRequest(serviceURL("esummary"))(
+      "db" -> db, "id" -> id.toString
+    )
 
-  private def parseArticleSet(articles: PubmedArticleSet): Set[Article] =
-    articles.pubmedarticlesetoption flatMap {
-      case DataRecord(_, _, PubmedArticleType(medline, _))  => parseArticleType(medline)
-      case DataRecord(_, _, PubmedBookArticleType(book, _)) => parseBookType(book)
-    } toSet
+  private def simpleHttpRequest[A](address: String)(params: (String, String)*)(implicit asA: Res => A): Future[A] =
+    Http(dispatch.url(address).setBodyEncoding("UTF-8") <<? params > asA)
 
-  private def parseArticleType(medline: MedlineCitationType): Option[Article] =
-    medline.Article.Abstract map { 
-      txt => Article(
-        Some(medline.PMID.value.toLong),
-        Jsoup.parse(medline.Article.ArticleTitle.value).text,
-        Jsoup.parse(txt.AbstractText.head.value).text
-      )
-    }
+  private def count(result: XMLElement): Int =
+    (result \ "Count").headOption.fold(0)(_.text.toInt)
 
-  private def parseBookType(book: BookDocumentType): Option[Article] =
-    book.ArticleTitle.flatMap(title => book.Abstract.map(txt => (title, txt))) map {
-      case (title, txt) => Article(
-        Some(book.PMID.value.toLong),
-        title.value,
-        txt.AbstractText.head.value
-      )
-    }
+  private def idList(result: XMLElement): Seq[Article.PMID] =
+    (result \ "IdList" \ "Id").map(_.text).map(_.toLong)
 
-  private def parseScientificName(summary: ESummaryResult): Option[String] = {
-    val items = summary.DocSum.flatMap(_.Item).filter(_.Name == "ScientificName")
-    items.headOption.flatMap(_.ItemContent)
-  }
+  private def parseResultArticles(result: XMLElement): Seq[Article] =
+    (result \ "PubmedArticle").map(parseArticle).flatten
+
+  private def parseArticle(article: XMLNode): Option[Article] =
+    for {
+      pmid  <- (article \\ "PMID").headOption.map(_.text.toLong)
+      title <- (article \\ "ArticleTitle").headOption.map(_.text.dropRight(1))
+      abstr <- (article \\ "AbstractText").headOption.map(_.text)
+    } yield Article(Some(pmid), title, title + System.lineSeparator + abstr)
+
+  private def parseScientificName(result: XMLElement): Option[String] =
+    (result \\ "Item").filter(_.attribute("Name").exists(_.text == "ScientificName")).headOption.map(_.text)
 
 }
