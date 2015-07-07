@@ -8,8 +8,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import dispatch.{ url, Http, Res }
 
-import org.jsoup.Jsoup
-
 import entity._
 import util.Page
 

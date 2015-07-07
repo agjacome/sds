@@ -39,17 +39,10 @@ object LinnaeusService {
   import uk.ac.man.entitytagger.matching.{ Matcher, Postprocessor }
   import uk.ac.man.entitytagger.matching.matchers.{ MatchPostProcessor, VariantDictionaryMatcher }
 
-  lazy val dictionary  = getClass.getResourceAsStream("/linnaeus/dict-species.tsv")
-  lazy val frequencies = getClass.getResourceAsStream("/linnaeus/freq-species.tsv")
-  lazy val stopList    = getClass.getResourceAsStream("/linnaeus/stoplist.tsv")
-  lazy val synonyms    = getClass.getResourceAsStream("/linnaeus/synonyms.tsv")
-
   lazy val linnaeus: Matcher = new MatchPostProcessor(
-    VariantDictionaryMatcher.load(dictionary, true),
-    Matcher.Disambiguation.ON_WHOLE,
-    true,
-    null,
-    new Postprocessor(Array(stopList), Array(synonyms), Array(frequencies), null, null)
+    VariantDictionaryMatcher.load(resourceStream("/linnaeus/dict-species.tsv"), true),
+    Matcher.Disambiguation.ON_WHOLE, true, null,
+    new Postprocessor(Array(resourceStream("/linnaeus/stoplist.tsv")), Array(resourceStream("/linnaeus/synonyms.tsv")), Array(resourceStream("/linnaeus/freq-species.tsv")), null, null)
   )
 
   implicit class MentionOps(mention: Mention) {
