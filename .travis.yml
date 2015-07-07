@@ -5,7 +5,6 @@ jdk:
   - oraclejdk7
 before_script:
   - tar -C src/main/resources --lzma -xvf share/linnaeus.tar.lzma
-  - tar -C src/main/resources --lzma -xvf share/abner.tar.lzma
 notifications:
   email:
     recipients:
