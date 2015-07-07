@@ -1,8 +1,8 @@
 language: scala
 scala:
-  - 2.11.6
+  - 2.11.7
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 before_script:
   - tar -C src/main/resources --lzma -xvf share/linnaeus.tar.lzma
 notifications:
