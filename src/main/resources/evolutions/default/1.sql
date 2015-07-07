@@ -3,7 +3,7 @@
 CREATE TABLE users (
     user_id       BIGINT(20)   NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_email    VARCHAR(255) NOT NULL UNIQUE,
-    user_password CHAR(60)     NOT NULL,
+    user_password CHAR(60)     NOT NULL
 );
 
 -- Default user is:
