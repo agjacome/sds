@@ -131,7 +131,7 @@ define(['./main'], function(controller) {
         scope.loading = true;
         scope.sigmaGraph.kill();
 
-        service.search(scope.terms, scope.pageNumber, COUNT_PER_PAGE).then(
+        service.search(scope.terms, Math.max(0, scope.pageNumber - 1), COUNT_PER_PAGE).then(
             function(response) {
                 scope.loading   = false;
                 rootScope.error = false;

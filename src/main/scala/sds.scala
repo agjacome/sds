@@ -12,10 +12,10 @@ package object sds {
   def httpContext(implicit app: Application): String =
     app.configuration.getString("play.http.context") map {
       case path if path endsWith "/" => path
-      case path                      => path
+      case path                      => path + "/"
     } getOrElse "/"
 
-  implicit class OptionOps[A](val opt: Option[A]) {
+  implicit class OptionOps[A](val opt: Option[A]) extends AnyVal {
     def getOrError(message: String): A =
       opt.getOrElse(sys.error(message))
   }

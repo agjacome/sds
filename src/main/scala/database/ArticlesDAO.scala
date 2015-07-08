@@ -29,7 +29,7 @@ trait ArticlesComponent { self: HasDatabaseConfig[JdbcProfile] =>
     def * = (id.?, pubmedId, title, content, isAnnotated, isProcessing) <> (Article.tupled, Article.unapply)
   }
 
-  val articles = TableQuery[Articles]
+  lazy val articles = TableQuery[Articles]
 
 }
 

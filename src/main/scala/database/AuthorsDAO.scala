@@ -28,7 +28,7 @@ trait AuthorsComponent { self: HasDatabaseConfig[JdbcProfile] =>
     def * = (id.?, pubmedId, lastName, firstName, initials) <> (Author.tupled, Author.unapply)
   }
 
-  val authors = TableQuery[Authors]
+  lazy val authors = TableQuery[Authors]
 
 }
 

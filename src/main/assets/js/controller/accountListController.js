@@ -7,7 +7,8 @@ define(['./main'], function(controller) {
     var list = function(service, scope, rootScope) {
         scope.loading = true;
         service.query({
-            page : scope.pageNumber, count : COUNT_PER_PAGE
+            page : Math.max(0, scope.pageNumber - 1),
+            count : COUNT_PER_PAGE
         }).$promise.then(
             function(data) {
                 scope.loading   = false;

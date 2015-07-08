@@ -16,7 +16,8 @@ trait KeywordsComponent { self: HasDatabaseConfig[JdbcProfile] =>
 
   import driver.api._
 
-  implicit val CategoryColumnType = MappedColumnType.base[Category, Long](_.id, Category.fromId)
+  implicit def CategoryColumnType: BaseColumnType[Category] =
+    MappedColumnType.base[Category, Long](_.id, Category.fromId)
 
   class Keywords(tag: Tag) extends Table[Keyword](tag, "keywords") {
     def id          = column[Keyword.ID]("keyword_id", O.PrimaryKey, O.AutoInc)
@@ -26,7 +27,7 @@ trait KeywordsComponent { self: HasDatabaseConfig[JdbcProfile] =>
     def * = (id.?, normalized, category) <> (Keyword.tupled, Keyword.unapply)
   }
 
-  val keywords = TableQuery[Keywords]
+  lazy val keywords = TableQuery[Keywords]
 
 }
 

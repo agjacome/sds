@@ -28,11 +28,17 @@ final class ABNERService {
 
   import ABNERService._
 
-  def getEntities(text: String): Future[Set[ABNEREntity]] =
-    Future(abner.getEntities(text)) map {
-      case Array(es, cs) => toEntities(es.zip(cs.map(toCategory)), text)
-    } recover {
-      case NonFatal(e) => Logger.info("Hidden ABNER error:", e); Set.empty
+  def getEntities(text: String): Future[Set[ABNEREntity]] = 
+    Future {
+      val entities = try abner getEntities text catch {
+        case NonFatal(e) =>
+          Logger.info("Hidden ABNER error:", e);
+          Array.empty
+      }
+
+      entities match {
+        case Array(es, cs) => toEntities(es.zip(cs.map(toCategory)), text)
+      }
     }
 
   def normalize(entity: ABNEREntity): Future[String] =
@@ -45,7 +51,6 @@ final class ABNERService {
   private def toEntities(entities: Seq[(String, Category)], text: String): Set[ABNEREntity] = {
     @tailrec def iter(xs: Seq[(String, Category)], pos: Int, acc: Set[ABNEREntity]): Set[ABNEREntity] =
       if (xs.isEmpty) acc else {
-        println(xs.head)
         val (term, category) = xs.head
         findPositions(term, text, pos.toInt) match {
           case Some((start, end)) => iter(xs.tail, end, acc + ABNEREntity(term, category, start, end))
@@ -63,6 +68,6 @@ final class ABNERService {
 
 object ABNERService {
 
-  lazy val abner: Tagger = new Tagger
+  lazy val abner: Tagger = new Tagger(Tagger.NLPBA)
 
 }

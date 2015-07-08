@@ -18,9 +18,17 @@ final class PubMedProvider {
   def search(query: String, limit: Option[Int], page: Int, pageSize: Int): Future[Page[Article.PMID]] =
     eUtils.searchArticlePMID(query, limit, page, pageSize)
 
-  def download(ids: Set[Article.PMID]): Future[Set[Article]] =
-    eUtils.fetchPubMedArticles(ids) flatMap {
-      articles => articlesDAO.insert(articles.toSeq: _*)
-    } map (_.toSet)
+  def download(pmidsToDownload: Set[Article.PMID]): Future[Set[Article]] = {
+    val existingArticles = Future.sequence {
+      pmidsToDownload.map(articlesDAO.getByPubmedId)
+    } map { _.flatten }
+
+    for {
+      existing <- existingArticles
+      pmids     = pmidsToDownload -- existing.flatMap(_.pubmedId)
+      fetched  <- eUtils.fetchPubMedArticles(pmids)
+      inserted <- articlesDAO.insert(fetched.toSeq: _*)
+    } yield existing ++ inserted
+  }
 
 }

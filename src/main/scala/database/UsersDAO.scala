@@ -26,7 +26,7 @@ trait UsersComponent { self: HasDatabaseConfig[JdbcProfile] =>
     def * = (id.?, email, pass) <> (User.tupled, User.unapply)
   }
 
-  val users = TableQuery[Users]
+  lazy val users = TableQuery[Users]
 
 }
 

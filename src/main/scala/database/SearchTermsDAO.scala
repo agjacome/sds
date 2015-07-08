@@ -21,7 +21,7 @@ trait SearchTermsComponent {
     def term         = column[String]("search_index_term")
     def tf           = column[Double]("search_index_tf")
     def idf          = column[Double]("search_index_idf")
-    def tfidf        = column[Double]("search_index_tf_idf")
+    def tfidf        = column[Double]("search_index_tfidf")
     def articleId    = column[Article.ID]("article_id")
     def keywordId    = column[Keyword.ID]("keyword_id")
 
@@ -33,7 +33,7 @@ trait SearchTermsComponent {
     def * = (term, tf, idf, tfidf, articleId, keywordId) <> (SearchTerm.tupled, SearchTerm.unapply)
   }
 
-  val terms = TableQuery[SearchTerms]
+  lazy val terms = TableQuery[SearchTerms]
 
 }
 

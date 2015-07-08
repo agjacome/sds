@@ -17,33 +17,36 @@ trait SearcherAdapter {
 
   def search(query: String): Future[Set[Keyword.ID]]
 
-  protected final def searchNormalized(terms: Set[String]): Future[Set[Keyword.ID]] =
+  protected final def searchNormalized(terms: Set[String]): Future[Set[Keyword.ID]] = {
     Future.sequence(terms map {
       term => searchTermsDAO.getKeywordIds(s"%$term%")
     }).map(_.flatten)
+  }
 
 }
 
 final class Searcher {
 
-  private lazy val searchers = createSearchers(Play.current.configuration.getStringList("searchers"))
+  private lazy val searchers = Play.current.configuration.getStringList("searchers")
+    .fold(Set.empty[SearcherAdapter])(createSearchers)
 
   lazy val searchTermsDAO = new SearchTermsDAO
 
   // FIXME: pageSize is not actually respected, because the groupBy of results
-  def search(query: String, page: Int = 0, pageSize: Int = 50): Future[Page[(Article, Set[Keyword])]] =
+  def search(query: String, page: Int = 0, pageSize: Int = 50): Future[Page[(Article, Set[Keyword])]] = {
     searchKeywords(query).flatMap(ks => searchTermsDAO.searchKeywords(page, pageSize, ks)) map {
       page =>
         val grouped = page.items.groupBy(_._1).mapValues(_.map(_._2).toSet).toSeq
         page.copy(items = grouped)
     }
+  }
 
   private def searchKeywords(query: String): Future[Set[Keyword.ID]] =
     Future.sequence(searchers.map(_.search(query))).map(_.flatten)
 
-  private def createSearchers(searchers: Option[java.util.List[String]]): Set[SearcherAdapter] =
-    searchers.map(_.asScala).fold(Set.empty[String])(_.toSet) map {
+  private def createSearchers(searchers: java.util.List[String]): Set[SearcherAdapter] =
+    (searchers.asScala map {
       clazz => Class.forName(clazz).newInstance.asInstanceOf[SearcherAdapter]
-    }
+    }).toSet
 
 }

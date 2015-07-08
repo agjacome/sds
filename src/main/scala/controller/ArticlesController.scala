@@ -45,8 +45,15 @@ object ArticlesController extends Controller with Authorization {
     }
 
   private def withAnnotatedArticle(id: Article.ID)(f: AnnotatedArticle => Result): Future[Result] =
-    annotationsDAO.getAnnotatedArticle(id) map {
+    annotationsDAO.getAnnotatedArticle(id) flatMap {
+      case a @ Some(_) => Future.successful(a)
+      case None        => articlesDAO.get(id) map { _.map(_.toAnnotatedArticle) }
+    } map {
       _.map(f).getOrElse(NotFound(Json.obj("err" -> "Article not found")))
     }
+
+  private implicit class ArticleOps(val a: Article) extends AnyVal {
+    def toAnnotatedArticle: AnnotatedArticle = AnnotatedArticle(a, Set.empty, Set.empty)
+  }
 
 }

@@ -34,7 +34,7 @@ object SDSSettings extends GlobalSettings {
   // when this onStart method is called, but not before.
   override def onStart(app: Application): Unit = {
     annotator
-    indexer
+    indexerSchedule
     ()
   }
 

@@ -31,7 +31,7 @@ trait AnnotationsComponent {
     def * = (id.?, articleId, keywordId, text, start, end) <> (Annotation.tupled, Annotation.unapply)
   }
 
-  val annotations = TableQuery[Annotations]
+  lazy val annotations = TableQuery[Annotations]
 
 }
 

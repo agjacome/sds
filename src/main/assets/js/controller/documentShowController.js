@@ -1,27 +1,25 @@
 define(['./main'], function(controller) {
     'use strict';
 
-    var success = function(data, scope, sce) {
-        scope.document    = data.document;
+    var success = function(data, scope) {
+        scope.document    = data.article;
         scope.keywords    = data.keywords;
         scope.annotations = data.annotations;
 
-        minimizeCompounds(scope.keywords);
+        // minimizeCompounds(scope.keywords);
         annotateDocumentText(scope.document, scope.keywords, scope.annotations);
-
-        scope.document.content = sce.trustAsHtml(scope.document.content);
     };
 
-    var minimizeCompounds = function(keywords) {
-        _.each(keywords, function(keyword) {
-            if (keyword.category === 'Compound')
-                keyword.normalized = keyword.normalized.split('/')[1];
-        });
-    };
+    // var minimizeCompounds = function(keywords) {
+        // _.each(keywords, function(keyword) {
+            // if (keyword.category === 'Compound')
+                // keyword.normalized = keyword.normalized.split('/')[1];
+        // });
+    // };
 
     var annotateDocumentText = function(doc, keywords, annotations) {
         _.each(filterDuplicateStartPositions(annotations), function(annotation) {
-            var keyword = findById(keywords, annotation.keywordId);
+            var keyword = findById(keywords, annotation.keyword);
             doc.content = addAnnotation(doc.content, annotation, keyword);
         });
     };
@@ -77,8 +75,10 @@ define(['./main'], function(controller) {
             DocumentService.get({ id : $routeParams.id }).$promise.then(
                 function(data) {
                     $rootScope.error     = false;
-                    $rootScope.pageTitle = data.document.title + $rootScope.pageTitle;
+                    $rootScope.pageTitle = data.article.title + $rootScope.pageTitle;
                     success(data, $scope, $sce);
+
+                    $scope.htmlContent = $sce.trustAsHtml($scope.document.content);
                 },
                 function(response) {
                     $rootScope.error        = true;

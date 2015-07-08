@@ -29,16 +29,13 @@ define(['./main'], function(controller) {
         service.search(
             scope.search.terms,
             scope.search.limit,
-            scope.pageNumber,
+            Math.max(0, scope.pageNumber - 1),
             COUNT_PER_PAGE
         ).then(
             function(response) {
                 scope.loading   = false;
                 rootScope.error = false;
-                scope.searchResults = {
-                    list       : response.data.list,
-                    totalCount : response.data.totalCount,
-                };
+                scope.searchResults = response.data;
             },
             function(response) {
                 scope.loading          = false;

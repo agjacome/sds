@@ -11,6 +11,9 @@ import play.api.Play.current
 
 import uk.ac.man.entitytagger.Mention
 
+import entity._
+
+
 final class LinnaeusService {
 
   import LinnaeusService._
@@ -45,8 +48,7 @@ object LinnaeusService {
     new Postprocessor(Array(resourceStream("/linnaeus/stoplist.tsv")), Array(resourceStream("/linnaeus/synonyms.tsv")), Array(resourceStream("/linnaeus/freq-species.tsv")), null, null)
   )
 
-  implicit class MentionOps(mention: Mention) {
-    import entity._
+  implicit class MentionOps(val mention: Mention) extends AnyVal {
     def toAnnotation(articleId: Article.ID, keywordId: Keyword.ID): Annotation =
       Annotation(None, articleId, keywordId, mention.getText, mention.getStart.toLong, mention.getEnd.toLong)
   }
