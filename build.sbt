@@ -58,7 +58,7 @@ libraryDependencies ++= Seq(
   // "org.mockito"       %  "mockito-core" % "1.10.19" % "test"
 )
 
-import PlayKeys._
+import PlayKeys.playPackageAssets
 import TwirlKeys.{ compileTemplates, templateImports }
 
 enablePlugins(PlayScala)
@@ -77,6 +77,9 @@ pipelineStages := Seq(rjs, digest, gzip)
 
 sourceDirectory in (Compile, compileTemplates) := (sourceDirectory in Compile).value / "twirl"
 templateImports += "es.uvigo.ei.sing.sds.controller._"
+
+mainClass     in assembly := Some("play.core.server.NettyServer")
+fullClasspath in assembly += Attributed.blank(playPackageAssets.value)
 
 initialCommands in console := "import es.uvigo.ei.sing.sds._"
 
