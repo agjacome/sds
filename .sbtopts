@@ -1,7 +1,6 @@
 -Xms128M
 -Xmx2400M
 -Xss20M
--XX:MaxPermSize=2400m
 -XX:+UseConcMarkSweepGC
 -XX:+CMSClassUnloadingEnabled
 -Dsbt.jse.engineType=Node
