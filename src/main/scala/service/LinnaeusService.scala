@@ -4,6 +4,7 @@ package service
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
+import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import play.api.cache.Cache
@@ -12,7 +13,6 @@ import play.api.Play.current
 import uk.ac.man.entitytagger.Mention
 
 import entity._
-
 
 final class LinnaeusService {
 
@@ -39,16 +39,24 @@ final class LinnaeusService {
 
 object LinnaeusService {
 
+  import java.nio.file.Files
   import uk.ac.man.entitytagger.matching.{ Matcher, Postprocessor }
   import uk.ac.man.entitytagger.matching.matchers.{ MatchPostProcessor, VariantDictionaryMatcher }
 
+  lazy val dictionary  = Files.newInputStream(dataDir.resolve("linnaeus").resolve("dict-species.tsv"))
+  lazy val frequencies = Files.newInputStream(dataDir.resolve("linnaeus").resolve("freq-species.tsv"))
+  lazy val stopList    = Files.newInputStream(dataDir.resolve("linnaeus").resolve("stoplist.tsv"))
+  lazy val synonyms    = Files.newInputStream(dataDir.resolve("linnaeus").resolve("synonyms.tsv"))
+
   lazy val linnaeus: Matcher = new MatchPostProcessor(
-    VariantDictionaryMatcher.load(resourceStream("/linnaeus/dict-species.tsv"), true),
-    Matcher.Disambiguation.ON_WHOLE, true, null,
-    new Postprocessor(Array(resourceStream("/linnaeus/stoplist.tsv")), Array(resourceStream("/linnaeus/synonyms.tsv")), Array(resourceStream("/linnaeus/freq-species.tsv")), null, null)
+    VariantDictionaryMatcher.load(dictionary, true),
+    Matcher.Disambiguation.ON_WHOLE,
+    true,
+    null,
+    new Postprocessor(Array(stopList), Array(synonyms), Array(frequencies), null, null)
   )
 
-  implicit class MentionOps(val mention: Mention) extends AnyVal {
+  implicit class MentionOps(mention: Mention) {
     def toAnnotation(articleId: Article.ID, keywordId: Keyword.ID): Annotation =
       Annotation(None, articleId, keywordId, mention.getText, mention.getStart.toLong, mention.getEnd.toLong)
   }
