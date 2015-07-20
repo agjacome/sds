@@ -43,10 +43,10 @@ object LinnaeusService {
   import uk.ac.man.entitytagger.matching.{ Matcher, Postprocessor }
   import uk.ac.man.entitytagger.matching.matchers.{ MatchPostProcessor, VariantDictionaryMatcher }
 
-  lazy val dictionary  = Files.newInputStream(dataDir.resolve("linnaeus").resolve("dict-species.tsv"))
-  lazy val frequencies = Files.newInputStream(dataDir.resolve("linnaeus").resolve("freq-species.tsv"))
-  lazy val stopList    = Files.newInputStream(dataDir.resolve("linnaeus").resolve("stoplist.tsv"))
-  lazy val synonyms    = Files.newInputStream(dataDir.resolve("linnaeus").resolve("synonyms.tsv"))
+  private def dictionary  = Files.newInputStream(dataDir.resolve("linnaeus").resolve("dict-species.tsv"))
+  private def frequencies = Files.newInputStream(dataDir.resolve("linnaeus").resolve("freq-species.tsv"))
+  private def stopList    = Files.newInputStream(dataDir.resolve("linnaeus").resolve("stoplist.tsv"))
+  private def synonyms    = Files.newInputStream(dataDir.resolve("linnaeus").resolve("synonyms.tsv"))
 
   lazy val linnaeus: Matcher = new MatchPostProcessor(
     VariantDictionaryMatcher.load(dictionary, true),
