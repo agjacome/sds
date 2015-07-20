@@ -1,14 +1,21 @@
+sudo: false
+
 language: scala
-scala:
-  - 2.11.7
-jdk:
-  - oraclejdk8
+scala: 2.11.7
+jdk: oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+
 before_script:
   - tar -C share/ --lzma -xvf share/linnaeus.tar.lzma
+
+after_script:
+  - find $HOME/.sbt -name "*.lock" -exec rm {} \;
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -exec rm {} \;
+
 notifications:
   email:
-    recipients:
-      - agjacome@esei.uvigo.es
-    on_success: change
-    on_failure: always
-    on_start: false
+    - agjacome@esei.uvigo.es
