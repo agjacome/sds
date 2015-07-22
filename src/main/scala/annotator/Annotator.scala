@@ -35,7 +35,7 @@ final class Annotator extends Actor {
   }
 
   def annotate(id: Article.ID, senderName: String): Unit = {
-    Logger.info(s"[$senderName] Annotating article $id")
+    Logger.info(s"Annotating article $id")
     articlesDAO.get(id) onComplete {
       case Success(article) => checkAndAnnotate(article, id, senderName)
       case Failure(error)   => failed(id, error, senderName)

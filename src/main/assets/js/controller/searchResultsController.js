@@ -10,6 +10,7 @@ define(['./main'], function(controller) {
         'RNA'      : '#95A5A6',
         'CellLine' : '#96281B',
         'CellType' : '#34495E',
+        'Disease'  : '#111111',
     };
 
     var COUNT_PER_PAGE       = 10;
