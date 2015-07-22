@@ -84,7 +84,6 @@ define(['./main'], function(controller) {
                     $rootScope.pageTitle = data.article.title + $rootScope.pageTitle;
                     success(data, $scope, $sce);
 
-                    console.log($scope.document.content);
                     $scope.htmlContent = $sce.trustAsHtml($scope.document.content);
                 },
                 function(response) {
