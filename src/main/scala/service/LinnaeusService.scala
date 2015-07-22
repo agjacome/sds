@@ -5,10 +5,8 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 import play.api.Play.current
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
 import play.api.cache.Cache
-import play.api.Play.current
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import uk.ac.man.entitytagger.Mention
 
