@@ -22,7 +22,7 @@ object Category {
   type ID = Long
 
   lazy val categories: Set[Category] =
-    Set(Compound, Drug, Gene, Protein, Species, DNA, RNA, CellLine, CellType)
+    Set(Compound, Drug, Gene, Protein, Species, DNA, RNA, CellLine, CellType, Disease)
 
   lazy val fromId: Map[Long, Category] =
     categories.map(v => (v.id -> v)).toMap
