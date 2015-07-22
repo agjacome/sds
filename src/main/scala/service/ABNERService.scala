@@ -41,13 +41,9 @@ final class ABNERService {
       }
     }
 
-  def normalize(entity: ABNEREntity): Future[String] =
-    Future.successful(entity.txt.toLowerCase)
-
   private def toCategory(str: String): Category =
     Category(str.filter(_.isLetterOrDigit)).getOrError(s"Invalid ABNER Category '$str'")
 
-  // TODO: delete explicit recursivity, can be done with a foldLeft
   private def toEntities(entities: Seq[(String, Category)], text: String): Set[ABNEREntity] = {
     @tailrec def iter(xs: Seq[(String, Category)], pos: Int, acc: Set[ABNEREntity]): Set[ABNEREntity] =
       if (xs.isEmpty) acc else {

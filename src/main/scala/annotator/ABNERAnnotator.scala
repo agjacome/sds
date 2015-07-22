@@ -20,7 +20,7 @@ final class ABNERAnnotator extends AnnotatorAdapter {
 
   private def saveEntity(entity: ABNEREntity, articleId: Article.ID): Future[(Keyword, Annotation)] =
     for {
-      normalized <- abner.normalize(entity)
+      normalized <- Future.successful(entity.txt.toLowerCase)
       keyword    <- getOrStoreKeyword(normalized, entity.cat)
       annotation <- annotationsDAO.insert(entity.toAnnotation(articleId, keyword.id.get))
     } yield (keyword, annotation)
