@@ -82,7 +82,7 @@ define(['./main'], function(controller) {
                 var currentId = AuthorizationService.accountId();
 
                 var modal = $modal.open({
-                    templateUrl : 'assets/template/confirmationDialog.html',
+                    templateUrl : 'assets/html/confirmationDialog.html',
                     controller  : modalController,
                 });
 

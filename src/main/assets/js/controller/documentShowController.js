@@ -25,7 +25,13 @@ define(['./main'], function(controller) {
     };
 
     var filterDuplicateStartPositions = function(annotations) {
-        var cmp = function(x, y) { return y.start - x.start};
+        var cmp = function(x, y) {
+            if (x.start === y.start && x.end === y.end  ) return 1;
+            if (x.end    <  y.start || y.end  <  x.start) return y.start - x.start;
+            if (x.start  <  y.start || x.end  >  y.end  ) return -1;
+            if (y.start  <  x.start || y.end  >  x.end  ) return 1;
+            return y.text.length - x.text.length;
+        };
 
         var noDuplicated   = [ ];
         var startPositions = [ ];
@@ -78,6 +84,7 @@ define(['./main'], function(controller) {
                     $rootScope.pageTitle = data.article.title + $rootScope.pageTitle;
                     success(data, $scope, $sce);
 
+                    console.log($scope.document.content);
                     $scope.htmlContent = $sce.trustAsHtml($scope.document.content);
                 },
                 function(response) {

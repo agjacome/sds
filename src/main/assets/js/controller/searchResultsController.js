@@ -59,6 +59,9 @@ define(['./main'], function(controller) {
             if (!_.contains(nodeIds, node.id)) {
                 graph.nodes.push(node)
                 nodeIds.push(node.id);
+            } else {
+                var found = _.find(graph.nodes, function(n) { return n.id === node.id });
+                found.size += 2;
             }
         });
 
@@ -70,15 +73,21 @@ define(['./main'], function(controller) {
                         id            : '' + k1.id + '-' + k2.id,
                         source        : '' + k1.id,
                         target        : '' + k2.id,
-                        size          : 1,
+                        size          : 10,
                         color         : '#444444',
                         originalColor : '#444444',
                     };
 
+                    var inverseId = '' + k2.id + '-' + k1.id;
                     if (!_.contains(edgeIds, edge.id)) {
                         graph.edges.push(edge);
                         edgeIds.push(edge.id);
-                        edgeIds.push('' + k2.id + '-' + k1.id);
+                        edgeIds.push(inverseId);
+                    } else {
+                        var found = _.find(graph.edges, function(e) {
+                            return e.id === edge.id || e.id === inverseId;
+                        });
+                        found.size += 10;
                     }
                 });
             });
@@ -138,10 +147,10 @@ define(['./main'], function(controller) {
                 rootScope.error = false;
 
                 scope.results = response.data;
-                minimizeCompounds(response.data.list);
+                minimizeCompounds(response.data.items);
 
                 scope.sigmaGraph = new sigma({
-                    graph: getGraph(response.data.list),
+                    graph: getGraph(response.data.items),
                     container: 'graph-container',
                 });
 

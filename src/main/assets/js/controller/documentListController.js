@@ -87,7 +87,7 @@ define(['./main'], function(controller) {
 
             $scope.deleteDocument = function(document) {
                 var modal = $modal.open({
-                    templateUrl : 'assets/template/confirmationDialog.html',
+                    templateUrl : 'assets/html/confirmationDialog.html',
                     controller  : modalController,
                 });
 

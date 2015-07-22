@@ -5,6 +5,7 @@
 .document-panel .panel-body p {
     line-height : 1.8em;
     text-align  : justify;
+    white-space : pre-wrap;
 }
 
 .document-panel .annotation {
