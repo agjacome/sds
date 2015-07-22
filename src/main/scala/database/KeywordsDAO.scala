@@ -48,7 +48,7 @@ final class KeywordsDAO extends KeywordsComponent with HasDatabaseConfig[JdbcPro
     db.run(keywords.filter(_.id === id).result.headOption)
 
   def getByNormalized(normalized: String): Future[Option[Keyword]] =
-    db.run(keywords.filter(_.normalized.toLowerCase === normalized.toLowerCase).result.headOption)
+    db.run(keywords.filter(_.normalized.toLowerCase === normalized.toLowerCase).result.headOption.transactionally)
 
   def list(page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderByID, normalizedFilter: String = "%"): Future[Page[Keyword]] = {
     val offset = pageSize * page
@@ -64,13 +64,18 @@ final class KeywordsDAO extends KeywordsComponent with HasDatabaseConfig[JdbcPro
   }
 
   def insert(keyword: Keyword): Future[Keyword] =
-    db.run((keywords returning keywords.map(_.id) into ((keyword, id) => keyword.copy(id = Some(id)))) += keyword)
+    db.run {
+      ((keywords returning keywords.map(_.id) into ((keyword, id) => keyword.copy(id = Some(id)))) += keyword).transactionally
+    }
+
 
   def insert(keywords: Keyword*): Future[Seq[Keyword]] =
-    db.run((this.keywords returning this.keywords.map(_.id) into ((keyword, id) => keyword.copy(id = Some(id)))) ++= keywords)
+    db.run {
+      ((this.keywords returning this.keywords.map(_.id) into ((keyword, id) => keyword.copy(id = Some(id)))) ++= keywords).transactionally
+    }
 
   def delete(id: Keyword.ID): Future[Unit] =
-    db.run(keywords.filter(_.id === id).delete).map(_ => ())
+    db.run(keywords.filter(_.id === id).delete.transactionally).map(_ => ())
 
   def delete(keyword: Keyword): Future[Unit] =
     keyword.id.fold(Future.failed[Unit] {

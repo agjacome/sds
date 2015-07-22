@@ -56,7 +56,7 @@ final class ArticlesDAO extends ArticlesComponent with HasDatabaseConfig[JdbcPro
     db.run(articles.filter(_.id === id).result.headOption)
 
   def getByPubmedId(pubmedId: Long): Future[Option[Article]] =
-    db.run(articles.filter(_.pubmedId === pubmedId).result.headOption)
+    db.run(articles.filter(_.pubmedId === pubmedId).result.headOption.transactionally)
 
   def list(page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderByID, filter: Filter = Filter()): Future[Page[Article]] = {
     val offset = pageSize * page
@@ -77,17 +77,17 @@ final class ArticlesDAO extends ArticlesComponent with HasDatabaseConfig[JdbcPro
 
   def insert(article: Article): Future[Article] =
     db.run {
-      (articles returning articles.map(_.id) into ((article, id) => article.copy(id = Some(id)))) += article
+      ((articles returning articles.map(_.id) into ((article, id) => article.copy(id = Some(id)))) += article).transactionally
     }
 
   def insert(articles: Article*): Future[Seq[Article]] =
     db.run {
-      (this.articles returning this.articles.map(_.id) into ((article, id) => article.copy(id = Some(id)))) ++= articles
+      ((this.articles returning this.articles.map(_.id) into ((article, id) => article.copy(id = Some(id)))) ++= articles).transactionally
     }
 
   def update(id: Article.ID, article: Article): Future[Unit] = {
     val updated: Article = article.copy(id = Some(id))
-    db.run(articles.filter(_.id === id).update(updated)).map(_ => ())
+    db.run(articles.filter(_.id === id).update(updated).transactionally).map(_ => ())
   }
 
   def update(article: Article, newIsAnnotated: Boolean, newIsProcessing: Boolean): Future[Unit] =
@@ -96,7 +96,7 @@ final class ArticlesDAO extends ArticlesComponent with HasDatabaseConfig[JdbcPro
     })(id => update(id, article.copy(isAnnotated = newIsAnnotated, isProcessing = newIsProcessing)))
 
   def delete(id: Article.ID): Future[Unit] =
-    db.run(articles.filter(_.id === id).delete).map(_ => ())
+    db.run(articles.filter(_.id === id).delete.transactionally).map(_ => ())
 
   def delete(article: Article): Future[Unit] =
     article.id.fold(Future.failed[Unit] {
