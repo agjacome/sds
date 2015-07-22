@@ -15,6 +15,7 @@ case object DNA      extends Category(6L)
 case object RNA      extends Category(7L)
 case object CellLine extends Category(8L)
 case object CellType extends Category(9L)
+case object Disease  extends Category(10L)
 
 object Category {
 
