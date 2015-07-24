@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export SDS_PORT=9000
-export SDS_PATH="/sds/"
+export SDS_PATH="/sds"
 
 export SDS_DATA_DIR="$(pwd)/share"
 
