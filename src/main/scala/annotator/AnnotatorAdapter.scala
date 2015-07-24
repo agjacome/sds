@@ -39,10 +39,6 @@ trait AnnotatorAdapter extends Actor {
     })(Future.successful))
 
   protected final def getOrStoreKeyword(normalized: String, category: Category): Future[Keyword] =
-    keywordsDAO.getByNormalized(normalized) map {
-      _.filter(_.category == category)
-    } flatMap {
-      _.fold(keywordsDAO.insert(Keyword(None, normalized, category)))(Future.successful)
-    }
+    keywordsDAO.getByNormalizedOrInsert(normalized, Keyword(None, normalized, category))
 
 }

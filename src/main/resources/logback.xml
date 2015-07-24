@@ -1,6 +1,6 @@
 <configuration scan="false">
 
-    <property name="LOG_FILE" value="log/application" />
+    <property name="LOG_FILE" value="logs/application" />
 
     <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.err</target>

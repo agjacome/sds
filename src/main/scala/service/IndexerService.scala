@@ -47,8 +47,17 @@ final class IndexerService extends Actor {
   }
 
   def updateIndex(): Unit = {
-    clearIndex()
-    populateIndex()
+    Logger.info("Updating search index")
+    val future: Future[Int] = for {
+      terms <- searchTerms
+      _     <- indexDAO.clear
+      nts   <- indexDAO.insert(terms: _*).map(_.size)
+    } yield nts
+
+    future onComplete {
+      case Success(nts) => Logger.info(s"Finished updating search index with $nts entries")
+      case Failure(e)   => Logger.error(s"Error populating search index", e); sys.exit(1)
+    }
   }
 
   private def insertSearchTerms(): Future[Seq[SearchTerm]] =

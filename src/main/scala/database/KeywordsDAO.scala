@@ -24,6 +24,8 @@ trait KeywordsComponent { self: HasDatabaseConfig[JdbcProfile] =>
     def normalized  = column[String]("keyword_normalized")
     def category    = column[Category]("keyword_category")
 
+    def unique_normalized_category = index("idx_keywords_unique_normalized_category", (normalized, category), unique = true)
+
     def * = (id.?, normalized, category) <> (Keyword.tupled, Keyword.unapply)
   }
 
@@ -63,11 +65,19 @@ final class KeywordsDAO extends KeywordsComponent with HasDatabaseConfig[JdbcPro
     } yield Page(result, page, offset, total)
   }
 
+  def getByNormalizedOrInsert(normalized: String, keyword: => Keyword): Future[Keyword] = {
+    val query = keywords.filter(_.normalized.toLowerCase === normalized.toLowerCase).result.headOption flatMap {
+      case Some(k) => DBIO.successful(k)
+      case None    => ((keywords returning keywords.map(_.id) into ((keyword, id) => keyword.copy(id = Some(id)))) += keyword)
+    }
+
+    db.run(query.transactionally)
+  }
+
   def insert(keyword: Keyword): Future[Keyword] =
     db.run {
       ((keywords returning keywords.map(_.id) into ((keyword, id) => keyword.copy(id = Some(id)))) += keyword).transactionally
     }
-
 
   def insert(keywords: Keyword*): Future[Seq[Keyword]] =
     db.run {
