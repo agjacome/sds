@@ -10,12 +10,12 @@ define(['./main'], function(controller) {
         annotateDocumentText(scope.document, scope.keywords, scope.annotations);
     };
 
-    // var minimizeCompounds = function(keywords) {
-        // _.each(keywords, function(keyword) {
-            // if (keyword.category === 'Compound')
-                // keyword.normalized = keyword.normalized.split('/')[1];
-        // });
-    // };
+    var minimizeCompounds = function(keywords) {
+        _.each(keywords, function(keyword) {
+            if (keyword.category === 'Compound')
+                keyword.normalized = keyword.normalized.split('/')[1];
+        });
+    };
 
     var annotateDocumentText = function(doc, keywords, annotations) {
         _.each(filterDuplicateStartPositions(annotations), function(annotation) {

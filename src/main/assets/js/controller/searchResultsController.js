@@ -11,6 +11,7 @@ define(['./main'], function(controller) {
         'CellLine' : '#96281B',
         'CellType' : '#34495E',
         'Disease'  : '#111111',
+        'Drug'     : '#DDDDDD',
     };
 
     var COUNT_PER_PAGE       = 10;

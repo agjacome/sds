@@ -49,19 +49,6 @@ final class DiseasesService {
       json <- Future.successful(Json.parse(res))
     } yield (json \ "name").get.asOpt[String]
 
-  private def findAll(term: String, text: String): List[(Int, Int)] = {
-    @tailrec def iter(pos: Int, acc: List[(Int, Int)]): List[(Int, Int)] =
-      if (pos >= text.length - 1) acc
-      else Option(text.indexOf(term, pos)).filter(_ > 0) match {
-        case Some(start) =>
-          val end = start + term.length
-          iter(pos + end, (start, end) :: acc)
-        case None => acc
-      }
-
-    iter(0, List.empty)
-  }
-
 }
 
 object DiseasesService {
