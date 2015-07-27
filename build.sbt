@@ -1,6 +1,6 @@
 name         := "sds"
 organization := "es.uvigo.ei.sing"
-version      := "1.2.0"
+version      := "1.2.2"
 
 scalaVersion := "2.11.7"
 
