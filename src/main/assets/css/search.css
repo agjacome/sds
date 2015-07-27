@@ -33,7 +33,6 @@
 
 .keyword {
     border    : 1px solid #ccc;
-    color     : #fff;
     display   : inline-block;
     font-size : 1.1em;
     overflow  : hidden;
@@ -42,4 +41,30 @@
 
 .keyword:hover {
     cursor : pointer;
+}
+
+.category-filter ul {
+    margin-bottom: 0;
+}
+
+.category-filter .keyword {
+    border: 2px outset #ccc;
+}
+
+.category-filter .selected {
+    border: 2px inset #ccc;
+    background-color: #F5D76E;
+    color: #000;
+}
+
+.category-filter a,
+.category-filter a:hover,
+.category-filter a:active,
+.category-filter a:visited {
+    color: #fff;
+    text-decoration: none;
+}
+
+.category-filter a:hover {
+    cursor: pointer;
 }

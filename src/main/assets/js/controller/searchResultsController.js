@@ -10,8 +10,8 @@ define(['./main'], function(controller) {
         'RNA'      : '#95A5A6',
         'CellLine' : '#96281B',
         'CellType' : '#34495E',
-        'Disease'  : '#111111',
-        'Drug'     : '#DDDDDD',
+        'Disease'  : '#222222',
+        'Drug'     : '#D2527F',
     };
 
     var COUNT_PER_PAGE       = 10;
@@ -53,6 +53,7 @@ define(['./main'], function(controller) {
                 size          : 10,
                 label         : keyword.normalized,
                 originalLabel : keyword.normalized,
+                category      : keyword.category,
                 color         : COLORS[keyword.category],
                 originalColor : COLORS[keyword.category]
             };
@@ -98,8 +99,13 @@ define(['./main'], function(controller) {
         return graph;
     };
 
-    var bindClickToSigma = function(s) {
+    var bindClickToSigma = function(scope) {
+        var s = scope.sigmaGraph;
+
         s.bind('clickNode', function(e) {
+            scope.uncheckFilters();
+            scope.$apply();
+
             var nodeId = e.data.node.id,
             toKeep = s.graph.neighbors(nodeId);
             toKeep[nodeId] = e.data.node;
@@ -109,7 +115,7 @@ define(['./main'], function(controller) {
                     n.color = n.originalColor;
                     n.label = n.originalLabel;
                 } else {
-                    n.color = '#ccc';
+                    n.color = '#eee';
                     n.label = '';
                 }
             });
@@ -118,13 +124,16 @@ define(['./main'], function(controller) {
                 if (toKeep[e.source] && toKeep[e.target])
                     e.color = e.originalColor;
                 else
-                    e.color = '#ccc';
+                    e.color = '#eee';
             });
 
             s.refresh();
         });
 
         s.bind('clickStage', function(e) {
+            scope.uncheckFilters();
+            scope.$apply();
+
             s.graph.nodes().forEach(function(n) {
                 n.color = n.originalColor;
                 n.label = n.originalLabel;
@@ -155,7 +164,8 @@ define(['./main'], function(controller) {
                     container: 'graph-container',
                 });
 
-                bindClickToSigma(scope.sigmaGraph);
+                // bindClickToSigma(scope.sigmaGraph, scope.categories);
+                bindClickToSigma(scope);
 
                 scope.refreshGraph();
             },
@@ -178,6 +188,18 @@ define(['./main'], function(controller) {
             $scope.maxSize      = MAX_PAGINATION_LINKS;
             $scope.pageNumber   = 1;
             $scope.sigmaGraph   = new sigma();
+            $scope.categories   = [
+                { 'name': 'Compound', 'selected': false },
+                { 'name': 'Gene'    , 'selected': false },
+                { 'name': 'Protein' , 'selected': false },
+                { 'name': 'Species' , 'selected': false },
+                { 'name': 'DNA'     , 'selected': false },
+                { 'name': 'RNA'     , 'selected': false },
+                { 'name': 'CellLine', 'selected': false },
+                { 'name': 'CellType', 'selected': false },
+                { 'name': 'Disease' , 'selected': false },
+                { 'name': 'Drug'    , 'selected': false },
+            ];
 
             $rootScope.pageTitle = $scope.terms + $rootScope.pageTitle;
 
@@ -189,6 +211,45 @@ define(['./main'], function(controller) {
             $scope.goToDocument = function(d) {
                 $rootScope.terms = $routeParams.terms;
                 $location.path('/document/' + d.id).search('terms', null);
+            };
+
+            $scope.uncheckFilters = function() {
+                _.each($scope.categories, function (cat) {
+                    cat.selected = false;
+                });
+            };
+
+            $scope.filterByCategory = function(c) {
+                var cat = _.find($scope.categories, function (cat) {
+                    return cat.name == c.name;
+                });
+
+                _.each($scope.categories, function (cat) {
+                    if (cat !== c) cat.selected = false;
+                });
+                cat.selected = !cat.selected;
+
+                _.each($scope.sigmaGraph.graph.nodes(), function (node) {
+                    node.color = node.originalColor;
+                    node.label = node.originalLabel;
+
+                    if (cat.selected && node.category !== cat.name) {
+                        node.color = '#eee';
+                        node.label = '';
+                    }
+                });
+
+                _.each($scope.sigmaGraph.graph.edges(), function (edge) {
+                    edge.color = edge.originalColor;
+
+                    var source = $scope.sigmaGraph.graph.nodes(edge.source);
+                    var target = $scope.sigmaGraph.graph.nodes(edge.target);
+                    if (cat.selected && (source.category !== cat.name || target.category !== cat.name)) {
+                        edge.color = "#eee";
+                    }
+                });
+
+                $scope.sigmaGraph.refresh();
             };
 
             $scope.refreshGraph = function() {

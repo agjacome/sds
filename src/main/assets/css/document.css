@@ -9,8 +9,8 @@
 }
 
 .document-panel .annotation {
-    color   : #fff;
-    padding : 0 0.5em;
+    margin  : 0 0.25em;
+    padding : 0 0.25em;
 }
 
 .document-panel .annotation:hover {

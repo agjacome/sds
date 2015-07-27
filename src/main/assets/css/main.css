@@ -66,13 +66,13 @@ body {
     background-color : #ffb232;
 }
 
-.compound { background-color : #59ABE3; }
-.gene     { background-color : #BF55EC; }
-.protein  { background-color : #F39C12; }
-.species  { background-color : #2ECC71; }
-.dna      { background-color : #E74C3C; }
-.rna      { background-color : #95A5A6; }
-.cellline { background-color : #96281B; }
-.celltype { background-color : #34495E; }
-.disease  { background-color : #111111; color : #eeeeee; }
-.drug     { background-color : #DDDDDD; color : #000000; }
+.compound { background-color : #59ABE3; color : #ffffff; }
+.gene     { background-color : #BF55EC; color : #ffffff; }
+.protein  { background-color : #F39C12; color : #ffffff; }
+.species  { background-color : #2ECC71; color : #ffffff; }
+.dna      { background-color : #E74C3C; color : #ffffff; }
+.rna      { background-color : #95A5A6; color : #ffffff; }
+.cellline { background-color : #96281B; color : #ffffff; }
+.celltype { background-color : #34495E; color : #ffffff; }
+.disease  { background-color : #222222; color : #ffffff; }
+.drug     { background-color : #D2527F; color : #ffffff; }

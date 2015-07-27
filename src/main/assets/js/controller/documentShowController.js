@@ -6,7 +6,7 @@ define(['./main'], function(controller) {
         scope.keywords    = data.keywords;
         scope.annotations = data.annotations;
 
-        // minimizeCompounds(scope.keywords);
+        minimizeCompounds(scope.keywords);
         annotateDocumentText(scope.document, scope.keywords, scope.annotations);
     };
 
