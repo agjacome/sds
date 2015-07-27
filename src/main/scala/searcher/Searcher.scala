@@ -32,14 +32,8 @@ final class Searcher {
 
   lazy val searchTermsDAO = new SearchTermsDAO
 
-  // FIXME: pageSize is not actually respected, because the groupBy of results
-  def search(query: String, page: Int = 0, pageSize: Int = 50): Future[Page[(Article, Set[Keyword])]] = {
-    searchKeywords(query).flatMap(ks => searchTermsDAO.searchKeywords(page, pageSize, ks)) map {
-      page =>
-        val grouped = page.items.groupBy(_._1).mapValues(_.map(_._2).toSet).toSeq
-        page.copy(items = grouped)
-    }
-  }
+  def search(query: String, page: Int = 0, pageSize: Int = 50): Future[Page[(Article, Set[Keyword])]] =
+    searchKeywords(query).flatMap(ks => searchTermsDAO.searchKeywords(page, pageSize, ks))
 
   private def searchKeywords(query: String): Future[Set[Keyword.ID]] =
     Future.sequence(searchers.map(_.search(query))).map(_.flatten)

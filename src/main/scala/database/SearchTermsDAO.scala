@@ -78,27 +78,35 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
     } yield Page(result, page, offset, total)
   }
 
-  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID]): Future[Page[(Article, Keyword)]] = {
+  // TODO: uglyness at its finest, clean up
+  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID]): Future[Page[(Article, Set[Keyword])]] = {
     val offset = pageSize * page
-
-    val joined = for {
-      t <- terms
-      a <- articles if t.articleId === a.id
-      k <- keywords if t.keywordId === k.id
-      if t.keywordId inSet keywordIds
-    } yield (t, a, k)
-
-    val query = joined.sortBy(_._1.tfidf.desc).map(
-      tuple => (tuple._2, tuple._3)
-    ).drop(offset).take(pageSize)
 
     val total = terms.filter(
       _.keywordId inSet keywordIds
     ).groupBy(_.articleId).map(_._1).length
 
+    val articleIds = terms.filter( _.keywordId inSet keywordIds).groupBy(_.articleId).map({
+      case (aid, ts) => (aid, ts.map(_.tfidf).sum)
+    }).sortBy(_._2.desc).drop(offset).take(pageSize)
+
+    val articles = articleIds.map(_._1) flatMap {
+      aid => this.articles.filter(_.id === aid)
+    }
+
+    val found = for {
+      t <- terms
+      a <- articles if a.id === t.articleId
+      k <- keywords if k.id === t.keywordId // && k.id.inSet(keywordIds) // uncomment to show only query-related keywords and not all that each article has
+    } yield (a, k)
+
+    val query = found.result map {
+      _.groupBy(_._1).mapValues(_.map(_._2).toSet).toList
+    }
+
     for {
       total  <- db.run(total.result)
-      result <- db.run(query.result)
+      result <- db.run(query)
     } yield Page(result, page, offset, total)
   }
 
