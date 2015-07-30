@@ -272,18 +272,20 @@ define(['./main'], function(controller) {
             };
 
             $scope.refreshGraph = function() {
-                $scope.sigmaGraph = $scope.createSigmaGraph();
-
-                // nasty hack, sleep for 500ms before refreshing, needed
-                // because the graph is inside a bootstrap tab, and does not
-                // have proper sizes (required by sigma) until it is fully
-                // rendered
                 window.setTimeout(function() {
-                    $scope.sigmaGraph.refresh();
-                    window.dispatchEvent(new Event('resize'));
-                }, 500);
+                    $scope.sigmaGraph = $scope.createSigmaGraph();
+                    $scope.$apply();
+                    bindClickToSigma($scope);
 
-                bindClickToSigma($scope);
+                    // nasty hack, sleep for 500ms before refreshing, needed
+                    // because the graph is inside a bootstrap tab, and does not
+                    // have proper sizes (required by sigma) until it is fully
+                    // rendered
+                    window.setTimeout(function() {
+                        $scope.sigmaGraph.refresh();
+                        window.dispatchEvent(new Event('resize'));
+                    }, 500);
+                }, 0);
             };
 
             search(SearchService, $scope, $rootScope, false);
