@@ -131,18 +131,13 @@ define(['./main'], function(controller) {
         });
 
         s.bind('clickEdge', function(e) {
-            scope.filteredResults = false;
-            scope.$apply();
-
             var nodes = e.data.edge.id.split("-");
             scope.filteredResults = _.filter(scope.results.items, function(item) {
                 var keywordIds = _.map(item.keywords, function(k) { return "" + k.id });
                 return _.contains(keywordIds, nodes[0]) &&
                        _.contains(keywordIds, nodes[1]);
             });
-
             scope.$apply();
-            document.getElementById('filteredResults').scrollIntoView();
         });
 
         s.bind('clickStage', function(e) {

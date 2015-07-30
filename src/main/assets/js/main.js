@@ -17,7 +17,6 @@
             'underscore'        : ['../lib/underscorejs/underscore'],
             'ui-bootstrap'      : ['../lib/angular-ui-bootstrap/ui-bootstrap'],
             'ui-bootstrap-tpls' : ['../lib/angular-ui-bootstrap/ui-bootstrap-tpls'],
-            'sigma'             : ['sigma.min'],
         },
         shim: {
             'angular'           : { deps: ['jquery'], exports: 'angular' },
@@ -35,7 +34,7 @@
         'jquery',
         'underscore',
         'bootstrap',
-        'sigma',
+        './sigma.min',
         './app',
         './routes',
         './util'
