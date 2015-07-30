@@ -89,7 +89,7 @@ define(['./main'], function(controller) {
                         var found = _.find(graph.edges, function(e) {
                             return e.id === edge.id || e.id === inverseId;
                         });
-                        found.size += 10;
+                        found.size += 2;
                     }
                 });
             });
@@ -130,6 +130,21 @@ define(['./main'], function(controller) {
             s.refresh();
         });
 
+        s.bind('clickEdge', function(e) {
+            scope.filteredResults = false;
+            scope.$apply();
+
+            var nodes = e.data.edge.id.split("-");
+            scope.filteredResults = _.filter(scope.results.items, function(item) {
+                var keywordIds = _.map(item.keywords, function(k) { return "" + k.id });
+                return _.contains(keywordIds, nodes[0]) &&
+                       _.contains(keywordIds, nodes[1]);
+            });
+
+            scope.$apply();
+            document.getElementById('filteredResults').scrollIntoView();
+        });
+
         s.bind('clickStage', function(e) {
             scope.uncheckFilters();
             scope.$apply();
@@ -147,9 +162,15 @@ define(['./main'], function(controller) {
         });
     };
 
-    var search = function(service, scope, rootScope) {
-        scope.loading = true;
-        scope.sigmaGraph.kill();
+    var search = function(service, scope, rootScope, reloadGraph) {
+        scope.loading         = true;
+        scope.filteredResults = false;
+
+        scope.uncheckFilters();
+        if (scope.sigmaGraph) {
+            scope.sigmaGraph.kill();
+            scope.sigmaGraph = null;
+        }
 
         service.search(scope.terms, Math.max(0, scope.pageNumber - 1), COUNT_PER_PAGE).then(
             function(response) {
@@ -159,15 +180,20 @@ define(['./main'], function(controller) {
                 scope.results = response.data;
                 minimizeCompounds(response.data.items);
 
-                scope.sigmaGraph = new sigma({
-                    graph: getGraph(response.data.items),
-                    container: 'graph-container',
-                });
+                scope.createSigmaGraph = function() {
+                    return new sigma({
+                        graph    : getGraph(response.data.items),
+                        renderer : { container: 'graph-container', type: 'canvas' },
+                        settings : {
+                            enableEdgeHovering   : true,
+                            edgeHoverColor       : 'edge',
+                            edgeHoverSizeRatio   : 5,
+                            edgeHoverExtremities : true,
+                        },
+                    });
+                };
 
-                // bindClickToSigma(scope.sigmaGraph, scope.categories);
-                bindClickToSigma(scope);
-
-                scope.refreshGraph();
+                if (reloadGraph) scope.refreshGraph();
             },
             function(error) {
                 scope.loading          = false;
@@ -187,7 +213,6 @@ define(['./main'], function(controller) {
             $scope.countPerPage = COUNT_PER_PAGE;
             $scope.maxSize      = MAX_PAGINATION_LINKS;
             $scope.pageNumber   = 1;
-            $scope.sigmaGraph   = new sigma();
             $scope.categories   = [
                 { 'name': 'Compound', 'selected': false },
                 { 'name': 'Gene'    , 'selected': false },
@@ -204,8 +229,7 @@ define(['./main'], function(controller) {
             $rootScope.pageTitle = $scope.terms + $rootScope.pageTitle;
 
             $scope.pageChanged = function( ) {
-                search(SearchService, $scope, $rootScope);
-                $window.scrollTo(0, 0);
+                search(SearchService, $scope, $rootScope, $scope.sigmaGraph);
             };
 
             $scope.goToDocument = function(d) {
@@ -253,6 +277,8 @@ define(['./main'], function(controller) {
             };
 
             $scope.refreshGraph = function() {
+                $scope.sigmaGraph = $scope.createSigmaGraph();
+
                 // nasty hack, sleep for 500ms before refreshing, needed
                 // because the graph is inside a bootstrap tab, and does not
                 // have proper sizes (required by sigma) until it is fully
@@ -261,9 +287,11 @@ define(['./main'], function(controller) {
                     $scope.sigmaGraph.refresh();
                     window.dispatchEvent(new Event('resize'));
                 }, 500);
+
+                bindClickToSigma($scope);
             };
 
-            search(SearchService, $scope, $rootScope);
+            search(SearchService, $scope, $rootScope, false);
         }
     ];
 

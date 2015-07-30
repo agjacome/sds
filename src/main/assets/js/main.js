@@ -17,7 +17,7 @@
             'underscore'        : ['../lib/underscorejs/underscore'],
             'ui-bootstrap'      : ['../lib/angular-ui-bootstrap/ui-bootstrap'],
             'ui-bootstrap-tpls' : ['../lib/angular-ui-bootstrap/ui-bootstrap-tpls'],
-            'sigma'             : ['../lib/sigma.js/sigma.min'],
+            'sigma'             : ['sigma.min'],
         },
         shim: {
             'angular'           : { deps: ['jquery'], exports: 'angular' },

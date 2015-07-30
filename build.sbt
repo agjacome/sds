@@ -48,8 +48,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "underscorejs"         % "1.8.3"   ,
   "org.webjars" % "requirejs"            % "2.1.17"  ,
   "org.webjars" % "angular-ui-bootstrap" % "0.13.0"  ,
-  "org.webjars" % "font-awesome"         % "4.3.0-2" ,
-  "org.webjars" % "sigma.js"             % "1.0.3"
+  "org.webjars" % "font-awesome"         % "4.3.0-2"
 
   // testing // NO TESTS ATM
   // "org.scalatest"     %% "scalatest"    % "2.2.5"   % "test" ,
