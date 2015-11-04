@@ -6,8 +6,6 @@ import play.api.libs.functional.syntax._
 import play.api.data.Form
 import play.api.data.Forms._
 
-// TODO: associate List[Author.ID] to Article
-
 final case class Article (
   id:           Option[Article.ID],
   pubmedId:     Option[Article.PMID],

@@ -27,8 +27,9 @@ final class PubMedProvider {
       existing <- existingArticles
       pmids     = pmidsToDownload -- existing.flatMap(_.pubmedId)
       fetched  <- eUtils.fetchPubMedArticles(pmids)
-      inserted <- articlesDAO.insert(fetched.toSeq: _*)
-    } yield existing ++ inserted
+      articles <- articlesDAO.insert(fetched.map(_._1).toSeq: _*)
+      // TODO: insert authors
+    } yield existing ++ articles
   }
 
 }
