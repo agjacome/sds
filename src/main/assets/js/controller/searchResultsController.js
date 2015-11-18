@@ -132,7 +132,7 @@ define(['./main'], function(controller) {
 
         s.bind('clickEdge', function(e) {
             var nodes = e.data.edge.id.split("-");
-            scope.filteredResults = _.filter(scope.results.items, function(item) {
+            scope.filteredResults = _.filter(scope.results.originalItems, function(item) {
                 var keywordIds = _.map(item.keywords, function(k) { return "" + k.id });
                 return _.contains(keywordIds, nodes[0]) &&
                        _.contains(keywordIds, nodes[1]);
@@ -174,10 +174,11 @@ define(['./main'], function(controller) {
 
                 scope.results = response.data;
                 minimizeCompounds(response.data.items);
+                scope.results.originalItems = scope.results.items.slice();
 
                 scope.createSigmaGraph = function() {
                     return new sigma({
-                        graph    : getGraph(response.data.items),
+                        graph    : getGraph(response.data.originalItems),
                         renderer : { container: 'graph-container', type: 'canvas' },
                         settings : {
                             enableEdgeHovering   : true,
@@ -230,6 +231,26 @@ define(['./main'], function(controller) {
             $scope.goToDocument = function(d) {
                 $rootScope.terms = $routeParams.terms;
                 $location.path('/document/' + d.id).search('terms', null);
+            };
+
+            $scope.filterByCategoryList = function(c) {
+                var cat = _.find($scope.categories, function (cat) {
+                    return cat.name == c.name;
+                });
+
+                _.each($scope.categories, function (cat) {
+                    if (cat !== c) cat.selected = false;
+                });
+                cat.selected = !cat.selected;
+
+                if (!$scope.results) return;
+
+                $scope.results.items = _.filter($scope.results.originalItems, function (item) {
+                    if (!cat.selected) return true;
+
+                    var cats = _.map(item.keywords, function (k) { return k.category; });
+                    return _.contains(cats, cat.name);
+                });
             };
 
             $scope.uncheckFilters = function() {
