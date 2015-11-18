@@ -79,26 +79,34 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
   }
 
   // TODO: uglyness at its finest, clean up
-  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID]): Future[Page[(Article, Set[Keyword])]] = {
+  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID]): Future[Page[(Article, Double, Set[Keyword])]] = {
     val offset = pageSize * page
 
-    val total = terms.filter(
-      _.keywordId inSet keywordIds
-    ).groupBy(_.articleId).map(_._1).length
+    val total = terms
+      .filter  { _.keywordId inSet keywordIds }
+      .groupBy { _.articleId }
+      .map     { _._1 }
+      .length
 
-    val articleIds = terms.filter( _.keywordId inSet keywordIds).groupBy(_.articleId).map({
-      case (aid, ts) => (aid, ts.map(_.tfidf).sum)
-    }).sortBy(_._2.desc).drop(offset).take(pageSize)
+    val articleIds = terms
+      .filter  { _.keywordId inSet keywordIds }
+      .groupBy { _.articleId }
+      .map     { case (id, ts) => id -> ts.map(_.tfidf).sum }
+      .sortBy  { case (_, sum) => sum.desc }
+      .drop    { offset   }
+      .take    { pageSize }
 
-    val articles = articleIds.map(_._1) flatMap {
-      aid => this.articles.filter(_.id === aid)
+    val articles = articleIds flatMap { case (id, sum) =>
+      this.articles
+        .filter { _.id === id }
+        .map    { (_, sum)    }
     }
 
     val found = for {
-      t <- terms
-      a <- articles if a.id === t.articleId
-      k <- keywords if k.id === t.keywordId // && k.id.inSet(keywordIds) // uncomment to show only query-related keywords and not all that each article has
-    } yield (a, k)
+      term    <- terms
+      article <- articles if article._1.id === term.articleId
+      keyword <- keywords if keyword.id    === term.keywordId
+    } yield (article, keyword)
 
     val query = found.result map {
       _.groupBy(_._1).mapValues(_.map(_._2).toSet).toList
@@ -107,7 +115,11 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
     for {
       total  <- db.run(total.result)
       result <- db.run(query)
-    } yield Page(result, page, offset, total)
+    } yield Page(
+      result map { res => (res._1._1, res._1._2.get, res._2) } sortWith { _._2 > _._2 },
+      page, offset, total
+    )
+
   }
 
   def insert(term: SearchTerm): Future[SearchTerm] =

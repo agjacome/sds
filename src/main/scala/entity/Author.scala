@@ -15,7 +15,8 @@ final case class Author (
 
 object Author extends ((Option[Long], String, String, String) => Author) {
 
-  type ID   = Long
+  type ID = Long
+
   def apply(lastName: String, firstName: String, initials: String): Author =
     Author.apply(None, lastName, firstName, initials)
 
@@ -25,13 +26,5 @@ object Author extends ((Option[Long], String, String, String) => Author) {
     (__ \ 'firstName).write[String] and
     (__ \ 'initials).write[String]
   )(unlift(Author.unapply))
-
-  implicit val AuthorForm: Form[Author] = Form {
-    mapping(
-      "lastName" -> nonEmptyText,
-      "firstName" -> nonEmptyText,
-      "initials" -> nonEmptyText
-    )(Author.apply)(a => Some((a.lastName, a.firstName, a.initials)))
-  }
 
 }

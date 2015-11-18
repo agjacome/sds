@@ -13,8 +13,9 @@ object SearcherController extends Controller {
 
   lazy val searcher = new Searcher
 
-  implicit val SearchResultWrites: Writes[(Article, Set[Keyword])] = (
+  implicit val SearchResultWrites: Writes[(Article, Double, Set[Keyword])] = (
     (__ \ 'article).write[Article] and
+    (__ \ 'tfidf).write[Double] and
     (__ \ 'keywords).write[Set[Keyword]]
   )(s => s)
 

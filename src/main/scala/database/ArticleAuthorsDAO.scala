@@ -37,7 +37,7 @@ trait ArticleAuthorsComponent {
 
 }
 
-final class AricleAuthorsDAO extends AuthorsComponent with ArticlesComponent with ArticleAuthorsComponent with HasDatabaseConfig[JdbcProfile] {
+final class ArticleAuthorsDAO extends AuthorsComponent with ArticlesComponent with ArticleAuthorsComponent with HasDatabaseConfig[JdbcProfile] {
 
   import driver.api._
   import ArticleAuthorsDAO._

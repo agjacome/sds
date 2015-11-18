@@ -51,6 +51,13 @@ final class AuthorsDAO extends AuthorsComponent with HasDatabaseConfig[JdbcProfi
   def get(id: Author.ID): Future[Option[Author]] =
     db.run(authors.filter(_.id === id).result.headOption)
 
+  def getByName(lastName: String, firstName: String, initials: String): Future[Option[Author]] =
+    db.run(authors.filter(a ⇒
+      a.lastName.toLowerCase  === lastName.toLowerCase  &&
+      a.firstName.toLowerCase === firstName.toLowerCase &&
+      a.initials.toLowerCase  === initials.toLowerCase
+    ).result.headOption)
+
   def list(page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderByID, filter: Filter = Filter()): Future[Page[Author]] = {
     val offset = pageSize * page
 

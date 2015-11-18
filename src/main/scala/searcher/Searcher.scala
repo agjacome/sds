@@ -32,7 +32,7 @@ final class Searcher {
 
   lazy val searchTermsDAO = new SearchTermsDAO
 
-  def search(query: String, page: Int = 0, pageSize: Int = 50): Future[Page[(Article, Set[Keyword])]] =
+  def search(query: String, page: Int = 0, pageSize: Int = 50): Future[Page[(Article, Double, Set[Keyword])]] =
     searchKeywords(query).flatMap(ks => searchTermsDAO.searchKeywords(page, pageSize, ks))
 
   private def searchKeywords(query: String): Future[Set[Keyword.ID]] =
