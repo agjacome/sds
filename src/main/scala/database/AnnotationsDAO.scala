@@ -67,7 +67,7 @@ final class AnnotationsDAO extends AnnotationsComponent with ArticlesComponent w
 
     val articleAuthors = for {
       authoring <- this.articleAuthors
-      author    <- authors if authoring.articleId === id
+      author    <- authors if authoring.authorId === author.id && authoring.articleId === id
     } yield (author, authoring.position)
 
     val query       = joined.sortBy(_._1.id)
