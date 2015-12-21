@@ -24,5 +24,10 @@ object SearcherController extends Controller {
       result => Ok(Json.toJson(result))
     })
 
+  def advSearch(query: String, page: Option[Int], pageSize: Option[Int], categories: List[Category], fromYear: Long, toYear: Long): Action[AnyContent] =
+    Action.async(searcher.advSearch(query, page.getOrElse(0), pageSize.getOrElse(50), categories.toSet, fromYear, toYear) map {
+      result => Ok(Json.toJson(result))
+    })
+
 }
 

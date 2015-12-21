@@ -79,17 +79,18 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
   }
 
   // TODO: uglyness at its finest, clean up
-  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID]): Future[Page[(Article, Double, Set[Keyword])]] = {
+  def searchKeywords(page: Int = 0, pageSize: Int = 10, keywordIds: Set[Keyword.ID], fromYear: Long, toYear: Long): Future[Page[(Article, Double, Set[Keyword])]] = {
     val offset = pageSize * page
 
-    val total = terms
-      .filter  { _.keywordId inSet keywordIds }
-      .groupBy { _.articleId }
-      .map     { _._1 }
-      .length
+    val total = (for {
+      term    <- terms         if term.keywordId inSet keywordIds
+      article <- this.articles if article.id === term.articleId && article.year >= fromYear && article.year <= toYear
+    } yield term).groupBy(_.articleId).map(_._1).length
 
-    val articleIds = terms
-      .filter  { _.keywordId inSet keywordIds }
+    val articleIds = (for {
+      term    <- terms         if term.keywordId inSet keywordIds
+      article <- this.articles if article.id === term.articleId && article.year >= fromYear && article.year <= toYear
+    } yield term)
       .groupBy { _.articleId }
       .map     { case (id, ts) => id -> ts.map(_.tfidf).sum }
       .sortBy  { case (_, sum) => sum.desc }
@@ -104,7 +105,7 @@ final class SearchTermsDAO extends SearchTermsComponent with ArticlesComponent w
 
     val found = for {
       term    <- terms
-      article <- articles if article._1.id === term.articleId
+      article <- articles if article._1.id === term.articleId // && article._1.year >= fromYear && article._1.year <= toYear
       keyword <- keywords if keyword.id    === term.keywordId
     } yield (article, keyword)
 

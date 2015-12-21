@@ -42,13 +42,14 @@ libraryDependencies ++= Seq(
   "com.h2database"   % "h2"                   % "1.4.187" ,
 
   // css/javascript
-  "org.webjars" % "angularjs"            % "1.3.17"  exclude("org.webjars", "jquery") ,
-  "org.webjars" % "bootstrap"            % "3.1.1"   exclude("org.webjars", "jquery") ,
-  "org.webjars" % "jquery"               % "1.11.3"  ,
-  "org.webjars" % "underscorejs"         % "1.8.3"   ,
-  "org.webjars" % "requirejs"            % "2.1.20"  ,
-  "org.webjars" % "angular-ui-bootstrap" % "0.13.4"  ,
-  "org.webjars" % "font-awesome"         % "4.4.0"
+  "org.webjars" % "angularjs"            % "1.3.17" exclude("org.webjars", "jquery") ,
+  "org.webjars" % "bootstrap"            % "3.1.1"  exclude("org.webjars", "jquery") ,
+  "org.webjars" % "jquery"               % "1.11.3" ,
+  "org.webjars" % "underscorejs"         % "1.8.3"  ,
+  "org.webjars" % "requirejs"            % "2.1.20" ,
+  "org.webjars" % "angular-ui-bootstrap" % "0.13.4" ,
+  "org.webjars" % "font-awesome"         % "4.4.0"  ,
+  "org.webjars" % "ng-tags-input"        % "2.3.0"
 
   // testing // NO TESTS ATM
   // "org.scalatest"     %% "scalatest"    % "2.2.5"   % "test" ,

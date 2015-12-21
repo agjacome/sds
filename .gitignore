@@ -2,6 +2,8 @@
 *.cache
 
 doc
+scripts
+share/linnaeus
 
 log
 target
@@ -9,8 +11,6 @@ project/*
 !project/build.properties
 !project/Build.scala
 !project/plugins.sbt
-
-share/linnaeus
 
 .flagged
 .idea

@@ -71,8 +71,9 @@ final class EUtilsService {
       pmid  <- (article \\ "PMID").headOption.map(_.text.toLong)
       title <- (article \\ "ArticleTitle").headOption.map(_.text.dropRight(1))
       abstr <- (article \\ "AbstractText").headOption.map(_.text)
+      year  <- (article \\ "PubDate" \\ "Year").headOption.map(_.text.toLong)
       auths <- Option(parseAuthors(article))
-    } yield (Article(Some(pmid), title, title + "." + System.lineSeparator + abstr), auths)
+    } yield (Article(Some(pmid), title, title + "." + System.lineSeparator + abstr, year), auths)
 
   private def parseAuthors(article: XMLNode): List[Author] =
     ((article \\ "Author") map { auth ⇒

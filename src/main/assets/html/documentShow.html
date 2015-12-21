@@ -10,6 +10,9 @@
                     <h3 class="panel-title" data-ng-bind-html="htmlTitle" data-dynamic></h3>
                 </div>
                 <div class="panel-body">
+                    <div class="year" data-ng-model="document.year">
+                        <span class="section-title">Year: </span><span>{{ document.year }}</span>
+                    </div>
                     <div class="authors" data-ng-model="authors">
                         <span class="section-title">Authors: </span>
                         <span data-ng-repeat="a in authors">{{ a.firstName }} {{ a.lastName }}<span ng-hide="$last">, </span></span>
