@@ -37,23 +37,24 @@ final class PubMedProvider {
     Future.sequence(fetched.map { case (article, authors) =>
       for {
         art <- articlesDAO.insert(article)
-        aut <- insertOrRetrieveAuthors(authors)
-        _   <- associateArticleAuthors(art, aut)
+        aut <- insertOrRetrieveAuthors(authors.toSet)
+        _   <- associateArticleAuthors(art, aut, authors)
       } yield art
     })
 
-  private def insertOrRetrieveAuthors(as: List[Author]): Future[List[Author]] =
-    Future.sequence(as map { a =>
-      authorsDAO.getByName(a.lastName, a.firstName, a.initials) flatMap {
-        _.fold(authorsDAO.insert(a))(Future.successful)
-      }
-    })
+  private def insertOrRetrieveAuthors(as: Set[Author]): Future[Set[Author]] =
+    Future.sequence(as.map(authorsDAO.getByNameOrInsert))
 
-  private def associateArticleAuthors(art: Article, auts: List[Author]): Future[Unit] = {
+  private def associateArticleAuthors(art: Article, auts: Set[Author], order: List[Author]): Future[Unit] = {
     import authoringDAO.ArticleAuthor
 
-    val aas: List[ArticleAuthor] = auts.zipWithIndex map {
-      case (aut, idx) => (art.id.get, aut.id.get, idx + 1) // FIXME: unsafe .get
+    // FIXME: unsafe .get
+    val aas: List[ArticleAuthor] = order.zipWithIndex flatMap { case (a1, idx) =>
+      auts.find(a2 =>
+        a1.firstName.equalsIgnoreCase(a2.firstName) &&
+        a1.lastName.equalsIgnoreCase(a2.lastName)   &&
+        a1.initials.equalsIgnoreCase(a2.initials)
+      ).map(a => (art.id.get, a.id.get, idx + 1))
     }
 
     authoringDAO.insert(aas: _*)

@@ -58,6 +58,22 @@ final class AuthorsDAO extends AuthorsComponent with HasDatabaseConfig[JdbcProfi
       a.initials.toLowerCase  === initials.toLowerCase
     ).result.headOption)
 
+  def getByNameOrInsert(author: Author): Future[Author] = {
+    def insert: DBIOAction[Author, NoStream, Effect.Write] =
+      (authors returning authors.map(_.id) into ((author, id) => author.copy(id = Some(id)))) += author
+
+    val filter = authors.filter(a ⇒
+      a.lastName.toLowerCase  === author.lastName.toLowerCase  &&
+      a.firstName.toLowerCase === author.firstName.toLowerCase
+    )
+
+    val query = filter.result.headOption flatMap {
+      _.fold(insert)(DBIO.successful)
+    }
+
+    db.run(query)
+  }
+
   def list(page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderByID, filter: Filter = Filter()): Future[Page[Author]] = {
     val offset = pageSize * page
 

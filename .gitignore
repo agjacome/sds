@@ -6,6 +6,7 @@ scripts
 share/linnaeus
 
 log
+logs
 target
 project/*
 !project/build.properties
