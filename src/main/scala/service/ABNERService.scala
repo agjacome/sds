@@ -31,9 +31,7 @@ final class ABNERService {
   def getEntities(text: String): Future[Set[ABNEREntity]] = 
     Future {
       val entities = try abner getEntities text catch {
-        case NonFatal(e) =>
-          Logger.info("Hidden ABNER error:", e);
-          Array.empty
+        case NonFatal(e) => Array.empty
       }
 
       entities match {

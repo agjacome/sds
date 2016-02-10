@@ -37,27 +37,42 @@ final class PubMedProvider {
     Future.sequence(fetched.map { case (article, authors) =>
       for {
         art <- articlesDAO.insert(article)
-        aut <- insertOrRetrieveAuthors(authors.toSet)
-        _   <- associateArticleAuthors(art, aut, authors)
+        aut <- insertOrRetrieveAuthors(authors)
+        _   <- associateArticleAuthors(art, aut)
       } yield art
     })
 
-  private def insertOrRetrieveAuthors(as: Set[Author]): Future[Set[Author]] =
-    Future.sequence(as.map(authorsDAO.getByNameOrInsert))
+  private def insertOrRetrieveAuthors(as: List[Author]): Future[List[Author]] =
+    Future.successful { as.map(insertOrRetrieveAuthor) }
 
-  private def associateArticleAuthors(art: Article, auts: Set[Author], order: List[Author]): Future[Unit] = {
+  private def insertOrRetrieveAuthor(a: Author): Author = {
+    import scala.concurrent.Await
+    import scala.concurrent.duration.Duration
+
+    try {
+      Await.result(authorsDAO.getByNameOrInsert(a), Duration.Inf)
+    } catch {
+      case e: java.sql.SQLIntegrityConstraintViolationException =>
+        play.api.Logger.error(s"Error inserting $a, will retry. Cause: ${e.getMessage}")
+        Thread.sleep(300L)
+        insertOrRetrieveAuthor(a)
+    }
+  }
+
+  private def associateArticleAuthors(art: Article, auts: List[Author]): Future[Unit] = {
+    import scala.concurrent.Await
+    import scala.concurrent.duration.Duration
     import authoringDAO.ArticleAuthor
 
     // FIXME: unsafe .get
-    val aas: List[ArticleAuthor] = order.zipWithIndex flatMap { case (a1, idx) =>
-      auts.find(a2 =>
-        a1.firstName.equalsIgnoreCase(a2.firstName) &&
-        a1.lastName.equalsIgnoreCase(a2.lastName)   &&
-        a1.initials.equalsIgnoreCase(a2.initials)
-      ).map(a => (art.id.get, a.id.get, idx + 1))
+    val aas: List[ArticleAuthor] = auts.zipWithIndex map {
+      case (a, idx) => (art.id.get, a.id.get, idx + 1)
     }
 
-    authoringDAO.insert(aas: _*)
+    // FIXME: this Await stuff is ugly, just fix it already
+    Future.successful(aas map {
+      a => Await.result(authoringDAO.insert(a), Duration.Inf)
+    }).map(_ => ())
   }
 
 }
